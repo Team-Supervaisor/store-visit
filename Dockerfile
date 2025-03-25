@@ -1,24 +1,25 @@
-# Use official Node.js image as base
+# Use official Node.js image
 FROM node:18-alpine
 ENV NEXT_PUBLIC_BACKEND_URL=https://store-visit-85801868683.us-central1.run.app
 
-
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock)
-COPY package.json package-lock.json ./
-
 # Install dependencies
+COPY package.json package-lock.json ./
 RUN npm install --force
-# Copy the rest of the application code
+
+# Copy app source code
 COPY . .
 
-# Build the Next.js application
+# Build the React Vite app
 RUN npm run build
 
-# Expose the port the app runs on
+# Install a production HTTP server
+RUN npm install -g serve
+
+# Expose port
 EXPOSE 3000
 
-# Start the Next.js application in production mode
-CMD ["npm", "run", "start"]
+# Run the built app with serve
+CMD ["serve", "-s", "dist", "-l", "3000"]
