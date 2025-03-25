@@ -883,7 +883,7 @@ useEffect(() => {
   // Connect to Socket.IO when component mounts
   useEffect(() => {
     // socketRef.current = io();
-    socketRef.current = io(backendUrl);
+    socketRef.current = io("https://store-visit-85801868683.us-central1.run.app");
     socketRef.current.on("connect", () => {
       console.log("Connected to server with ID:", socketRef.current.id);
     });
@@ -993,7 +993,7 @@ useEffect(() => {
       socketRef.current.emit("clear-coordinates");
       socketRef.current.emit("clear-images");
     }
-    fetch(`${backendUrl}/api/all`, {
+    fetch("https://store-visit-85801868683.us-central1.run.app/api/all", {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -1036,7 +1036,7 @@ useEffect(() => {
 
     const timestamp = Date.now();
 
-    fetch(`${backendUrl}/api/coordinates`, {
+    fetch("https://store-visit-85801868683.us-central1.run.app/api/coordinates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1085,7 +1085,7 @@ useEffect(() => {
           const randomType = types[Math.floor(Math.random() * types.length)];
 
           // First post the image
-          fetch(`${backendUrl}/api/image`, {
+          fetch("https://store-visit-85801868683.us-central1.run.app/api/image", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",S
@@ -1102,7 +1102,7 @@ useEffect(() => {
               console.log("Image Response:", data);
               
               // Then post the banner data
-              fetch(`${backendUrl}/api/banner_data`, {
+              fetch("https://store-visit-85801868683.us-central1.run.app/api/banner_data", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
