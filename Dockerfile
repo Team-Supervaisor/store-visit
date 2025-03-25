@@ -1,5 +1,6 @@
 # Use official Node.js image as base
 FROM node:18-alpine
+ENV NEXT_PUBLIC_BACKEND_URL=https://store-visit-85801868683.us-central1.run.app
 
 
 # Set working directory inside the container
