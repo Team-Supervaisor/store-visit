@@ -229,6 +229,7 @@ axios.request(config)
 })
 .catch((error) => {
   console.log(error);
+  setAIDetails((prevdetails) => [...prevdetails,[{ error: "No banners detected" }]])
 });
 
   }
@@ -494,7 +495,7 @@ axios.request(config)
 
     setPerpendicularCoord((prev) => {
       // console.log("Previous State:", prev);
-      const updated = [perpendicularPoint, ...prev];
+      const updated = [...prev,perpendicularPoint ];
       // console.log("Updated State:", updated);
       return updated;
     });
@@ -909,9 +910,9 @@ useEffect(() => {
     // Receive image history
     socketRef.current.on("image-history", (history) => {
       console.log("Received image history:", history);
-      setImageHistory(history);
-      updateImagePointMap();
-      renderAllImages(history);
+      // setImageHistory(history);
+      // updateImagePointMap();
+      // renderAllImages(history);
     });
   
     // Receive new coordinate
@@ -927,15 +928,15 @@ useEffect(() => {
     // Receive new image
     socketRef.current.on("new-image", (data) => {
       console.log("New image received:", data);
-      setImageResponse(true);
-      setImageResponseUrl(data.url);
+      // setImageResponse(true);
+      // setImageResponseUrl(data.url);
       let aisummary=getAI(data.url);
       console.log("AI Summaryrrrrrrr:", aisummary);
       // setAIDetails((prevdetails) => [aisummary, ...prevdetails]);
       // Add to beginning of array so newest is first
-      setImageHistory(prevHistory => [data, ...prevHistory]);
-      updateImagePointMap();
-      renderAllImages();
+      setImageHistory(prevHistory => [...prevHistory,data]);
+      // updateImagePointMap();
+      // renderAllImages();
     });
   
     // Coordinates cleared
@@ -1067,8 +1068,8 @@ useEffect(() => {
           //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FLGE_Banner_TV.png?alt=media&token=87654321",
           // ];
           const testImages=[
-            // "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_DummyDevice_Watch_0_0.png?alt=media&token=57327a02-caf0-4bd5-a13c-7dcb3604f497"
-          
+            "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_DummyDevice_Watch_0_0.png?alt=media&token=57327a02-caf0-4bd5-a13c-7dcb3604f497"
+            ,"https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FGoogle_Poster_Phone_0.5271072.png?alt=media&token=00c0492e-057b-477c-b49c-44a604bc88d6",
             "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2Fgoogle_dummy_phone_9_5.jpg?alt=media&token=8c13c2aa-dd7e-48c0-9353-607951ac7f39",
           ]
 
@@ -1088,7 +1089,7 @@ useEffect(() => {
           fetch("https://store-visit-85801868683.us-central1.run.app/api/image", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",S
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               imageUrl: imageUrl,
@@ -1359,7 +1360,7 @@ return (
                   <div
                     className="tooltip"
                     style={{ position: 'absolute', top: centerZ + center[1]-10, left: centerX + center[0] ,
-                    display: isHovering===perpendicularCoord.length-index-1 ? "block" : "none"
+                    display: isHovering===index ? "block" : "none"
                   }}
                     onClick={() => setSelectedImage(index)}
                     
@@ -1405,7 +1406,7 @@ return (
         </div>
         <div id="imageContainer">
           {imageHistory.length > 0 && aiDetails.length>0 ? (
-            console.log("ai details",aiDetails),
+            console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
               let a = parseImageUrl(image.url);
               // let ai = getAI(image.url);
@@ -1434,7 +1435,7 @@ return (
                         <span className="card-info-label">Measurement</span>
                       </div>
                       <div className="card-info-row">
-                        <span className="card-info-value">{image.metadata.bannerData?.brand || 'N/A'}</span>
+                        <span className="card-info-value">{a.brand || 'N/A'}</span>
                         <span className="card-info-value">{a.merchandise || 'N/A'}</span>
                         <span className="card-info-value">{a.product || 'N/A'}</span>
                         <span className="card-info-value">
