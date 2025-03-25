@@ -16,7 +16,7 @@
             text-align: center;
             margin-top: 0;
             margin-bottom: 10px;
-            font-size: 22px;
+            font-size: 25px;
         }
 
         .control-panel {
@@ -197,7 +197,7 @@
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    /* transform: translateY(-5px); */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 

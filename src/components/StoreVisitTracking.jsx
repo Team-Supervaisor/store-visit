@@ -1176,7 +1176,7 @@ return (
         width: '100%'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
         <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
         <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }}>Store Visit Tracking</h1>
       </div>
@@ -1235,7 +1235,7 @@ return (
     <span
       id="distance"
       ref={distanceDisplayRef}
-      style={{ color: 'black', fontWeight: 500 }}
+      style={{ color: 'black', fontWeight: 500,marginLeft:15 }}
     >
       Distance: {totalDistance.toFixed(2)}
     </span>
