@@ -4,6 +4,9 @@ import './store.css';
 import logo from '../assets/logo.png'
 import star from '../assets/star.png'
 import axios from 'axios';
+import samsung from '../assets/samsung.png'
+import googlei from '../assets/google.png' 
+import apple from '../assets/apple.jpeg'
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -825,11 +828,17 @@ useEffect(()=>{
       const newPolygons = pstructures.map((structure,structureIndex) => {
         console.log("ploygon structure:",structure);
         let pathData = "";
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
         structure.coordinates.forEach((coord, index) => {
           const screenX = centerx + coord[0];
           const screenZ = centerz + coord[1];
   
           pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+          minX = Math.min(minX, screenX);
+      maxX = Math.max(maxX, screenX);
+      minY = Math.min(minY, screenZ);
+      maxY = Math.max(maxY, screenZ);
         });
   
         pathData += "Z"; // Close the polygon
@@ -837,7 +846,11 @@ useEffect(()=>{
         const centerCoord = getPolygonCenter(structure.coordinates);
         const textX = centerx + centerCoord[0];
         const textY = centerz + centerCoord[1];
-  
+        
+        const imageWidth = maxX - minX - 10;
+        const imageHeight = maxY - minY - 10;
+        const imageX = minX + 5; // Shift slightly inward
+        const imageY = minY + 5;
         return {
           id: structureIndex.toString(), 
           name:"",
@@ -845,7 +858,11 @@ useEffect(()=>{
           pathData,
           textX,
           textY,
-          color: 'red',
+          color: 'white',
+          imageX,  // Store computed image position
+      imageY,
+      imageWidth,
+      imageHeight,
         };
       });
     //  const newQuad=
@@ -1318,7 +1335,7 @@ return (
     </svg>
   )}
 
-  {isPathVisible && (
+  {isPathVisible && imageHistory.length==pPolygons.length && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
       {pPolygons.map((polygon, index) => (
         <g
@@ -1329,6 +1346,14 @@ return (
           onMouseLeave={() => setIsHovering(null)}
           onClick={() => setSelectedImage(index)}
         >
+          <image
+    href={imageHistory[index].metadata.brand=='google'?googlei:imageHistory[index].metadata.brand=='apple'?apple:imageHistory[index].metadata.brand=='Google'?googlei:samsung}
+    x={polygon.imageX + 5} // Slightly inward positioning
+    y={polygon.imageY + 5}
+    width={polygon.imageWidth - 10} // Reduced width
+    height={polygon.imageHeight - 10} // Reduced height
+    preserveAspectRatio="xMidYMid slice"
+  />
           <path
             d={polygon.pathData}
             fill={polygon.color}
