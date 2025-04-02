@@ -455,7 +455,7 @@ axios.request(config)
     //   [perpendicularPoint[0] , perpendicularPoint[1] - b/2], // Top-right
     //    // Bottom-left
     // ]
-    const angle=45;
+    const angle=90;
     const newCoords = getNewCoordinates(x, z, angle);
     setDistcoord((prev) => {
       // console.log("Previous State:", prev);
@@ -464,10 +464,10 @@ axios.request(config)
       return updated;
     });
     const pcoordinates=[
-      [newCoords[0] - l, newCoords[1] - b/2], // Top-left
-      [newCoords[0] - l, newCoords[1] + b/2],
-      [newCoords[0] , newCoords[1] + b/2], // Bottom-right
-      [newCoords[0] , newCoords[1] - b/2], // Top-right
+      [newCoords[0] - l/2, newCoords[1] - b/2], // Top-left
+      [newCoords[0] + l/2, newCoords[1] - b/2],
+      [newCoords[0] + l/2, newCoords[1] + b/2], // Bottom-right
+      [newCoords[0] - l/2, newCoords[1] + b/2], // Top-right
        // Bottom-left
     ]
 
@@ -482,10 +482,10 @@ axios.request(config)
 
   function getNewCoordinates(x, z, angle) {
     const radians = (angle * Math.PI) / 180; // Convert angle to radians
-    const distance = 50; // Given distance
+    const distance = 100; // Given distance
 
     const newX = x + distance * Math.cos(radians);
-    const newZ = z + distance * Math.sin(radians);
+    const newZ = z - distance * Math.sin(radians);
 
     return [newX, newZ];
 }
