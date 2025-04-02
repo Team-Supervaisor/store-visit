@@ -7,6 +7,7 @@ import axios from 'axios';
 import samsung from '../assets/samsung.png'
 import googlei from '../assets/google.png' 
 import apple from '../assets/apple.jpeg'
+import layout from '../assets/store_layout.png'
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -45,9 +46,8 @@ const [selectedImage, setSelectedImage] = useState();
 const [pstructures, setPstructures] = useState([]);
 const [pPolygons, setPPolygons] = useState([]);
 const [isHovering, setIsHovering] = useState();
-const [imageResponse, setImageResponse] = useState(false);
-const [imageResponseUrl, setImageResponseUrl] = useState("");
 const [aiDetails, setAIDetails] = useState();
+const [distCoord,setDistcoord]=useState([]);
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -313,57 +313,11 @@ axios.request(config)
     
     console.log(screenX,screenZ);
 
-    // // Create point
-    // const pointElement = document.createElement("div");
-    // pointElement.className = "point";
-    // pointElement.dataset.timestamp = coord.timestamp;
-
-    // // Set initial scale to 0 for animation
-    // pointElement.style.transform = "translate(-50%, -50%) scale(0)";
-    // pointElement.style.backgroundColor='red'
-    // let diagonal=2;
-
-    // If photo was captured at this point, add the photo-captured class
     if (coord.photoCapture === 1) {
       const vizElement = document.getElementById("visualization");
-      let trial=find_nearest(coord.x,coord.z,coord.distance,vizElement,coord.l,coord.b);
+      let trial=find_nearest(coord.x,coord.z,vizElement,coord.l,coord.b);
       console.log(trial);
-      
-
-      // pointElement.style.zIndex = 5;
-
-      // Add click event to show the corresponding image
-      // pointElement.addEventListener("click", () => {
-      //   const pointData = imagePointMap.get(coord.timestamp);
-      //   if (pointData) {
-      //     // Find the corresponding image card
-      //     const imageCard = document.querySelector(
-      //       `.card[data-timestamp="${pointData.image.timestamp}"]`
-      //     );
-      //     if (imageCard) {
-      //       // Remove active class from all cards
-      //       document
-      //         .querySelectorAll(".card")
-      //         .forEach((card) => card.classList.remove("active"));
-
-      //       // Add active class to this card
-      //       imageCard.classList.add("active");
-
-      //       // Scroll to the card
-      //       imageCard.scrollIntoView({ behavior: "smooth", block: "center" });
-      //     }
-      //   }
-      // });
     }
-
-    // pointElement.style.left = `${screenX}px`;
-    // pointElement.style.top = `${screenZ}px`;
-    // vizElement.appendChild(pointElement);
-
-    // Trigger animation after a small delay
-    setTimeout(() => {
-      pointElement.style.transform = "translate(-50%, -50%) scale(1)";
-    }, 10);
   }
   function getPerpendicularDistanceAndPoint(x, z, x1, z1, x2, z2) {
     // Vector from (x1,z1) to (x2,z2)
@@ -397,18 +351,8 @@ axios.request(config)
     
     return { distance, point: [projX, projZ] };
 }
-  function find_nearest(x, z,diagonal,vizElemen,l,b) {
+  function find_nearest(x, z,vizElemen,l,b) {
     console.log("imagesssssssss:",imageHistory);
-    // console.log(parseImageUrl(imageHistory[0]?.url));
-    // const interval = setInterval(() => {
-    //   if (!imageResponse) {
-    //     console.log("imageResponseUrl:",imageResponseUrl);
-    //     console.log("failureeeee:",parseImageUrl(imageResponseUrl));
-    //   } else {
-    //     console.log("successsssss:",parseImageUrl(imageResponseUrl));
-    //     clearInterval(interval);
-    //   }
-    // }, 1000);
     // x=(x/100)*500;
     // z=(z/100)*250;
     console.log(x,z);
@@ -477,14 +421,7 @@ axios.request(config)
   
     console.log("Nearest Structure:", nearest.name);
     console.log("Perpendicular Point:", perpendicularPoint);
-    if(diagonal==0){
-      // diagonal=2;
-    }
-    // Calculate square side from diagonal using Pythagoras' theorem
-    const squareSide = diagonal / Math.sqrt(2);
   
-    // Find a position inside the quadrilateral for the square
-    // const center = getPolygonCenter(nearest.coordinates);
     const center = [...getPolygonCenter(nearest.coordinates)];
     console.log("Center:", center);
     //append in the front to cenercoord
@@ -504,26 +441,34 @@ axios.request(config)
     });
     // setCenterCoord(center);
     console.log("CenterCoord:", centerCoord);
-    const squareCoordinates = [
-      [center[0] - squareSide / 2, center[1] - squareSide / 2], // Top-left
-      [center[0] + squareSide / 2, center[1] - squareSide / 2], // Top-right
-      [center[0] + squareSide / 2, center[1] + squareSide / 2], // Bottom-right
-      [center[0] - squareSide / 2, center[1] + squareSide / 2]  // Bottom-left
-    ];
     if(l==0 && b==0)
     {
       l=10;
       b=5;
     }
-    l=l*5;
-    b=b*5;
+    l=l*10;
+    b=b*10;
+    // const pcoordinates=[
+    //   [perpendicularPoint[0] - l, perpendicularPoint[1] - b/2], // Top-left
+    //   [perpendicularPoint[0] - l, perpendicularPoint[1] + b/2],
+    //   [perpendicularPoint[0] , perpendicularPoint[1] + b/2], // Bottom-right
+    //   [perpendicularPoint[0] , perpendicularPoint[1] - b/2], // Top-right
+    //    // Bottom-left
+    // ]
+    const angle=45;
+    const newCoords = getNewCoordinates(x, z, angle);
+    setDistcoord((prev) => {
+      // console.log("Previous State:", prev);
+      const updated = [...prev,newCoords ];
+      // console.log("Updated State:", updated);
+      return updated;
+    });
     const pcoordinates=[
-      [perpendicularPoint[0] - l, perpendicularPoint[1] - b/2], // Top-left
-      [perpendicularPoint[0] - l, perpendicularPoint[1] + b/2],
-      [perpendicularPoint[0] , perpendicularPoint[1] + b/2], // Bottom-right
-      [perpendicularPoint[0] , perpendicularPoint[1] - b/2], // Top-right
+      [newCoords[0] - l, newCoords[1] - b/2], // Top-left
+      [newCoords[0] - l, newCoords[1] + b/2],
+      [newCoords[0] , newCoords[1] + b/2], // Bottom-right
+      [newCoords[0] , newCoords[1] - b/2], // Top-right
        // Bottom-left
-
     ]
 
     setPstructures(prevStructures => [
@@ -531,69 +476,22 @@ axios.request(config)
       { coordinates: pcoordinates }
     ]);
     console.log("pcoordinates:",pcoordinates);
-  
-    // console.log("Square Coordinates:", squareCoordinates);
-    // setSquareCoordinates(squareCoordinates);
-
-    // createSquareVisualization(squareCoordinates, vizElement);
-    return { nearestStructure, squareCoordinates };
+    return { nearestStructure };
   
   }
-  function getPerpendicularDistance(x, z, x1, z1, x2, z2) {
-    let A = z2 - z1;
-    let B = -(x2 - x1);
-    let C = x2 * z1 - z2 * x1;
-  
-    let numerator = Math.abs(A * x + B * z + C);
-    let denominator = Math.sqrt(A ** 2 + B ** 2);
-    let perpendicularDistance = numerator / denominator;
-  
-    // Find the projection point (xp, zp) on the line
-    let t = ((x - x1) * (x2 - x1) + (z - z1) * (z2 - z1)) / ((x2 - x1) ** 2 + (z2 - z1) ** 2);
-  
-    if (t >= 0 && t <= 1) {
-        // The perpendicular falls inside the segment, return the perpendicular distance
-        return perpendicularDistance;
-    } else {
-        // The perpendicular falls outside, return the minimum distance to an endpoint
-        let distanceToStart = Math.sqrt((x - x1) ** 2 + (z - z1) ** 2);
-        let distanceToEnd = Math.sqrt((x - x2) ** 2 + (z - z2) ** 2);
-        return Math.min(distanceToStart, distanceToEnd);
-    }
-  }
-  function createSquareVisualization(squareCoordinates, vizElement) {
-    // Clear existing square visualization
-    setCenterX(vizDimensions.width / 2);
-      setCenterZ(vizDimensions.height / 2);
-     const centerx = vizDimensions.width / 2;
-     const centerz = vizDimensions.height / 2;
-  
-    // Create an SVG element
-   const newSquare=()=>{
-    squareCoordinates.forEach((coord, index) => {
-      const screenX = centerx + coord[0];
-      const screenZ = centerz + coord[1];
 
-      pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
-    });
-    pathData += "Z"; // Close the polygon
+  function getNewCoordinates(x, z, angle) {
+    const radians = (angle * Math.PI) / 180; // Convert angle to radians
+    const distance = 50; // Given distance
 
-      const centerCoord = getPolygonCenter(squareCoordinates);
-      const textX = centerx + centerCoord[0];
-      const textY = centerz + centerCoord[1];
+    const newX = x + distance * Math.cos(radians);
+    const newZ = z + distance * Math.sin(radians);
 
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        name: 'test',
-        type: 'counter',
-        pathData,
-        textX,
-        textY,
-        color: '#E6E7F8',
-      };
-   }
-   setSquare(newSquare);
-  }
+    return [newX, newZ];
+}
+
+
+
   function renderAllImages(history) {
     console.log("render images")
     console.log(imageHistory);
@@ -718,7 +616,7 @@ useEffect(()=>{
       const centerz = vizDimensions.height / 2;
 
       const newPolygons = pstructures.map((structure,structureIndex) => {
-        console.log("ploygon structure:",structure);
+        console.log("polygon structure:",structure);
         let pathData = "";
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
@@ -744,7 +642,7 @@ useEffect(()=>{
         const imageX = minX + 5; // Shift slightly inward
         const imageY = minY + 5;
         return {
-          id: structureIndex.toString(), 
+          image_id: structureIndex.toString(), 
           name:"",
           type: 'counter',
           pathData,
@@ -761,6 +659,7 @@ useEffect(()=>{
 
 
 setPPolygons(newPolygons);
+console.log("PPOlygons:",pPolygons);
 
 },[pstructures,vizDimensions])
 
@@ -837,8 +736,6 @@ useEffect(() => {
     // Receive new image
     socketRef.current.on("new-image", (data) => {
       console.log("New image received:", data);
-      //setImageResponse(true);
-      //setImageResponseUrl(data.url);
       let aisummary=getAI(data.url);
       console.log("AI Summaryrrrrrrr:", aisummary);
       // setAIDetails((prevdetails) => [aisummary, ...prevdetails]);
@@ -921,6 +818,7 @@ useEffect(() => {
     setPPolygons([]);
     setPstructures([]);
     setAIDetails([]);
+    setDistcoord([]);
   };
   
   const handleStartButton = () => {
@@ -1154,8 +1052,17 @@ return (
 
 
     {/* Main Layout */}
-    <div className="layout-container">
-      <div className="left-container">
+    <div className="layout-container" >
+      <div className="left-container"style={{
+        backgroundImage:isStructureVisible ? `url(${layout})` : "none",
+        backgroundSize: "cover",  // Ensures the image covers the entire container
+        backgroundPosition: "center", // Centers the image
+        backgroundRepeat: "no-repeat", 
+        borderRadius:'26px',
+        transition: "background 0.5s ease-in-out",
+        backgroundColor:'white'
+        // zIndex:10 // Full height of the viewport
+      }}>
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
@@ -1199,8 +1106,8 @@ return (
   )}
 
   {/* Store structure overlay and other SVG elements remain unchanged */}
-  {isStructureVisible && <div className="overlay"></div>}
-  {isStructureVisible && (
+  {/* {isStructureVisible && <div className="overlay"></div>} */}
+  {/* {isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       {polygons.map((polygon) => (
         <g key={polygon.id} className={`structure ${polygon.type}`} title={polygon.name}>
@@ -1225,13 +1132,13 @@ return (
         </g>
       ))}
     </svg>
-  )}
+  )} */}
 
   {isPathVisible && imageHistory.length==pPolygons.length && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
       {pPolygons.map((polygon, index) => (
         <g
-          key={polygon.id}
+          key={polygon.image_id}
           className={`structure ${polygon.type}`}
           title={polygon.name}
           onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
