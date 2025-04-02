@@ -282,7 +282,7 @@ const StoreVisitTracking = () => {
                   <>
                     <tr
                       key={index}
-                      className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px]"
+                      className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
                     >
                       <td className="pr-[28px] pl-[28px] pt-[9px] pb-[9px] ">
                         <img
