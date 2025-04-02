@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { CircleUserRound, Check } from "lucide-react";
+import { CircleUserRound, Check, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
-const Button = ({ children, sytling }) => (
+const Button = ({ children, sytling, onClick }) => (
   <button
     className={`px-4 py-2 rounded bg-[#E1E9FD] text-[#4F4FDC] ${sytling}`}
+    onClick={() => onClick()}
   >
     {children}
   </button>
@@ -69,10 +71,11 @@ const Dropdown = ({ options, selected, onChange }) => {
   return (
     <div className="relative">
       <button
-        className="bg-[#EFF4FE] rounded px-2 py-1 text-[#717AEA] text-left"
+        className="bg-[#EFF4FE] rounded px-2 py-1 text-[#717AEA] text-left flex"
         onClick={() => setIsOpen(!isOpen)}
       >
         {options.find((option) => option === selected) || "Select"}
+        <ChevronDown />
       </button>
       {isOpen && (
         <ul className="absolute shadow-md mt-1 rounded z-10 w-[130px] text-[#717AEA] bg-[#EFF4FE]">
@@ -178,6 +181,7 @@ const dates = [
 ];
 
 const StoreVisitTracking = () => {
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("all");
   const [selectedStore, setSelectedStore] = useState(storeIds[0]);
   const [selectedDate, setSelectedDate] = useState(dates[0]);
@@ -236,6 +240,7 @@ const StoreVisitTracking = () => {
           <Button
             variant="outline"
             sytling="bg-[#EFF4FE] border-2 border-[#E1E9FD]"
+            onClick={() => navigate('/manageStores')}
           >
             Manage Stores
           </Button>
