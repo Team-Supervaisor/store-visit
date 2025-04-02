@@ -692,7 +692,7 @@ useEffect(() => {
   // Connect to Socket.IO when component mounts
   useEffect(() => {
     // socketRef.current = io();
-    socketRef.current = io("https://store-visit-85801868683.us-central1.run.app");
+    socketRef.current = io("https://debc-115-187-42-68.ngrok-free.app");
     socketRef.current.on("connect", () => {
       console.log("Connected to server with ID:", socketRef.current.id);
     });
@@ -800,7 +800,7 @@ useEffect(() => {
       socketRef.current.emit("clear-coordinates");
       socketRef.current.emit("clear-images");
     }
-    fetch("https://store-visit-85801868683.us-central1.run.app/api/all", {
+    fetch("https://debc-115-187-42-68.ngrok-free.app/api/all", {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -844,7 +844,7 @@ useEffect(() => {
 
     const timestamp = Date.now();
 
-    fetch("https://store-visit-85801868683.us-central1.run.app/api/coordinates", {
+    fetch("https://debc-115-187-42-68.ngrok-free.app/api/coordinates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -893,7 +893,7 @@ useEffect(() => {
           const randomType = types[Math.floor(Math.random() * types.length)];
 
           // First post the image
-          fetch("https://store-visit-85801868683.us-central1.run.app/api/image", {
+          fetch("https://debc-115-187-42-68.ngrok-free.app/api/image", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -910,7 +910,7 @@ useEffect(() => {
               console.log("Image Response:", data);
               
               // Then post the banner data
-              fetch("https://store-visit-85801868683.us-central1.run.app/api/banner_data", {
+              fetch("https://debc-115-187-42-68.ngrok-free.app/api/banner_data", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",

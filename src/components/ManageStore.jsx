@@ -3,16 +3,22 @@ import logo from '../assets/logo.png'
 import { ArrowRight, Plus, UploadCloudIcon } from 'lucide-react'
 import image_plan from '../assets/samsung.png'
 import { useState } from "react";
+import { Store, X, Upload } from 'lucide-react';
 export default function ManageStore() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [image, setImage] = useState(null);
+    const [storeName, setStoreName] = useState('');
+  const [storeId, setStoreId] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
 
-    const handleImageChange = (event) => {
-      if (event.target.files && event.target.files[0]) {
-        const file = event.target.files[0];
-        setImage(URL.createObjectURL(file)); // Create a preview URL
-      }
-    };
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Convert file to URL for preview
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+    }
+  };
     const StoreData=[
         {
           "id": 1,
@@ -166,60 +172,81 @@ export default function ManageStore() {
         </div>
     </div>
     {isModalOpen && (
-        <div className="fixed inset-0  bg-opacity-20 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white p-6 rounded-[20px] shadow-lg w-[600px]">
-            {/* Modal Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Add Store Details</h3>
-              <button onClick={() =>{ setIsModalOpen(false);setImage(null)}} className="text-gray-500">
-                ✕
-              </button>
+       <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center">
+       <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+         {/* Header */}
+         <div className="flex items-center justify-between p-4 border-b border-gray-200">
+           <div className="flex items-center gap-2"> 
+           <div className="bg-[#EFF4FE] p-2 rounded-full">
+              <Store className="h-5 w-5 text-[#4F4FDC]" />
             </div>
-
-            {/* Modal Body */}
-            <div>
-              <label className="block text-gray-600">Store Name:</label>
-              <input type="text" className="w-full p-2 border rounded mt-1" placeholder="Enter store name" />
-
-              <label className="block text-gray-600 mt-3">Store ID:</label>
-              <input type="text" className="w-full p-2 border rounded mt-1" placeholder="Enter store ID" />
-
-              <label className="block text-gray-600 mt-3">Upload Planogram:</label>
-{/* Label linked to file input */}
-                <label 
-                    htmlFor="fileUpload" 
-                    className="flex items-center gap-2 bg-[#717AEA] text-white px-4 py-2 rounded-lg mt-2 cursor-pointer"
-                >
-                    <UploadCloudIcon /> Upload
-                </label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    id="fileUpload"
-                    onChange={handleImageChange}
-                    className="hidden"
-                />
-                {/* Image Preview */}
-      {image && (
-        <div className="mt-4">
-          <img src={image} alt="Preview" className="w-40 h-40 rounded-lg shadow-lg object-cover" />
-        </div>
-      )}
-              {/* Upload Preview Box */}
-              {/* <div className="mt-4 p-6 border-dashed border-2 border-gray-300 text-center rounded-lg">
-                Upload to view
-              </div> */}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex justify-end mt-4 gap-2">
-              <button onClick={() =>{ setIsModalOpen(false);setImage(null)}} className="px-4 py-2 rounded-lg border">
-                Close
-              </button>
-              <button className="px-4 py-2 rounded-lg bg-[#A5A6F6] text-white">Done</button>
-            </div>
-          </div>
-        </div>
+             <h1 className="text-lg font-medium">Add Store Details</h1>
+           </div>
+           <button className="text-gray-500 hover:text-gray-700" onClick={() => setIsModalOpen(false)}>
+             <X className="h-5 w-5" />
+           </button>
+         </div>
+ 
+         {/* Form Content */}
+         <div className="p-4 space-y-6">
+           <div className="flex items-center">
+             <label htmlFor="storeName" className="text-sm font-medium text-gray-700 w-40">
+               Store Name:
+             </label>
+             <input
+               id="storeName"
+               type="text"
+               value={storeName}
+               onChange={(e) => setStoreName(e.target.value)}
+               className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+             />
+           </div>
+ 
+           <div className="flex items-center">
+             <label htmlFor="storeId" className="text-sm font-medium text-gray-700 w-40">
+               Store ID:
+             </label>
+             <input
+               id="storeId"
+               type="text"
+               value={storeId}
+               onChange={(e) => setStoreId(e.target.value)}
+               className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+             />
+           </div>
+ 
+           <div className="flex items-center">
+             <label className="text-sm font-medium text-gray-700 w-40">Upload Planogram:</label>
+             {/* Hidden File Input */}
+             <input type="file" accept="image/*" id="fileUpload" onChange={handleImageChange} className="hidden" />
+             {/* Label for file input */}
+             <label htmlFor="fileUpload" className="flex items-center gap-2 text-indigo-600 px-3 py-1 rounded cursor-pointer  p-[2px] bg-[#F2F2FF]">
+               <Upload className="h-4 w-4 text-[#717AEA]" />
+               <span className='text-black'>Upload</span>
+             </label>
+           </div>
+ 
+           {/* Planogram Preview Area */}
+           <div className="border border-gray-200 bg-[#EFF4FE] rounded-lg h-56 flex items-center justify-center overflow-hidden">
+             {previewImage ? (
+               <img src={previewImage} alt="Planogram Preview" className="h-full w-full object-contain" />
+             ) : (
+               <p className="text-gray-500 text-sm">Upload to view</p>
+             )}
+           </div>
+         </div>
+ 
+         {/* Footer */}
+         <div className="flex justify-end gap-2 p-4 border-t border-gray-200">
+           <button className="px-4 py-2 rounded text-gray-700 hover:bg-gray-50" onClick={() => setIsModalOpen(false)}>
+             Close
+           </button>
+           <button className="px-4 py-2 bg-indigo-400 text-white rounded hover:bg-indigo-500">
+             Done
+           </button>
+         </div>
+       </div>
+     </div>
       )}
           
         
