@@ -313,15 +313,15 @@ axios.request(config)
     
     console.log(screenX,screenZ);
 
-    // Create point
-    const pointElement = document.createElement("div");
-    pointElement.className = "point";
-    pointElement.dataset.timestamp = coord.timestamp;
+    // // Create point
+    // const pointElement = document.createElement("div");
+    // pointElement.className = "point";
+    // pointElement.dataset.timestamp = coord.timestamp;
 
-    // Set initial scale to 0 for animation
-    pointElement.style.transform = "translate(-50%, -50%) scale(0)";
-    pointElement.style.backgroundColor='red'
-    let diagonal=2;
+    // // Set initial scale to 0 for animation
+    // pointElement.style.transform = "translate(-50%, -50%) scale(0)";
+    // pointElement.style.backgroundColor='red'
+    // let diagonal=2;
 
     // If photo was captured at this point, add the photo-captured class
     if (coord.photoCapture === 1) {
@@ -333,31 +333,31 @@ axios.request(config)
       // pointElement.style.zIndex = 5;
 
       // Add click event to show the corresponding image
-      pointElement.addEventListener("click", () => {
-        const pointData = imagePointMap.get(coord.timestamp);
-        if (pointData) {
-          // Find the corresponding image card
-          const imageCard = document.querySelector(
-            `.card[data-timestamp="${pointData.image.timestamp}"]`
-          );
-          if (imageCard) {
-            // Remove active class from all cards
-            document
-              .querySelectorAll(".card")
-              .forEach((card) => card.classList.remove("active"));
+      // pointElement.addEventListener("click", () => {
+      //   const pointData = imagePointMap.get(coord.timestamp);
+      //   if (pointData) {
+      //     // Find the corresponding image card
+      //     const imageCard = document.querySelector(
+      //       `.card[data-timestamp="${pointData.image.timestamp}"]`
+      //     );
+      //     if (imageCard) {
+      //       // Remove active class from all cards
+      //       document
+      //         .querySelectorAll(".card")
+      //         .forEach((card) => card.classList.remove("active"));
 
-            // Add active class to this card
-            imageCard.classList.add("active");
+      //       // Add active class to this card
+      //       imageCard.classList.add("active");
 
-            // Scroll to the card
-            imageCard.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }
-      });
+      //       // Scroll to the card
+      //       imageCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      //     }
+      //   }
+      // });
     }
 
-    pointElement.style.left = `${screenX}px`;
-    pointElement.style.top = `${screenZ}px`;
+    // pointElement.style.left = `${screenX}px`;
+    // pointElement.style.top = `${screenZ}px`;
     // vizElement.appendChild(pointElement);
 
     // Trigger animation after a small delay
@@ -598,90 +598,7 @@ axios.request(config)
     console.log("render images")
     console.log(imageHistory);
   }
-  // function parseImageUrl(url) {
-  //   try {
-  //     // First, decode the URL to handle any encoded characters
-  //     const decodedUrl = decodeURIComponent(url);
-      
-  //     // Extract the filename portion from the URL
-  //     let filename = null;
-  //     if (decodedUrl.includes('/o/ARTracker%2F')) {
-  //       filename = decodedUrl.split('/o/ARTracker%2F')[1];
-  //     } else if (decodedUrl.includes('/o/ARTracker/')) {
-  //       filename = decodedUrl.split('/o/ARTracker/')[1];
-  //     }
-      
-  //     if (filename) {
-  //       // Remove the query parameters
-  //       filename = filename.split('?')[0];
-        
-  //       // Split the filename by underscores
-  //       const parts = filename.split('_');
-        
-  //       // Handle case when there are no underscores in the filename
-  //       if (parts.length === 1) {
-  //         // Try to extract information from single part
-  //         const nameParts = parts[0].replace(/\.png$/, '').split(/(?=[A-Z])/);
-  //         if (nameParts.length > 2) {
-  //           return {
-  //             brand: nameParts[0] || "Unknown",
-  //             visual: nameParts[1] || "Unknown",
-  //             product: nameParts[2] || "Unknown",
-  //             measurement: "N/A"
-  //           };
-  //         }
-  //       }
-        
-  //       // Extract components based on position
-  //       const brand = parts[0] || "Unknown";
-        
-  //       // Handle "Dummy device" which contains a space
-  //       let visual = parts[1] || "Unknown";
-  //       let productIndex = 2;
-        
-  //       // If visual has a space that was encoded in the URL, it might span multiple parts
-  //       if (parts.length > 2 && parts[2] && !parts[2].toLowerCase().includes("phone") && 
-  //           !parts[2].toLowerCase().includes("tablet") && !parts[2].toLowerCase().includes("tv")) {
-  //         visual = visual + " " + parts[2];
-  //         productIndex = 3;
-  //       }
-        
-  //       // Get product and remove .png extension if it exists
-  //       let product = parts[productIndex] || "Unknown";
-  //       product = product.replace(/\.png$/i, '');
-        
-  //       // Check if we have a measurement (next part after product before .png)
-  //       let measurement = "N/A";
-  //       if (parts.length > productIndex + 1) {
-  //         // Extract measurement without the .png extension
-  //         measurement = parts[productIndex + 1].replace(/\.png$/i, '');
-  //       }
-        
-  //       return {
-  //         brand,
-  //         visual,
-  //         product,
-  //         measurement
-  //       };
-  //     }
-  
-  //     // Fallback if parsing fails
-  //     return {
-  //       brand: "Unknown",
-  //       visual: "Unknown",
-  //       product: "Unknown",
-  //       measurement: "N/A"
-  //     };
-  //   } catch (error) {
-  //     console.error("Error parsing image URL:", error);
-  //     return {
-  //       brand: "Unknown",
-  //       visual: "Unknown",
-  //       product: "Unknown",
-  //       measurement: "N/A"
-  //     };
-  //   }
-  // }
+
   function parseImageUrl(url) {
     try {
       // Decode the URL to handle any encoded characters
@@ -792,32 +709,7 @@ axios.request(config)
     setPolygons(newPolygons);
   }, [vizDimensions]);
 
-// useEffect(() => {
-//   console.log("setting squareCoordinates");
-//    squares = squareCoordinates??squareCoordinates.map((coords, index) => {
-//     // Generate path data from coordinates
-//     const pathData = coords.map((point, i) => {
-//       return `${i === 0 ? 'M' : 'L'} ${point[0]},${point[1]}`;
-//     }).join(' ') + ' Z'; // Close the path
-    
-//     // Calculate center point for text
-//     const centerX = coords.reduce((sum, point) => sum + point[0], 0) / coords.length;
-//     const centerY = coords.reduce((sum, point) => sum + point[1], 0) / coords.length;
-    
-//     return {
-//       id: `square-${index}`,
-//       pathData: pathData,
-//       color: "#717AEA",
-//       type: "shelf", // or any other classification you need
-//       name: `Square ${index + 1}`,
-//       textX: centerX,
-//       textY: centerY
-//     };
-//   });
 
-// }, [squareCoordinates])
-
-  // Refs
 useEffect(()=>{
   console.log(vizDimensions.width,vizDimensions.height);
       setCenterX(vizDimensions.width / 2);
