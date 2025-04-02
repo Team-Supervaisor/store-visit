@@ -5,6 +5,8 @@ import image_plan from "../assets/samsung.png";
 import { useState } from "react";
 import { Store, X, Upload } from "lucide-react";
 import axios from 'axios';
+import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [image, setImage] = useState(null);
@@ -119,9 +121,10 @@ export default function ManageStore() {
 
         <div className="bg-white shadow-md rounded-[26px] p-8 mt-8">
           {/* Header Section */}
+          {storeData.length>0?<>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-[26px] text-black font-medium">
-              Store Data <span className="text-[26px] text-black  ">(14)</span>
+              Store Data <span className="text-[26px] text-black  ">({storeData.length})</span>
             </h2>
             <button
               className="flex items-center gap-2 bg-[#717AEA] text-white px-4 py-2 rounded-lg transition"
@@ -144,12 +147,12 @@ export default function ManageStore() {
                 </tr>
               </thead>
               <tbody>
-                {StoreData.map((store, index) => (
+                {storeData.map((store, index) => (
                   <tr
                     key={index}
                     className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[5px] hover:bg-[#F6F9FF] transition duration-200"
                   >
-                    <td className="px-6 py-2 text-[14px]">{store.storeName}</td>
+                    <td className="px-6 py-2 text-[14px]">{store.name}</td>
                     <td className="px-6 py-2 text-[14px]">{store.store_id}</td>
                     <td className="px-6 py-2 text-[14px]">
                       <img
@@ -158,7 +161,7 @@ export default function ManageStore() {
                         className="h-20 w-30 rounded-md"
                       />
                     </td>
-                    <td className="px-6 py-2 text-[14px]">{store.TSM_name}</td>
+                    <td className="px-6 py-2 text-[14px]">{store.TSM_name||"N/A"}</td>
                     <td className="px-6 py-2 text-[14px] text-gray-500">
                       <ChevronRight size={20} />
                     </td>
@@ -167,6 +170,12 @@ export default function ManageStore() {
               </tbody>
             </table>
           </div>
+          </>:<>
+          <div className="flex items-center justify-center h-screen">
+      <Loader2 className="animate-spin text-blue-500" size={48} />
+    </div>
+          </>}
+          
         </div>
       </div>
       {isModalOpen && (
