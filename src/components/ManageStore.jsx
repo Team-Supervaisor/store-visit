@@ -4,13 +4,14 @@ import { ArrowRight, Plus, UploadCloudIcon, ChevronRight } from "lucide-react";
 import image_plan from "../assets/samsung.png";
 import { useState } from "react";
 import { Store, X, Upload } from "lucide-react";
+import axios from 'axios';
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [image, setImage] = useState(null);
   const [storeName, setStoreName] = useState("");
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
-
+    const [storeData,setStoreData]=useState([])
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -19,57 +20,77 @@ export default function ManageStore() {
       setPreviewImage(imageUrl);
     }
   };
-  const StoreData = [
-    {
-      id: 1,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 2,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 3,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 4,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 5,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 6,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-    {
-      id: 7,
-      storeName: "Queenstown",
-      store_id: "AR-23523612",
-      image: "https://via.placeholder.com/50",
-      TSM_name: "John Doe",
-    },
-  ];
+    // const StoreData=[
+    //     {
+    //       "id": 1,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 2,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 3,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 4,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 5,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 6,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     },
+    //     {
+    //       "id": 7,
+    //       "storeName": "Queenstown",
+    //       "store_id": "AR-23523612",
+    //       "image": "https://via.placeholder.com/50",
+    //       "TSM_name": "John Doe"
+    //     }
+    // ]
+      
+    useEffect(() => {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://store-visit-85801868683.us-central1.run.app/stores',
+            headers: { }
+          };
+          
+          axios.request(config)
+          .then((response) => {
+            console.log((response.data));
+            setStoreData(response.data)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+          
+    }, [])
+    
 
   return (
     <>

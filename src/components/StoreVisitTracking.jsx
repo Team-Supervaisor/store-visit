@@ -301,22 +301,22 @@ axios.request(config)
     renderPoint(coord);
   }
   function renderPoint(coord) {
-    console.log('coord',coord);
-    // Transform coordinates from -100,100 range to screen position
-    // (0,0) at center of screen
-    // plotO();
-    console.log(coord.x,coord.z);
+    // console.log('coord',coord);
+    // // Transform coordinates from -100,100 range to screen position
+    // // (0,0) at center of screen
+    // // plotO();
+    // console.log(coord.x,coord.z);
     
-    console.log(centerX,centerZ);
+    // console.log(centerX,centerZ);
     let screenX = centerX + (coord.x * centerX) / 100;
     let screenZ = centerZ + (coord.z * centerZ) / 100;
     
-    console.log(screenX,screenZ);
+    // console.log(screenX,screenZ);
 
     if (coord.photoCapture === 1) {
       const vizElement = document.getElementById("visualization");
-      let trial=find_nearest(coord.x,coord.z,vizElement,coord.l,coord.b);
-      console.log(trial);
+      // let trial=find_nearest(coord.x,coord.z,coord.l,coord.b,coord.rotation);
+      // console.log(trial);
     }
   }
   function getPerpendicularDistanceAndPoint(x, z, x1, z1, x2, z2) {
@@ -351,8 +351,8 @@ axios.request(config)
     
     return { distance, point: [projX, projZ] };
 }
-  function find_nearest(x, z,vizElemen,l,b) {
-    console.log("imagesssssssss:",imageHistory);
+  function find_nearest(x, z,l,b,angle) {
+    console.log("imagesssssssss:",x,z,l,b,angle);
     // x=(x/100)*500;
     // z=(z/100)*250;
     console.log(x,z);
@@ -455,7 +455,7 @@ axios.request(config)
     //   [perpendicularPoint[0] , perpendicularPoint[1] - b/2], // Top-right
     //    // Bottom-left
     // ]
-    const angle=90;
+    // const angle=90;
     const newCoords = getNewCoordinates(x, z, angle);
     setDistcoord((prev) => {
       // console.log("Previous State:", prev);
@@ -692,7 +692,7 @@ useEffect(() => {
   // Connect to Socket.IO when component mounts
   useEffect(() => {
     // socketRef.current = io();
-    socketRef.current = io("https://debc-115-187-42-68.ngrok-free.app");
+    socketRef.current = io("https://store-visit-85801868683.us-central1.run.app");
     socketRef.current.on("connect", () => {
       console.log("Connected to server with ID:", socketRef.current.id);
     });
@@ -725,22 +725,33 @@ useEffect(() => {
   
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
-      console.log("New coordinate received:", data);
+      // console.log("New coordinate received:", data);
+      if(data.photoCapture===1)
+      {
+        console.log("Photo capture",data);
+      }
       setCoordinates(prevCoordinates => [...prevCoordinates, data]);
       // setTotalDistance(data.distance);
       updateDistanceDisplay(data);
       // console.log("render coordinate")
       renderCoordinate(data);
+      if(data.store_visit_complete==="True")
+      {
+        console.log("Store visit complete");
+        // savePlanogram(data);
+      }
     });
   
     // Receive new image
     socketRef.current.on("new-image", (data) => {
       console.log("New image received:", data);
+      find_nearest(data.x_y_coords.x,data.x_y_coords.y,data.metadata.measurementL,data.metadata.measurementB,data.metadata.rotation);
       let aisummary=getAI(data.url);
       console.log("AI Summaryrrrrrrr:", aisummary);
       // setAIDetails((prevdetails) => [aisummary, ...prevdetails]);
       // Add to beginning of array so newest is first
       setImageHistory(prevHistory => [...prevHistory,data]);
+
       //updateImagePointMap();
       //renderAllImages();
     });
@@ -772,27 +783,31 @@ useEffect(() => {
     };
   }, []); // Dependency array
   
-
-  // const updateDistanceDisplay = (data) => {
-  //   setDistance(data.distance || 0);
-  // };
+const savePlanogram = (coord) => {
+  let data1 = JSON.stringify({
+    "store_visit_id": coord.store_visit_id,
+    "polygon_cords": pPolygons,
+    "total_distance": totalDistance
+  });
   
-  // Helper function to update the image point map
-  const updateImagePointMap = () => {
-    imagePointMap.clear();
-
-    // Find matching coordinates for each image
-    imageHistory.forEach((image) => {
-      // Find the closest coordinate point by timestamp
-      const closestCoord = findClosestCoordinateByTimestamp(image.timestamp);
-      if (closestCoord) {
-        imagePointMap.set(closestCoord.timestamp, {
-          image: image,
-          coordinate: closestCoord,
-        });
-      }
-    });
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://store-visit-85801868683.us-central1.run.app/api/update_store_visit',
+    headers: { 
+      'Content-Type': 'application/json'
+    },
+    data : data1
   };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+}
   
   // Add these functions to handle button actions
   const handleClearButton = () => {
@@ -800,7 +815,7 @@ useEffect(() => {
       socketRef.current.emit("clear-coordinates");
       socketRef.current.emit("clear-images");
     }
-    fetch("https://debc-115-187-42-68.ngrok-free.app/api/all", {
+    fetch("https://store-visit-85801868683.us-central1.run.app/api/all", {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -843,93 +858,119 @@ useEffect(() => {
     const photoCapture = Math.random() > 0.5 ? 1 : 0;
 
     const timestamp = Date.now();
-
-    fetch("https://debc-115-187-42-68.ngrok-free.app/api/coordinates", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    let data = JSON.stringify({
+      "coordinates": {
+        "distance": 100,
+        "x": x,
+        "z": z,
+        "photoCapture": photoCapture,
+        "l": 0,
+        "b": 0,
+        "timestamp": timestamp,
+        "store_id": "store1",
+        "store_visit_complete": Math.random() > 0.9 ? "True" : "False"
+      }
+    });
+    
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://store-visit-85801868683.us-central1.run.app/api/coordinates',
+      headers: { 
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        coordinates: [
-          Number.parseFloat(totalDistance.toFixed(2)),
-          x,
-          z,
-          photoCapture,
-          l,
-          b,
+      data : data
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log((response.data));
+      if (photoCapture === 1) {
+        // Use a random selection of image URLs for testing
+        // const testImages = [
+        //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FGoogle_Poster_Phone_0.9244657.png?alt=media&token=7affeac9-1f60-42b1-9e1f-d2c65a348da8",
+        //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FApple_Poster_Phone.png?alt=media&token=7f75f533-e249-44e3-8056-adca5caef03d",
+        //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_Display_Tablet.png?alt=media&token=12345678",
+        //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FLGE_Banner_TV.png?alt=media&token=87654321",
+        // ];
+        const testImages=[
+          "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_DummyDevice_Watch_0_0.png?alt=media&token=57327a02-caf0-4bd5-a13c-7dcb3604f497"
+          ,"https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FGoogle_Poster_Phone_0.5271072.png?alt=media&token=00c0492e-057b-477c-b49c-44a604bc88d6",
+          "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2Fgoogle_dummy_phone_9_5.jpg?alt=media&token=8c13c2aa-dd7e-48c0-9353-607951ac7f39",
+        ]
 
-        ],
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Response:", data);
+        const imageUrl =
+          testImages[Math.floor(Math.random() * testImages.length)];
 
-        // If photo was captured, send a test image URL
-        if (photoCapture === 1) {
-          // Use a random selection of image URLs for testing
-          // const testImages = [
-          //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FGoogle_Poster_Phone_0.9244657.png?alt=media&token=7affeac9-1f60-42b1-9e1f-d2c65a348da8",
-          //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FApple_Poster_Phone.png?alt=media&token=7f75f533-e249-44e3-8056-adca5caef03d",
-          //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_Display_Tablet.png?alt=media&token=12345678",
-          //   "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FLGE_Banner_TV.png?alt=media&token=87654321",
-          // ];
-          const testImages=[
-            "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FSamsung_DummyDevice_Watch_0_0.png?alt=media&token=57327a02-caf0-4bd5-a13c-7dcb3604f497"
-            ,"https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FGoogle_Poster_Phone_0.5271072.png?alt=media&token=00c0492e-057b-477c-b49c-44a604bc88d6",
-            "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2Fgoogle_dummy_phone_9_5.jpg?alt=media&token=8c13c2aa-dd7e-48c0-9353-607951ac7f39",
-          ]
+        // For testing, also send randomized banner data
+        const brands = ["Google", "Apple", "Samsung", "LGE"];
+        const positions = ["Top Shelf", "Eye Level", "Bottom Shelf", "End Cap"];
+        const types = ["Phone", "Tablet", "TV", "Laptop"];
+        
+        const randomBrand = brands[Math.floor(Math.random() * brands.length)];
+        const randomPosition = positions[Math.floor(Math.random() * positions.length)];
+        const randomType = types[Math.floor(Math.random() * types.length)];
 
-          const imageUrl =
-            testImages[Math.floor(Math.random() * testImages.length)];
 
-          // For testing, also send randomized banner data
-          const brands = ["Google", "Apple", "Samsung", "LGE"];
-          const positions = ["Top Shelf", "Eye Level", "Bottom Shelf", "End Cap"];
-          const types = ["Phone", "Tablet", "TV", "Laptop"];
-          
-          const randomBrand = brands[Math.floor(Math.random() * brands.length)];
-          const randomPosition = positions[Math.floor(Math.random() * positions.length)];
-          const randomType = types[Math.floor(Math.random() * types.length)];
+        let data = JSON.stringify({
+          "imageUrl": "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/ARTracker%2FApple_Tabletop%20Dummy_Watch_0.46_0.35.png?alt=media&token=...",
+          "metadata": {
+            "brand": randomBrand,
+            "merchandise": "Tabletop Dummy",
+            "product": "Watch",
+            "measurementL": 0.48,
+            "measurementB": 0.35,
+            "store_id": "store12",
+            "rotation": 45
+          }
+        });
+        
+        let config = {
+          method: 'post',
+          maxBodyLength: Infinity,
+          url: 'https://store-visit-85801868683.us-central1.run.app/api/image',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          data : data
+        };
+        
+        axios.request(config)
+        .then((response) => {
+          console.log((response.data));
 
-          // First post the image
-          fetch("https://debc-115-187-42-68.ngrok-free.app/api/image", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              imageUrl: imageUrl,
-              metadata: {
-                timestamp: timestamp,
+           fetch("https://store-visit-85801868683.us-central1.run.app/api/banner_data", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("Image Response:", data);
-              
-              // Then post the banner data
-              fetch("https://debc-115-187-42-68.ngrok-free.app/api/banner_data", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  imageUrl: imageUrl,
-                  brand: randomBrand,
-                  position: randomPosition,
-                  type: randomType,
-                }),
-              })
-                .then((response) => response.json())
-                .then((data) => console.log("Banner Data Response:", data))
-                .catch((error) => console.error("Error sending banner data:", error));
+              body: JSON.stringify({
+                imageUrl: imageUrl,
+                brand: randomBrand,
+                position: randomPosition,
+                type: randomType,
+              }),
             })
-            .catch((error) => console.error("Error sending image:", error));
-        }
-      })
-      .catch((error) => console.error("Error:", error));
+              .then((response) => response.json())
+              .then((data) => console.log("Banner Data Response:", data))
+              .catch((error) => console.error("Error sending banner data:", error));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+        
+
+        // First post the image
+
+          
+
+      }
+
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    
   };
 
   const toggleStructure = () => {
@@ -1092,21 +1133,23 @@ return (
   {/* Render individual coordinate points */}
   {isPathVisible && (
     <>
-      {coordinates.map((point, index) => (
+      {coordinates.map((point, index) => 
+      {
+        return(
         <div
           key={index}
           className={`point ${point.photoCapture ? 'photo-captured' : ''}`}
           style={{
-            left: `${centerX + point.x}px`,
-            top: `${centerZ + point.z}px`
+            left: `${centerX+ point.x}px`,
+            top: `${centerZ+point.z}px`
           }}
         />
-      ))}
+      )})}
     </>
   )}
 
   {/* Store structure overlay and other SVG elements remain unchanged */}
-  {/* {isStructureVisible && <div className="overlay"></div>} */}
+  {isStructureVisible && <div className="overlay"></div>}
   {/* {isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       {polygons.map((polygon) => (
@@ -1230,7 +1273,7 @@ return (
         </div>
         <div id="imageContainer">
           {imageHistory.length > 0 && aiDetails.length>0 ? (
-            console.log("ai details",imageHistory,aiDetails),
+            // console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
               let a = parseImageUrl(image.url);
               // let ai = getAI(image.url);
