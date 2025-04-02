@@ -1176,7 +1176,7 @@ return (
     </svg>
   )}
           {centerCoord && isStructureVisible && (
-            perpendicularCoord.map((center, index) => {
+            distCoord.map((center, index) => {
               let a = parseImageUrl(imageHistory[index]?.url);
               // console.log("parsed:",a);
               return (
