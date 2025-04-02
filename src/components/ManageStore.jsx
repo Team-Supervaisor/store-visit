@@ -127,9 +127,9 @@ export default function ManageStore() {
 
     <div className="bg-white shadow-md rounded-[26px] p-6 mt-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between pb-4 ">
-            <h2 className="text-[26px] text-black-500">
-            Store Data <span className="text-[26px] text-black-500">(14)</span>
+        <div className="flex items-center justify-between ">
+            <h2 className="text-[26px] text-black">
+            Store Data <span className="text-[26px] text-black  ">(14)</span>
             </h2>
             <button className="flex items-center gap-2 bg-[#717AEA] text-white px-4 py-2 rounded-lg transition" onClick={() => setIsModalOpen(true)}>
             <Plus size={16} /> Add Store
@@ -180,7 +180,7 @@ export default function ManageStore() {
            <div className="bg-[#EFF4FE] p-2 rounded-full">
               <Store className="h-5 w-5 text-[#4F4FDC]" />
             </div>
-             <h1 className="text-lg font-medium">Add Store Details</h1>
+             <h1 className="text-lg font-medium text-black">Add Store Details</h1>
            </div>
            <button className="text-gray-500 hover:text-gray-700" onClick={() => setIsModalOpen(false)}>
              <X className="h-5 w-5" />
@@ -189,7 +189,7 @@ export default function ManageStore() {
  
          {/* Form Content */}
          <div className="p-4 space-y-6">
-           <div className="flex items-center">
+           <div className="flex items-center w-[450px]">
              <label htmlFor="storeName" className="text-sm font-medium text-gray-700 w-40">
                Store Name:
              </label>
@@ -198,11 +198,11 @@ export default function ManageStore() {
                type="text"
                value={storeName}
                onChange={(e) => setStoreName(e.target.value)}
-               className="flex-1 border-b w-md border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+               className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
              />
            </div>
  
-           <div className="flex items-center">
+           <div className="flex items-center w-[450px]">
              <label htmlFor="storeId" className="text-sm font-medium text-gray-700 w-40">
                Store ID:
              </label>
@@ -211,7 +211,7 @@ export default function ManageStore() {
                type="text"
                value={storeId}
                onChange={(e) => setStoreId(e.target.value)}
-               className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+               className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
              />
            </div>
  
@@ -241,7 +241,7 @@ export default function ManageStore() {
            <button className="px-4 py-2 rounded text-gray-700 hover:bg-gray-50" onClick={() => setIsModalOpen(false)}>
              Close
            </button>
-           <button className="px-4 py-2 bg-indigo-400 text-white rounded hover:bg-indigo-500">
+           <button className="px-4 py-2 bg-indigo-400 text-white rounded hover:bg-indigo-500" onClick={() => setIsModalOpen(false)}>
              Done
            </button>
          </div>

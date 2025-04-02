@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Button = ({ children, sytling, onClick }) => (
   <button
-    className={`px-4 py-2 rounded bg-[#E1E9FD] text-[#4F4FDC] ${sytling}`}
+    className={`p-2 rounded bg-[#E1E9FD] text-[#4F4FDC] ${sytling}`}
     onClick={() => onClick()}
   >
     {children}
@@ -237,11 +237,13 @@ const StoreVisitTracking = () => {
           </TabsList>
         </Tabs>
         <div className="flex space-x-2">
+          
           <Button
             variant="outline"
-            sytling="bg-[#EFF4FE] border-2 border-[#E1E9FD]"
+            sytling="bg-[#EFF4FE] border-2 border-[#E1E9FD] flex items-center text-black"
             onClick={() => navigate('/manageStores')}
           >
+            <img src="/store.svg" alt="store" className='w-[20px] mr-2' />
             Manage Stores
           </Button>
           <div className="flex items-center rounded-md p-2 w-fit bg-[#F7FAFF] border-2 border-[#EFF5FE]">
@@ -295,10 +297,9 @@ const StoreVisitTracking = () => {
                       <td className="p-4">{item.date || "N/A "}</td>
                       <td className="p-4">{item?.time || "N/A "}</td>
                       <td className="p-4">
-                        {item.tsm || "N/A "}m away from the Entry
+                        {item.tsm}
                       </td>
-                      <td className="p-4">
-                        {item.analysis || "N/A "}&times;{item.y_cord || "N/A "}m
+                      <td className="p-4">{item.analysis}
                       </td>
                     </tr>
                   </>
