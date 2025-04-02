@@ -173,7 +173,7 @@ export default function ManageStore() {
     </div>
     {isModalOpen && (
        <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center">
-       <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+       <div className="bg-white rounded-[33px] shadow-lg w-full max-w-5xl">
          {/* Header */}
          <div className="flex items-center justify-between p-4 border-b border-gray-200">
            <div className="flex items-center gap-2"> 
@@ -198,7 +198,7 @@ export default function ManageStore() {
                type="text"
                value={storeName}
                onChange={(e) => setStoreName(e.target.value)}
-               className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+               className="flex-1 border-b w-md border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
              />
            </div>
  
@@ -211,7 +211,7 @@ export default function ManageStore() {
                type="text"
                value={storeId}
                onChange={(e) => setStoreId(e.target.value)}
-               className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
+               className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500"
              />
            </div>
  
@@ -227,7 +227,7 @@ export default function ManageStore() {
            </div>
  
            {/* Planogram Preview Area */}
-           <div className="border border-gray-200 bg-[#EFF4FE] rounded-lg h-56 flex items-center justify-center overflow-hidden">
+           <div className="border border-gray-200 bg-[#EFF4FE] rounded-lg h-56 w-md flex items-center justify-center overflow-hidden">
              {previewImage ? (
                <img src={previewImage} alt="Planogram Preview" className="h-full w-full object-contain" />
              ) : (
