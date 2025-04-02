@@ -8,6 +8,7 @@ import samsung from '../assets/samsung.png'
 import googlei from '../assets/google.png' 
 import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
+import { useNavigate } from 'react-router-dom';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -22,6 +23,7 @@ const StoreVisitTracking = () => {
   const closeModal = () => {
     setModalImage(null);
   };
+  const navigate = useNavigate();
   const [isStructureVisible, setIsStructureVisible] = useState(false);
   const [isPathVisible, setIsPathVisible] = useState(true);
   const [images, setImages] = useState([]);
@@ -1023,6 +1025,8 @@ return (
         paddingLeft: '15px',
         width: '100%'
       }}
+      className="hover:cursor-pointer"
+      onClick={() => navigate('/')}
     >
       <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
         <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />

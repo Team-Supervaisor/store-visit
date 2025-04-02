@@ -16,26 +16,6 @@ const Card = ({ children }) => (
   <div className="p-4 bg-white rounded-3xl shadow-sm">{children}</div>
 );
 
-const Table = ({ children }) => (
-  <table className="w-full border-collapse border border-gray-300">
-    {children}
-  </table>
-);
-
-const TableHeader = ({ children }) => (
-  <thead className="bg-gray-200">{children}</thead>
-);
-
-const TableRow = ({ children }) => (
-  <tr className="border-b border-gray-300">{children}</tr>
-);
-
-const TableCell = ({ children }) => (
-  <td className="p-2 border border-gray-300 text-black">{children}</td>
-);
-
-const TableBody = ({ children }) => <tbody>{children}</tbody>;
-
 const Tabs = ({ children }) => <div className="">{children}</div>;
 
 const TabsList = ({ children }) => (
@@ -204,7 +184,10 @@ const StoreVisitTracking = () => {
   return (
     <div className="bg-[#F7FAFF] min-h-screen min-w-screen font-[Urbanist]">
       <header className="flex p-4 bg-[#F7FAFF] justify-between items-center">
-        <div style={{ display: "flex", alignItems: "center", marginLeft: 15 }}>
+        <div style={{ display: "flex", alignItems: "center", marginLeft: 15 }}
+          className="hover:cursor-pointer"
+          onClick={() => navigate('/')}
+        >
           <img
             src={logo}
             alt="Logo"
@@ -318,7 +301,7 @@ const StoreVisitTracking = () => {
             <div className="overflow-auto">
               <table className="w-full text-sm text-left bg-white rounded-lg border-[2px] border-[#EFF4FE] pt-[20px] pb-[20px] pr-[32px] pl-[32px] ">
                 <thead className="bg-[#EFF4FE] text-[#717AEA] text-[16px] font-[600]">
-                  <tr className="">
+                  <tr>
                     <th className="p-4">Image</th>
                     <th className="p-4">Store Name</th>
                     <th className="p-4">Date of Visit</th>
@@ -336,6 +319,7 @@ const StoreVisitTracking = () => {
                       <tr
                         key={index}
                         className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
+                        onClick={() => navigate('/store-visit-tracking')}
                       >
                         <td className="p-4 border-[#EFF4FE] flex items-center">
                         <div className="w-[7px] h-[7px] bg-red-500 rounded-full mr-4"></div>

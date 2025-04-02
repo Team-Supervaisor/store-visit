@@ -1,19 +1,22 @@
 import React from "react";
 import logo from "../assets/logo.png";
-import { ArrowRight, Plus, UploadCloudIcon, ChevronRight } from "lucide-react";
-import image_plan from "../assets/samsung.png";
+import {Plus, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Store, X, Upload } from "lucide-react";
 import axios from 'axios';
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [image, setImage] = useState(null);
   const [storeName, setStoreName] = useState("");
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
-    const [storeData,setStoreData]=useState([])
+    const [storeData,setStoreData] = useState([])  
+    const navigate = useNavigate();
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -106,6 +109,8 @@ export default function ManageStore() {
               marginLeft: 15,
               marginTop: "15px",
             }}
+            className="hover:cursor-pointer"
+            onClick={() => navigate('/')}
           >
             <img
               src={logo}
