@@ -363,11 +363,15 @@ const StoreVisitTracking = () => {
                       return true; // Show all if "all" is selected
                     })
                     .map((item, index) => {
+                      if(item.x_y_coords){
                       console.log(item);
+                      }
                       return (
                         <tr
                           key={index}
                           className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
+                          onClick={() => {
+                            navigate('/storevisit', { state: { storeVisitDetails: item } })}}
                         >
                           <td className="p-4 border-[#EFF4FE] flex items-center">
                             <div

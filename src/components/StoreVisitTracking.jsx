@@ -317,7 +317,7 @@ axios.request(config)
 
     if (coord.photoCapture === 1) {
       const vizElement = document.getElementById("visualization");
-      // let trial=find_nearest(coord.x,coord.z,coord.l,coord.b,coord.rotation);
+      let trial=find_nearest(coord.x,coord.z,coord.l,coord.b,coord.rotation);
       // console.log(trial);
     }
   }
@@ -573,7 +573,7 @@ axios.request(config)
   useEffect(() => {
 
     if (!structures.length || !vizDimensions) return;
-      console.log(vizDimensions.width,vizDimensions.height);
+      // console.log(vizDimensions.width,vizDimensions.height);
       setCenterX(vizDimensions.width / 2);
       setCenterZ(vizDimensions.height / 2);
      const centerx = vizDimensions.width / 2;
@@ -661,7 +661,7 @@ useEffect(()=>{
 
 
 setPPolygons(newPolygons);
-console.log("PPOlygons:",pPolygons);
+console.log("PPOlygons:",newPolygons);
 
 },[pstructures,vizDimensions])
 
@@ -740,14 +740,14 @@ useEffect(() => {
       if(data.store_visit_complete==="True")
       {
         console.log("Store visit complete");
-        // savePlanogram(data);
+        savePlanogram(data);
       }
     });
   
     // Receive new image
     socketRef.current.on("new-image", (data) => {
       console.log("New image received:", data);
-      find_nearest(data.x_y_coords.x,data.x_y_coords.y,data.metadata.measurementL,data.metadata.measurementB,data.metadata.rotation);
+      // find_nearest(data.x_y_coords.x,data.x_y_coords.y,data.metadata.measurementL,data.metadata.measurementB,data.metadata.rotation);
       let aisummary=getAI(data.url);
       console.log("AI Summaryrrrrrrr:", aisummary);
       // setAIDetails((prevdetails) => [aisummary, ...prevdetails]);
@@ -804,7 +804,7 @@ const savePlanogram = (coord) => {
   
   axios.request(config)
   .then((response) => {
-    console.log(JSON.stringify(response.data));
+    console.log((response.data));
   })
   .catch((error) => {
     console.log(error);
@@ -1026,7 +1026,7 @@ return (
         width: '100%'
       }}
       className="hover:cursor-pointer"
-      onClick={() => navigate('/')}
+      // onClick={() => navigate('/')}
     >
       <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
         <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
@@ -1193,7 +1193,7 @@ return (
           onClick={() => setSelectedImage(index)}
         >
           <image
-    href={imageHistory[index].metadata.brand=='google'?googlei:imageHistory[index].metadata.brand=='apple'?apple:imageHistory[index].metadata.brand=='Google'?googlei:samsung}
+    href={imageHistory[index].metadata.brand=='google'?googlei:imageHistory[index].metadata.brand=='Apple'?apple:imageHistory[index].metadata.brand=='Google'?googlei:samsung}
     x={polygon.imageX + 5} // Slightly inward positioning
     y={polygon.imageY + 5}
     width={polygon.imageWidth - 10} // Reduced width
