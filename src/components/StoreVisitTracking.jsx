@@ -1163,7 +1163,7 @@ return (
       <polyline
         points={
           coordinates
-            .map(point => `${centerX + point.x},${centerZ + point.z}`)
+            .map(point => `${centerX + point.x},${centerZ + point.y}`)
             .join(' ')
         }
         fill="none"
