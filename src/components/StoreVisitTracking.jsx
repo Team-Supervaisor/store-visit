@@ -1306,7 +1306,7 @@ return (
                         <span className="card-info-value">{a.merchandise || 'N/A'}</span>
                         <span className="card-info-value">{a.product || 'N/A'}</span>
                         <span className="card-info-value">
-                          {parseFloat(a.measurementL).toFixed(3)}&times;{parseFloat(a.measurementB).toFixed(3)}
+                          {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
                         </span>
                       </div>
                     </div>
