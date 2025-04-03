@@ -150,12 +150,18 @@ useEffect(() => {
         paddingLeft: '15px',
         width: '100%'
       }}
-      className="hover:cursor-pointer"
       // onClick={() => navigate('/')}
     >
-      <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
+      <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }} 
+      className="hover:cursor-pointer"
+
+      onClick={() => navigate('/')}
+      
+      >
         <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
-        <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }}>Store Visit Tracking</h1>
+        <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }} 
+        
+        >Store Visit Tracking</h1>
       </div>
       <div className="control-panel" style={{ textAlign: 'right' }}>
         <div>
