@@ -326,7 +326,7 @@ export default function ManageStore() {
                 {previewImage ? (
                   <div className="relative w-full h-full" ref={imageRef}>
                     <img
-                      src={previewImage}
+                      src={previewImage || "https://firebasestorage.googleapis.com/v0/b/fieldapp-39256.appspot.com/o/planogram%2FFrame%2040.png?alt=media&token=1d749e88-3180-4e97-871c-ca9ff6c858af"}
                       onClick={handleImageClick}
                       alt="Planogram Preview"
                     />
