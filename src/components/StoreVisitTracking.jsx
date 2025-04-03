@@ -51,6 +51,7 @@ const [isHovering, setIsHovering] = useState();
 const [aiDetails, setAIDetails] = useState();
 const [distCoord,setDistcoord]=useState([]);
 const [save,setSave]=useState(false);
+const [itr,setItr]=useState(0);
 
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
@@ -661,9 +662,7 @@ useEffect(()=>{
 
 
 setPPolygons(newPolygons);
-if(save===true){
-  savePlanogram();
-}
+
 console.log("PPOlygons:",newPolygons);
 
 },[pstructures,vizDimensions])
@@ -743,7 +742,6 @@ useEffect(() => {
       {
         console.log("Store visit complete");
         setSave(true);
-        // savePlanogram(data);
       }
     });
   
@@ -754,9 +752,7 @@ useEffect(() => {
       let aisummary=getAI(data.url);
       setImageHistory(prevHistory => [...prevHistory,data]);
       console.log("To be saved:",save);
-      if(save===true){
-        savePlanogram();
-      }
+      
       //updateImagePointMap();
       //renderAllImages();
     });
@@ -788,7 +784,10 @@ useEffect(() => {
     };
   }, []); // Dependency array
   
+// useEffect(() => {
 
+//   savePlanogram();
+// }, [save]);
     
 
 const savePlanogram = () => {
@@ -812,6 +811,7 @@ const savePlanogram = () => {
   axios.request(config)
   .then((response) => {
     console.log((response.data));
+    handleClearButton();
   })
   .catch((error) => {
     console.log(error);
@@ -1283,7 +1283,7 @@ return (
           Reports
         </div>
         <div id="imageContainer">
-          {imageHistory.length > 0 && aiDetails.length>0 ? (
+          {imageHistory.length > 0 ? (
             // console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
               let a = parseImageUrl(image.url);
@@ -1337,9 +1337,9 @@ return (
                Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
            </p> */}
                         <p className="extra-details">
-                          <strong>Brand:</strong> {aiDetails[index]?.brand || 'N/A'} <br />
-                          <strong>Position:</strong> {aiDetails[index]?.position || 'N/A'} <br />
-                          <strong>Summary:</strong> {aiDetails[index]?.summary || 'No AI analysis available.'}
+                          <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
+                          <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
+                          <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
                         </p>
                         {/* <p>
                           {aiDetails[index]?.summary || 'No AI analysis available.'}

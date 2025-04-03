@@ -166,7 +166,7 @@ const StoreVisitTracking = () => {
     
     axios.request(config)
     .then((response) => {
-      console.log((response.data));
+      // console.log((response.data));
       setStoreVisit(response.data.store_visits);
 
       storevisitdetails(response.data.store_visits);
@@ -365,16 +365,16 @@ const StoreVisitTracking = () => {
                     })
                     .map((item, index) => {
                       if(item.x_y_coords){
-                      console.log(item);
-                      console.log(item.x_y_coords,item.x_y_coords.length,typeof(item.x_y_coords));
+                      // console.log(item);
+                      // console.log(item.x_y_coords,item.x_y_coords.length,typeof(item.x_y_coords));
                       }
                       return (
                         <tr
                           key={index}
                           className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
                           onClick={() => {
-                            // navigate('/storevisit', { state: { storeVisitDetails: item } })
-                            navigate('/store-visit-tracking')
+                            navigate('/storevisit', { state: { storeVisitDetails: item } })
+                            // navigate('/store-visit-tracking')
                           }}
                         >
                           <td className="p-4 border-[#EFF4FE] flex items-center">
