@@ -119,8 +119,8 @@ const Dropdown = ({ options, selected, onChange }) => {
 const StoreVisitTracking = () => {
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState("all");
-  const [selectedStore, setSelectedStore] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStore, setSelectedStore] = useState('all');
+  const [selectedDate, setSelectedDate] = useState('all');
   const [storeId, setStoreId] = useState("");
   const [date, setDate] = useState("");
   const [storeVisit,setStoreVisit] = useState([])
@@ -145,6 +145,7 @@ const StoreVisitTracking = () => {
         setDate(updatedDates);
         setSelectedStore(updatedStoreIds[0]);
         setSelectedDate(updatedDates[0]);
+        handleGo();
       })
       .catch((error) => {
         console.log(error);
@@ -365,13 +366,16 @@ const StoreVisitTracking = () => {
                     .map((item, index) => {
                       if(item.x_y_coords){
                       console.log(item);
+                      console.log(item.x_y_coords,item.x_y_coords.length,typeof(item.x_y_coords));
                       }
                       return (
                         <tr
                           key={index}
                           className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
                           onClick={() => {
-                            navigate('/storevisit', { state: { storeVisitDetails: item } })}}
+                            // navigate('/storevisit', { state: { storeVisitDetails: item } })
+                            navigate('/store-visit-tracking')
+                          }}
                         >
                           <td className="p-4 border-[#EFF4FE] flex items-center">
                             <div

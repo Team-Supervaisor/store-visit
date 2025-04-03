@@ -50,6 +50,8 @@ const [pPolygons, setPPolygons] = useState([]);
 const [isHovering, setIsHovering] = useState();
 const [aiDetails, setAIDetails] = useState();
 const [distCoord,setDistcoord]=useState([]);
+const [save,setSave]=useState(false);
+
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -62,7 +64,7 @@ let squares=[];
 const vizRef = useRef(null);
   useEffect(() => {
     // localStorage.getItem
-    handleClearButton();
+    // handleClearButton();
   }, [])
   
   const structures = [
@@ -426,8 +428,6 @@ axios.request(config)
   
     const center = [...getPolygonCenter(nearest.coordinates)];
     console.log("Center:", center);
-    //append in the front to cenercoord
-    // setCenterCoord(prevcenterCoord  => [center,...prevcenterCoord]);
     setCenterCoord((prev) => {
       // console.log("Previous State:", prev);
       const updated = [center, ...prev];
@@ -448,8 +448,8 @@ axios.request(config)
       l=10;
       b=5;
     }
-    l=l*10;
-    b=b*10;
+    l=l*30;
+    b=b*30;
     // const pcoordinates=[
     //   [perpendicularPoint[0] - l, perpendicularPoint[1] - b/2], // Top-left
     //   [perpendicularPoint[0] - l, perpendicularPoint[1] + b/2],
@@ -611,7 +611,7 @@ axios.request(config)
 
 
 useEffect(()=>{
-  console.log(vizDimensions.width,vizDimensions.height);
+  // console.log(vizDimensions.width,vizDimensions.height);
       setCenterX(vizDimensions.width / 2);
       setCenterZ(vizDimensions.height / 2);
       const centerx = vizDimensions.width / 2;
@@ -661,6 +661,9 @@ useEffect(()=>{
 
 
 setPPolygons(newPolygons);
+if(save===true){
+  savePlanogram();
+}
 console.log("PPOlygons:",newPolygons);
 
 },[pstructures,vizDimensions])
@@ -690,7 +693,6 @@ useEffect(() => {
     window.removeEventListener('resize', updateDimensions);
   };
 }, []);
-
   // Connect to Socket.IO when component mounts
   useEffect(() => {
     // socketRef.current = io();
@@ -737,10 +739,11 @@ useEffect(() => {
       updateDistanceDisplay(data);
       // console.log("render coordinate")
       renderCoordinate(data);
-      if(data.store_visit_complete==="True")
+      if(data.store_visit_complete==="true")
       {
         console.log("Store visit complete");
-        savePlanogram(data);
+        setSave(true);
+        // savePlanogram(data);
       }
     });
   
@@ -749,11 +752,11 @@ useEffect(() => {
       console.log("New image received:", data);
       // find_nearest(data.x_y_coords.x,data.x_y_coords.y,data.metadata.measurementL,data.metadata.measurementB,data.metadata.rotation);
       let aisummary=getAI(data.url);
-      console.log("AI Summaryrrrrrrr:", aisummary);
-      // setAIDetails((prevdetails) => [aisummary, ...prevdetails]);
-      // Add to beginning of array so newest is first
       setImageHistory(prevHistory => [...prevHistory,data]);
-
+      console.log("To be saved:",save);
+      if(save===true){
+        savePlanogram();
+      }
       //updateImagePointMap();
       //renderAllImages();
     });
@@ -785,13 +788,17 @@ useEffect(() => {
     };
   }, []); // Dependency array
   
-const savePlanogram = (coord) => {
+
+    
+
+const savePlanogram = () => {
+  console.log("Ppolygons:",pPolygons);
   let data1 = JSON.stringify({
-    "store_visit_id": coord.store_visit_id,
+    "store_visit_id": coordinates[0].store_visit_id,
     "polygon_cords": pPolygons,
     "total_distance": totalDistance
   });
-  
+  console.log("Data to send to saveee:", data1);
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
@@ -870,7 +877,7 @@ const savePlanogram = (coord) => {
         "b": 0,
         "timestamp": timestamp,
         "store_id": "store1",
-        "store_visit_complete": Math.random() > 0.9 ? "True" : "False"
+        "store_visit_complete": Math.random() > 0.6 ? "true" : "false"
       }
     });
     
@@ -1089,7 +1096,7 @@ return (
       ref={distanceDisplayRef}
       style={{ color: 'black', fontWeight: 500,marginLeft:15 }}
     >
-      Distance: {totalDistance.toFixed(2)}
+      Distance: {totalDistance?.toFixed(2)}
     </span>
     <span className="arrow">◀</span>
   </span>
@@ -1181,7 +1188,7 @@ return (
     </svg>
   )} */}
 
-  {isPathVisible && imageHistory.length==pPolygons.length && (
+  {isPathVisible  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
       {pPolygons.map((polygon, index) => (
         <g
@@ -1192,14 +1199,14 @@ return (
           onMouseLeave={() => setIsHovering(null)}
           onClick={() => setSelectedImage(index)}
         >
-          <image
+          {/* <image
     href={imageHistory[index].metadata.brand=='google'?googlei:imageHistory[index].metadata.brand=='Apple'?apple:imageHistory[index].metadata.brand=='Google'?googlei:samsung}
     x={polygon.imageX + 5} // Slightly inward positioning
     y={polygon.imageY + 5}
     width={polygon.imageWidth - 10} // Reduced width
     height={polygon.imageHeight - 10} // Reduced height
     preserveAspectRatio="xMidYMid slice"
-  />
+  /> */}
           <path
             d={polygon.pathData}
             fill={polygon.color}
