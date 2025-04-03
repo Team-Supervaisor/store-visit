@@ -96,6 +96,7 @@ useEffect(() => {
         setCoordinates(storeVisitDetails.x_y_coords);
         setPPolygons(storeVisitDetails.polygon_coordinates);
         setImageHistory(storeVisitDetails.images);
+        setTotalDistance(storeVisitDetails.distance);
         
       }
     }, []);
@@ -215,16 +216,13 @@ useEffect(() => {
 {/* Distance Display */}
 <div className="info-display">
   <span className="distance-box">
-    <span
-      id="distance"
-      ref={distanceDisplayRef}
-      style={{ color: 'black', fontWeight: 500,marginLeft:15 }}
-    >
+    <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
       Distance: {totalDistance?.toFixed(2)}
     </span>
     <span className="arrow">◀</span>
   </span>
 </div>
+
 
 
     {/* Main Layout */}
