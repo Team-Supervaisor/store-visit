@@ -19,6 +19,7 @@ export default function ManageStore() {
   const [clickPosition, setClickPosition] = useState();
   const imageRef = useRef(null);
   const navigate = useNavigate();
+  const [tsmName, setTsmName] = useState("");
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -29,7 +30,7 @@ export default function ManageStore() {
       setPreviewImage(imageUrl);
     }
   };
-  
+
   const handleCreate = async () => {
     if (!storeName || !storeId) {
       alert("Please fill all the fields");
@@ -43,28 +44,31 @@ export default function ManageStore() {
       alert("Please click on the image to set the start point");
       return;
     }
-  
+
     const formData = {
       name: storeName,
       store_id: storeId,
       planogram: image,
-      TSM_name: "John Doe",
+      TSM_name: tsmName,
       transform: JSON.stringify({
         scale: 1.0,
       }),
       startpoint: JSON.stringify(clickPosition),
     };
-  
+
     console.log("Form data: ", formData);
-    const url = updateStore ? `https://store-visit-85801868683.us-central1.run.app/updatestore/${storeId}` : "https://store-visit-85801868683.us-central1.run.app/addstores";
-    axios.post(url, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
+    const url = updateStore
+      ? `https://store-visit-85801868683.us-central1.run.app/updatestore/${storeId}`
+      : "https://store-visit-85801868683.us-central1.run.app/addstores";
+    axios
+      .post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         console.log(res.data);
-        if(updateStore) alert("Store updated successfully");
+        if (updateStore) alert("Store updated successfully");
         else alert("Store added successfully");
         handleClose();
       })
@@ -72,7 +76,6 @@ export default function ManageStore() {
         console.log(err);
       });
   };
-  
 
   const handleClose = () => {
     setIsModalOpen(false);
@@ -82,7 +85,9 @@ export default function ManageStore() {
     setClickPosition(null);
     setImage(null);
     setAllowClickPosition(false);
-  }
+    setUpdateStore(false);
+    setTsmName("");
+  };
 
   const handleImageClick = (event) => {
     if (!allowClickPosition) return;
@@ -94,8 +99,6 @@ export default function ManageStore() {
     // Convert to desired coordinate system
     const mappedX = (x / rect.width) * 1000 - 500;
     const mappedY = (y / rect.height) * 500 - 250;
-    console.log("Mapped X:", mappedX);
-    console.log("Mapped Y:", mappedY);
     setClickPosition({ x: mappedX, y: mappedY });
   };
 
@@ -182,10 +185,11 @@ export default function ManageStore() {
                         key={index}
                         className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[5px] hover:bg-[#F6F9FF] transition duration-200"
                         onClick={() => {
-                          setIsModalOpen(true)
-                          setUpdateStore(true)
+                          setIsModalOpen(true);
+                          setUpdateStore(true);
                           setStoreName(store.name);
                           setStoreId(store.store_id);
+                          setTsmName(store.TSM_name);
                         }}
                       >
                         <td className="px-6 py-2 text-[14px]">{store.name}</td>
@@ -281,6 +285,23 @@ export default function ManageStore() {
                 />
               </div>
 
+              <div className="flex items-center w-[450px]">
+                <label
+                  htmlFor="tsmName"
+                  className="text-sm font-medium text-gray-700 w-40"
+                >
+                  TSM Name:
+                </label>
+                <input
+                  id="tsmName"
+                  disabled={updateStore}
+                  type="text"
+                  value={tsmName}
+                  onChange={(e) => setTsmName(e.target.value)}
+                  className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                />
+              </div>
+
               <div className="flex items-center">
                 <label className="text-sm font-medium text-gray-700 w-40">
                   Upload Planogram:
@@ -304,25 +325,24 @@ export default function ManageStore() {
               </div>
 
               {/* Planogram Preview Area */}
-              <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg h-56 w-md flex items-center justify-center overflow-hidden mb-4">
+              <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
                 {previewImage ? (
-                  <div className="relative">
+                  <div className="relative w-full h-full" ref={imageRef}>
                     <img
                       src={previewImage}
-                      ref={imageRef}
                       onClick={handleImageClick}
                       alt="Planogram Preview"
-                      className="h-full w-full object-contain"
                     />
                     {clickPosition && (
-                      <div
-                        className="absolute bg-red-500 w-3 h-3 rounded-full"
+                      <img
+                        src="/pointer.svg"
+                        className="absolute w-5 h-5"
                         style={{
                           left: `${((clickPosition.x + 500) / 1000) * 100}%`,
                           top: `${((clickPosition.y + 250) / 500) * 100}%`,
                           transform: "translate(-50%, -50%)",
                         }}
-                      ></div>
+                      ></img>
                     )}
                   </div>
                 ) : (
@@ -352,7 +372,7 @@ export default function ManageStore() {
               <button
                 className="px-4 py-2 bg-indigo-400 text-white rounded text-sm font-bold w-[120px] hover:bg-indigo-500"
                 onClick={() => {
-                  handleCreate()
+                  handleCreate();
                 }}
               >
                 Done
