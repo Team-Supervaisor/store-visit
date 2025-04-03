@@ -611,61 +611,61 @@ axios.request(config)
   }, [vizDimensions]);
 
 
-useEffect(()=>{
-  // console.log(vizDimensions.width,vizDimensions.height);
-      setCenterX(vizDimensions.width / 2);
-      setCenterZ(vizDimensions.height / 2);
-      const centerx = vizDimensions.width / 2;
-      const centerz = vizDimensions.height / 2;
+  const pPolygonsRef = useRef([]);
 
-      const newPolygons = pstructures.map((structure,structureIndex) => {
-        console.log("polygon structure:",structure);
-        let pathData = "";
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-
-        structure.coordinates.forEach((coord, index) => {
-          const screenX = centerx + coord[0];
-          const screenZ = centerz + coord[1];
+  useEffect(() => {
+    setCenterX(vizDimensions.width / 2);
+    setCenterZ(vizDimensions.height / 2);
+    const centerx = vizDimensions.width / 2;
+    const centerz = vizDimensions.height / 2;
   
-          pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
-          minX = Math.min(minX, screenX);
-      maxX = Math.max(maxX, screenX);
-      minY = Math.min(minY, screenZ);
-      maxY = Math.max(maxY, screenZ);
-        });
+    const newPolygons = pstructures.map((structure, structureIndex) => {
+      let pathData = "";
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   
-        pathData += "Z"; // Close the polygon
-  
-        const centerCoord = getPolygonCenter(structure.coordinates);
-        const textX = centerx + centerCoord[0];
-        const textY = centerz + centerCoord[1];
-        
-        const imageWidth = maxX - minX - 10;
-        const imageHeight = maxY - minY - 10;
-        const imageX = minX + 5; // Shift slightly inward
-        const imageY = minY + 5;
-        return {
-          image_id: structureIndex.toString(), 
-          name:"",
-          type: 'counter',
-          pathData,
-          textX,
-          textY,
-          color: 'white',
-          imageX,  // Store computed image position
-      imageY,
-      imageWidth,
-      imageHeight,
-        };
+      structure.coordinates.forEach((coord, index) => {
+        const screenX = centerx + coord[0];
+        const screenZ = centerz + coord[1];
+    
+        pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+        minX = Math.min(minX, screenX);
+        maxX = Math.max(maxX, screenX);
+        minY = Math.min(minY, screenZ);
+        maxY = Math.max(maxY, screenZ);
       });
-    //  const newQuad=
-
-
-setPPolygons(newPolygons);
-
-console.log("PPOlygons:",newPolygons);
-
-},[pstructures,vizDimensions])
+  
+      pathData += "Z"; // Close the polygon
+  
+      const centerCoord = getPolygonCenter(structure.coordinates);
+      const textX = centerx + centerCoord[0];
+      const textY = centerz + centerCoord[1];
+  
+      const imageWidth = maxX - minX - 10;
+      const imageHeight = maxY - minY - 10;
+      const imageX = minX + 5;
+      const imageY = minY + 5;
+      
+      return {
+        image_id: structureIndex.toString(),
+        name: "",
+        type: 'counter',
+        coordinates: structure.coordinates,
+        pathData,
+        textX,
+        textY,
+        color: 'white',
+        imageX,
+        imageY,
+        imageWidth,
+        imageHeight,
+      };
+    });
+    
+    setPPolygons(newPolygons);
+    pPolygonsRef.current = newPolygons; // Update the ref with the latest polygons
+    console.log("PPolygons:", newPolygons);
+  }, [pstructures, vizDimensions]);
+  
 
 // Add state for the visualization dimensions
 
@@ -746,16 +746,48 @@ useEffect(() => {
     });
   
     // Receive new image
-    socketRef.current.on("new-image", (data) => {
-      console.log("New image received:", data);
-      // find_nearest(data.x_y_coords.x,data.x_y_coords.y,data.metadata.measurementL,data.metadata.measurementB,data.metadata.rotation);
-      let aisummary=getAI(data.url);
-      setImageHistory(prevHistory => [...prevHistory,data]);
-      console.log("To be saved:",save);
-      
-      //updateImagePointMap();
-      //renderAllImages();
-    });
+    // Separate function to post the payload to the update endpoint
+const postPayload = (payload) => {
+  axios.post(
+    'https://store-visit-85801868683.us-central1.run.app/api/update_store_visit',
+    payload,
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+  .then((response) => {
+    console.log("Payload published successfully:", response.data);
+  })
+  .catch((error) => {
+    console.error("Error publishing payload:", error);
+  });
+};
+
+// Socket event handler for new-image remains largely unchanged
+socketRef.current.on("new-image", (data) => {
+  console.log("New image received:", data);
+
+  // Existing functionality: process AI and update state
+  let aisummary = getAI(data.url);
+  setImageHistory(prevHistory => [...prevHistory, data]);
+
+  // Access the latest pPolygons from the ref
+  const latestPPolygons = pPolygonsRef.current;
+  console.log("Latest PPolygons:", latestPPolygons);
+  // For example, if you want to use the coordinates of the last polygon:
+  const latestPolygonCoordinates = latestPPolygons.length > 0 
+    ? latestPPolygons[latestPPolygons.length - 1].coordinates 
+    : [];
+
+  const payload = {
+    image_id: data.image_id,
+    polygon_coordinates: latestPolygonCoordinates,
+  };
+
+  console.log("Payload:", payload);
+  postPayload(payload);
+});
+
+
+
   
     // Coordinates cleared
     socketRef.current.on("coordinates-cleared", () => {
@@ -791,7 +823,7 @@ useEffect(() => {
     
 
 const savePlanogram = () => {
-  console.log("Ppolygons:",pPolygons);
+  console.log("Ppolygons are:",pPolygons);
   let data1 = JSON.stringify({
     "store_visit_id": coordinates[0].store_visit_id,
     "polygon_cords": pPolygons,
