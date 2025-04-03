@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [updateStore, setUpdateStore] = useState(false);
   const [image, setImage] = useState(null);
   const [allowClickPosition, setAllowClickPosition] = useState(false);
   const [storeName, setStoreName] = useState("");
@@ -55,15 +56,16 @@ export default function ManageStore() {
     };
   
     console.log("Form data: ", formData);
-  
-    axios.post("https://store-visit-85801868683.us-central1.run.app/addstores", formData, {
+    const url = updateStore ? `https://store-visit-85801868683.us-central1.run.app/updatestore/${storeId}` : "https://store-visit-85801868683.us-central1.run.app/addstores";
+    axios.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
       .then((res) => {
         console.log(res.data);
-        alert("Store added successfully");
+        if(updateStore) alert("Store updated successfully");
+        else alert("Store added successfully");
         handleClose();
       })
       .catch((err) => {
@@ -179,6 +181,12 @@ export default function ManageStore() {
                       <tr
                         key={index}
                         className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[5px] hover:bg-[#F6F9FF] transition duration-200"
+                        onClick={() => {
+                          setIsModalOpen(true)
+                          setUpdateStore(true)
+                          setStoreName(store.name);
+                          setStoreId(store.store_id);
+                        }}
                       >
                         <td className="px-6 py-2 text-[14px]">{store.name}</td>
                         <td className="px-6 py-2 text-[14px]">
@@ -226,12 +234,12 @@ export default function ManageStore() {
                   />
                 </div>
                 <h1 className="text-lg font-medium text-black ml-2">
-                  Add Store Details
+                  {updateStore ? "Update Store Details" : "Add Store Details"}
                 </h1>
               </div>
               <button
                 className="text-gray-500 hover:text-gray-700 bg-[#F8F8F8] p-[4px] rounded-full"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => handleClose()}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -249,6 +257,7 @@ export default function ManageStore() {
                 <input
                   id="storeName"
                   type="text"
+                  disabled={updateStore}
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
                   className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
@@ -264,6 +273,7 @@ export default function ManageStore() {
                 </label>
                 <input
                   id="storeId"
+                  disabled={updateStore}
                   type="text"
                   value={storeId}
                   onChange={(e) => setStoreId(e.target.value)}
@@ -341,7 +351,9 @@ export default function ManageStore() {
               </button>
               <button
                 className="px-4 py-2 bg-indigo-400 text-white rounded text-sm font-bold w-[120px] hover:bg-indigo-500"
-                onClick={() => handleCreate()}
+                onClick={() => {
+                  handleCreate()
+                }}
               >
                 Done
               </button>
