@@ -63,27 +63,32 @@ const socketRef = useRef(null);
 let squares=[];
 const vizRef = useRef(null);
 useEffect(() => {
-  // Function to update dimensions
   const updateDimensions = () => {
-    if (vizRef.current) {
-      setVizDimensions({
-        width: vizRef.current.offsetWidth,
-        height: vizRef.current.offsetHeight
-      });
-    }
+    setTimeout(() => {
+      if (vizRef.current) {
+        setVizDimensions({
+          width: vizRef.current.offsetWidth,
+          height: vizRef.current.offsetHeight
+        });
+      }
+    }, 100); // Small delay to allow layout calculation
   };
 
-  // Initial dimensions update
   updateDimensions();
+  window.addEventListener("resize", updateDimensions);
 
-  // Add resize event listener
-  window.addEventListener('resize', updateDimensions);
-
-  // Cleanup
-  return () => {
-    window.removeEventListener('resize', updateDimensions);
-  };
+  return () => window.removeEventListener("resize", updateDimensions);
 }, []);
+useEffect(() => {
+    // console.log(vizDimensions.width,vizDimensions.height);
+    setCenterX(vizDimensions.width / 2);
+    setCenterZ(vizDimensions.height / 2);
+   const centerx = vizDimensions.width / 2;
+   const centerz = vizDimensions.height / 2;
+
+
+}, [ vizDimensions]);
+
 
     useEffect(() => {
       console.log('Store Visit Details:', storeVisitDetails);
@@ -228,7 +233,7 @@ useEffect(() => {
         backgroundColor:'white'
         // zIndex:10 // Full height of the viewport
       }}>
-      <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
+<div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
     <svg
@@ -259,9 +264,9 @@ useEffect(() => {
     <>
       {coordinates.map((point, index) => 
       {
-        console.log("point",point);
-        console.log("centerX",centerX);
-        console.log("centerZ",centerZ);
+        // console.log("point",point);
+        // console.log("centerX",centerX);
+        // console.log("centerZ",centerZ);
         return(
         <div
           key={index}
@@ -402,6 +407,7 @@ useEffect(() => {
           {imageHistory.length > 0 ? (
             // console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
+              // console.log("image",image);
               // let a = parseImageUrl(image.url);
               // let ai = getAI(image.url);
               // console.log("AI:",ai);  
@@ -414,7 +420,7 @@ useEffect(() => {
                   <div className="card-image-container">
                     {/* NEW LINE: onClick added here to open modal */}
                     <img
-                      src={image.metadata?.image_url}
+                      src={image.image_url}
                       alt={`Report ${index}`}
                       className="card-image"
                       onClick={() => openModal(image.url)}
@@ -429,11 +435,11 @@ useEffect(() => {
                         <span className="card-info-label">Measurement</span>
                       </div>
                       <div className="card-info-row">
-                        <span className="card-info-value">{imageHistory[index].metadata?.brand || 'N/A'}</span>
-                        <span className="card-info-value">{imageHistory[index].metadata?.merchandise || 'N/A'}</span>
-                        <span className="card-info-value">{imageHistory[index].metadata?.product || 'N/A'}</span>
+                        <span className="card-info-value">{image?.brand || 'N/A'}</span>
+                        <span className="card-info-value">{image?.merchandise || 'N/A'}</span>
+                        <span className="card-info-value">{image?.product || 'N/A'}</span>
                         <span className="card-info-value">
-                          {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata?.measurementB).toFixed(3)}
+                          {parseFloat(image?.length).toFixed(3)}&times;{parseFloat(image?.breadth).toFixed(3)}
                         </span>
                       </div>
                     </div>
