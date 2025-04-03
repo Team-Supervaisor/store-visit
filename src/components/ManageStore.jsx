@@ -56,9 +56,8 @@ export default function ManageStore() {
       startpoint: JSON.stringify(clickPosition),
     };
 
-    console.log("Form data: ", formData);
     const url = updateStore
-      ? `https://store-visit-85801868683.us-central1.run.app/updatestore/${storeId}`
+      ? `https://store-visit-85801868683.us-central1.run.app/updatestore`
       : "https://store-visit-85801868683.us-central1.run.app/addstores";
     axios
       .post(url, formData, {
