@@ -260,7 +260,6 @@ export default function ManageStore() {
                 <input
                   id="storeName"
                   type="text"
-                  disabled={updateStore}
                   value={storeName}
                   onChange={(e) => setStoreName(e.target.value)}
                   className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
@@ -293,7 +292,6 @@ export default function ManageStore() {
                 </label>
                 <input
                   id="tsmName"
-                  disabled={updateStore}
                   type="text"
                   value={tsmName}
                   onChange={(e) => setTsmName(e.target.value)}
