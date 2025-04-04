@@ -395,7 +395,13 @@ export default function ManageStore() {
           </div>
         </div>
       )}
+      {isDrawerOpen && isModalOpen && (
+        <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]">
+
       <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      </div>
+
+      )}
     </>
   );
 }
