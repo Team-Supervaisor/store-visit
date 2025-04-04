@@ -11,6 +11,8 @@ export default function DrawingCanvas() {
     isDrawing: false,
     startX: 0,
     startY: 0,
+    currentX: 0,
+    currentY: 0,
   })
   const [shapes, setShapes] = useState([])
   const [nextId, setNextId] = useState(1)
@@ -21,27 +23,9 @@ export default function DrawingCanvas() {
     text: "",
   })
 
-  // Canvas dimensions and coordinate system
-  const canvasWidth = 1000 // -500 to +500
-  const canvasHeight = 500 // -250 to +250
-
-  // Convert canvas coordinates to our coordinate system
-  const toCoordX = (canvasX) => {
-    return canvasX - canvasWidth / 2
-  }
-
-  const toCoordY = (canvasY) => {
-    return -1 * (canvasY - canvasHeight / 2)
-  }
-
-  // Convert our coordinate system to canvas coordinates
-  const toCanvasX = (coordX) => {
-    return coordX + canvasWidth / 2
-  }
-
-  const toCanvasY = (coordY) => {
-    return -1 * coordY + canvasHeight / 2
-  }
+  // Canvas dimensions - using natural canvas coordinates now
+  const canvasWidth = 1000
+  const canvasHeight = 500
 
   // Initialize canvas context
   useEffect(() => {
@@ -63,7 +47,7 @@ export default function DrawingCanvas() {
     }
   }, [])
 
-  // Draw all shapes
+  // Draw all shapes and preview
   useEffect(() => {
     if (!ctx || !canvasRef.current) return
 
@@ -76,19 +60,38 @@ export default function DrawingCanvas() {
       if (shape.type === "rectangle") {
         ctx.strokeStyle = "#000000"
         ctx.lineWidth = 2
-        ctx.strokeRect(toCanvasX(shape.x), toCanvasY(shape.y), shape.width, shape.height)
+        ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
 
         // Draw ID in the top-left corner of the rectangle
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
-        ctx.fillText(`ID: ${shape.id}`, toCanvasX(shape.x) + 5, toCanvasY(shape.y) + 15)
+        ctx.fillText(`ID: ${shape.id}`, shape.x + 5, shape.y + 15)
       } else if (shape.type === "text") {
         ctx.fillStyle = "#000000"
         ctx.font = "16px Arial"
-        ctx.fillText(shape.text, toCanvasX(shape.x), toCanvasY(shape.y))
+        ctx.fillText(shape.text, shape.x, shape.y)
       }
     })
-  }, [shapes, ctx])
+
+    // Draw preview shape if currently drawing
+    if (drawingState.isDrawing && selectedTool === "rectangle") {
+      const width = drawingState.currentX - drawingState.startX
+      const height = drawingState.currentY - drawingState.startY
+
+      // Draw preview with semi-transparent style
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.6)" // Purple with transparency
+      ctx.lineWidth = 2
+      ctx.setLineDash([5, 3]) // Dashed line for preview
+      ctx.strokeRect(drawingState.startX, drawingState.startY, width, height)
+
+      // Fill with very light color
+      ctx.fillStyle = "rgba(99, 102, 241, 0.1)" // Very light purple
+      ctx.fillRect(drawingState.startX, drawingState.startY, width, height)
+
+      // Reset line dash
+      ctx.setLineDash([])
+    }
+  }, [shapes, ctx, drawingState])
 
   // Handle mouse events
   const startDrawing = (e) => {
@@ -105,22 +108,35 @@ export default function DrawingCanvas() {
         isDrawing: true,
         startX: canvasX,
         startY: canvasY,
+        currentX: canvasX,
+        currentY: canvasY,
       })
     } else if (selectedTool === "text") {
       // Position for new text
       setTextInput({
         isActive: true,
-        x: toCoordX(canvasX),
-        y: toCoordY(canvasY),
+        x: canvasX,
+        y: canvasY,
         text: "",
       })
     }
   }
 
   const draw = (e) => {
-    if (!drawingState.isDrawing || !ctx || !canvasRef.current || selectedTool !== "rectangle") return
+    if (!drawingState.isDrawing || !ctx || !canvasRef.current) return
 
-    // This would be for a live preview while drawing, but we'll skip it for simplicity
+    const rect = canvasRef.current.getBoundingClientRect()
+    const canvasX = e.clientX - rect.left
+    const canvasY = e.clientY - rect.top
+
+    if (selectedTool === "rectangle") {
+      // Update current position for preview
+      setDrawingState({
+        ...drawingState,
+        currentX: canvasX,
+        currentY: canvasY,
+      })
+    }
   }
 
   const stopDrawing = (e) => {
@@ -136,23 +152,19 @@ export default function DrawingCanvas() {
 
     // Only add if it has some size
     if (Math.abs(width) > 5 && Math.abs(height) > 5) {
-      // Convert to our coordinate system
-      const x = toCoordX(drawingState.startX)
-      const y = toCoordY(drawingState.startY)
-
-      // Add new rectangle to shapes
+      // Add new rectangle to shapes using raw canvas coordinates
       const newRectangle = {
         id: nextId,
         type: "rectangle",
-        x: x,
-        y: y,
+        x: drawingState.startX,
+        y: drawingState.startY,
         width: width,
-        height: -height, // Flip height due to canvas y-axis being inverted
+        height: height,
         vertices: [
-          { x: x, y: y },
-          { x: x + width, y: y },
-          { x: x + width, y: y - height },
-          { x: x, y: y - height },
+          { x: drawingState.startX, y: drawingState.startY },
+          { x: drawingState.startX + width, y: drawingState.startY },
+          { x: drawingState.startX + width, y: drawingState.startY + height },
+          { x: drawingState.startX, y: drawingState.startY + height },
         ],
       }
 
@@ -160,7 +172,13 @@ export default function DrawingCanvas() {
       setNextId(nextId + 1)
     }
 
-    setDrawingState({ ...drawingState, isDrawing: false })
+    setDrawingState({
+      isDrawing: false,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0,
+    })
   }
 
   const handleTextSubmit = (text) => {
@@ -220,8 +238,8 @@ export default function DrawingCanvas() {
           <div
             className="absolute bg-white p-2 rounded shadow-md"
             style={{
-              left: toCanvasX(textInput.x),
-              top: toCanvasY(textInput.y),
+              left: textInput.x,
+              top: textInput.y,
             }}
           >
             <input

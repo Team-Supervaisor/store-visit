@@ -1,40 +1,52 @@
 "use client"
 
-import { Square, Type, Trash2, Save } from "lucide-react"
+import { MousePointer, Square, RectangleHorizontal, Undo, Redo } from "lucide-react"
 import { Button } from "../components/ui/button"
 
 export default function ToolBar({ selectedTool, setSelectedTool, clearCanvas, saveShapes }) {
   const tools = [
-    { name: "rectangle", icon: <Square size={20} color="black" /> },
-    { name: "text", icon: <Type size={20} color="black" /> },
-    
+    { name: "pointer", icon: <MousePointer size={18} color="white" />, bgColor: "bg-[#6366F1]" },
+    { name: "rectangle", icon: <Square size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
+    { name: "rectangle-h", icon: <RectangleHorizontal size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
   ]
 
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 flex items-center gap-2">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 flex items-center gap-2">
       <div className="flex items-center gap-2">
         {tools.map((tool) => (
           <Button
             key={tool.name}
-            variant={selectedTool === tool.name ? "default" : "ghost"}
+            variant="ghost"
             size="icon"
             onClick={() => setSelectedTool(tool.name)}
-            className="rounded-full h-10 w-10"
+            className={`${tool.bgColor} rounded-md h-9 w-9 ${selectedTool === tool.name ? "ring-2 ring-blue-300" : ""}`}
           >
             {tool.icon}
           </Button>
         ))}
       </div>
 
-      <div className="h-6 w-px bg-gray-200 mx-1" />
+      <div className="flex items-center gap-2 ml-1">
+        <Button variant="ghost" size="icon" className="bg-[#F3F4F6] rounded-md h-9 w-9">
+          <Undo size={18} color="#333" />
+        </Button>
+        <Button variant="ghost" size="icon" className="bg-[#F3F4F6] rounded-md h-9 w-9">
+          <Redo size={18} color="#333" />
+        </Button>
+      </div>
 
-      <Button variant="ghost" size="icon" onClick={clearCanvas} className="rounded-full h-10 w-10">
-  <Trash2 size={20} color="black" />
-</Button>
-
-<Button variant="ghost" size="icon" onClick={saveShapes} className="rounded-full h-10 w-10">
-  <Save size={20} color="black" />
-</Button>
+      <div className="flex items-center gap-2 ml-2">
+        <Button variant="outline" onClick={clearCanvas} className="rounded-md h-9 px-4 text-sm font-medium text-black">
+          Discard
+        </Button>
+        <Button
+          variant="default"
+          onClick={saveShapes}
+          className="rounded-md h-9 px-4 bg-[#6366F1] hover:bg-[#5558E3] text-sm font-medium"
+        >
+          Save
+        </Button>
+      </div>
     </div>
   )
 }
