@@ -9,6 +9,7 @@ import googlei from '../assets/google.png'
 import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -1096,9 +1097,12 @@ return (
       </div>
       <div className="control-panel" style={{ textAlign: 'right' }}>
         <div>
+       
           <button
-            id="startButton"
+            // id="startButton"
             type="button"
+            style={{backgroundColor:"white", color:"black"}}
+            className='bg-red text-black rounded-sm'
             onClick={(e) => {
               createRipple(e);
               handleStartButton();
@@ -1109,6 +1113,7 @@ return (
           <button
             id="clearButton"
             type="button"
+            style={{backgroundColor:"white", color:"black"}}
             className="clear"
             onClick={(e) => {
               createRipple(e);
@@ -1130,7 +1135,7 @@ return (
           </label>
 
           <label className="toggle-container">
-            <span>Structure</span>
+            <span>Planogram</span>
             <input
               type="checkbox"
               id="structureToggle"
@@ -1139,6 +1144,7 @@ return (
             />
             <span className="slider"></span>
           </label>
+          <img src="/profile.svg" alt="profile" className=" w-[51px]" />
         </div>
       </div>
     </div>
@@ -1164,7 +1170,8 @@ return (
         backgroundRepeat: "no-repeat", 
         borderRadius:'26px',
         transition: "background 0.5s ease-in-out",
-        backgroundColor:'white'
+        backgroundColor:'white',
+        border:"none"
         // zIndex:10 // Full height of the viewport
       }}>
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
@@ -1325,11 +1332,14 @@ return (
       <div className="right-container">
         <div
           style={{
-            paddingLeft: '10px',
+            paddingLeft: '14px',
             paddingTop: '10px',
             fontWeight: 'bold',
-            boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
-            color: 'black'
+            // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
+            borderBottom: '1px solid #EFF4FE',
+            color: 'black',
+            paddingBottom: '5px',
+            
           }}
         >
           Reports
@@ -1407,8 +1417,15 @@ return (
               );
             })
           ) : (
-            <div className="no-images-message">
-              No reports available. Start tracking to capture store data.
+            <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
+              <img 
+                src="/empty.svg" 
+                alt="arrow" 
+                className="h-40 object-contain "
+              />
+              <p className="text-gray-400 text-lg">
+                Seems like the planogram is lonely
+              </p>
             </div>
           )}
         </div>
