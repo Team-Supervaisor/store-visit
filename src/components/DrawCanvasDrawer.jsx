@@ -33,44 +33,45 @@ export default function DrawingCanvas({ isOpen, onClose }) {
     instruction: "",
   })
 
-  // Canvas dimensions - using natural canvas coordinates now
+  
   const canvasWidth = 1000
   const canvasHeight = 500
 
-  // Initialize canvas context
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Set fixed canvas size
+   
     canvas.width = canvasWidth
     canvas.height = canvasHeight
 
-    // Set up context
+   
     const context = canvas.getContext("2d")
     if (context) {
+ 
       context.lineCap = "round"
       context.lineJoin = "round"
-      context.fillStyle = "#ffffff"
-      context.fillRect(0, 0, canvas.width, canvas.height)
       setCtx(context)
     }
   }, [])
 
-  // Draw all shapes and preview
   useEffect(() => {
     if (!ctx || !canvasRef.current) return
 
-    // Clear canvas
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.fillStyle = "#ffffff"
     ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
-    // Draw all shapes
+   
+    ctx.save()
+    ctx.translate(canvasWidth / 2, canvasHeight / 2)
+
+   
     shapes.forEach((shape) => {
       if (shape.type === "rectangle") {
-        // Highlight selected shape
         if (selectedShape && selectedShape.id === shape.id) {
-          ctx.strokeStyle = "#6366F1" // Purple for selected shape
+          ctx.strokeStyle = "#6366F1" 
           ctx.lineWidth = 2.5
         } else {
           ctx.strokeStyle = "#000000"
@@ -78,13 +79,11 @@ export default function DrawingCanvas({ isOpen, onClose }) {
         }
 
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
-
-        // Draw ID in the top-left corner of the rectangle
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
         ctx.fillText(`ID: ${shape.id}`, shape.x + 5, shape.y + 15)
 
-        // If shape has a name, display it
+
         if (shape.name) {
           ctx.fillStyle = "#6366F1"
           ctx.font = "14px Arial"
@@ -97,71 +96,66 @@ export default function DrawingCanvas({ isOpen, onClose }) {
       }
     })
 
-    // Draw preview shape if currently drawing
+
     if (drawingState.isDrawing && selectedTool === "rectangle") {
       const width = drawingState.currentX - drawingState.startX
       const height = drawingState.currentY - drawingState.startY
 
-      // Draw preview with semi-transparent style
-      ctx.strokeStyle = "rgba(99, 102, 241, 0.6)" // Purple with transparency
+
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.6)"
       ctx.lineWidth = 2
-      ctx.setLineDash([5, 3]) // Dashed line for preview
+      ctx.setLineDash([5, 3])
       ctx.strokeRect(drawingState.startX, drawingState.startY, width, height)
 
-      // Fill with very light color
-      ctx.fillStyle = "rgba(99, 102, 241, 0.1)" // Very light purple
+      ctx.fillStyle = "rgba(99, 102, 241, 0.1)"
       ctx.fillRect(drawingState.startX, drawingState.startY, width, height)
 
-      // Reset line dash
       ctx.setLineDash([])
     }
+    ctx.restore()
   }, [shapes, ctx, drawingState, selectedShape])
 
-  // Find shape at position
+  const getCustomCoordinates = (e) => {
+    const rect = canvasRef.current?.getBoundingClientRect()
+    if (!rect) return { x: 0, y: 0 }
+    const x = e.clientX - rect.left - canvasWidth / 2
+    const y = e.clientY - rect.top - canvasHeight / 2
+    return { x, y }
+  }
+
   const findShapeAtPosition = (x, y) => {
-    // Check in reverse order (top-most shape first)
+   
     for (let i = shapes.length - 1; i >= 0; i--) {
       const shape = shapes[i]
 
       if (shape.type === "rectangle") {
-        // Check if point is inside rectangle
         if (x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height) {
           return shape
         }
       } else if (shape.type === "text") {
-        // Simple hit test for text (could be improved)
         const textWidth = ctx.measureText(shape.text).width
         if (x >= shape.x && x <= shape.x + textWidth && y >= shape.y - 16 && y <= shape.y) {
           return shape
         }
       }
     }
-
     return null
   }
 
-  // Handle mouse events
   const startDrawing = (e) => {
     if (!ctx) return
 
-    const rect = canvasRef.current?.getBoundingClientRect()
-    if (!rect) return
-
-    const canvasX = e.clientX - rect.left
-    const canvasY = e.clientY - rect.top
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
 
     if (selectedTool === "pointer") {
-      // Check if we clicked on a shape
       const clickedShape = findShapeAtPosition(canvasX, canvasY)
 
       if (clickedShape) {
         setSelectedShape(clickedShape)
-
-        // Open the shape dialog
         setShapeDialog({
           isOpen: true,
-          x: clickedShape.x + clickedShape.width / 2,
-          y: clickedShape.y + clickedShape.height / 2,
+          x: clickedShape.x + clickedShape.width / 2 + canvasWidth / 2,
+          y: clickedShape.y + clickedShape.height / 2 + canvasHeight / 2,
           shapeId: clickedShape.id,
           name: clickedShape.name || "",
           instruction: clickedShape.instruction || "",
@@ -181,7 +175,6 @@ export default function DrawingCanvas({ isOpen, onClose }) {
       setSelectedShape(null)
       setShapeDialog({ ...shapeDialog, isOpen: false })
     } else if (selectedTool === "text") {
-      // Position for new text
       setTextInput({
         isActive: true,
         x: canvasX,
@@ -196,12 +189,9 @@ export default function DrawingCanvas({ isOpen, onClose }) {
   const draw = (e) => {
     if (!drawingState.isDrawing || !ctx || !canvasRef.current) return
 
-    const rect = canvasRef.current.getBoundingClientRect()
-    const canvasX = e.clientX - rect.left
-    const canvasY = e.clientY - rect.top
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
 
     if (selectedTool === "rectangle") {
-      // Update current position for preview
       setDrawingState({
         ...drawingState,
         currentX: canvasX,
@@ -213,17 +203,10 @@ export default function DrawingCanvas({ isOpen, onClose }) {
   const stopDrawing = (e) => {
     if (!ctx || !drawingState.isDrawing || !canvasRef.current || selectedTool !== "rectangle") return
 
-    const rect = canvasRef.current.getBoundingClientRect()
-    const canvasX = e.clientX - rect.left
-    const canvasY = e.clientY - rect.top
-
-    // Calculate rectangle properties
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
-
-    // Only add if it has some size
     if (Math.abs(width) > 5 && Math.abs(height) > 5) {
-      // Add new rectangle to shapes using raw canvas coordinates
       const newRectangle = {
         id: nextId,
         type: "rectangle",
@@ -232,13 +215,12 @@ export default function DrawingCanvas({ isOpen, onClose }) {
         width: width,
         height: height,
         vertices: [
-          [  drawingState.startX,  drawingState.startY ],
-         [ drawingState.startX,  drawingState.startY + height ],
-          [ drawingState.startX + width,  drawingState.startY + height ],
-          [ drawingState.startX +width, drawingState.startY ]
+          [drawingState.startX, drawingState.startY],
+          [drawingState.startX, drawingState.startY + height],
+          [drawingState.startX + width, drawingState.startY + height],
+          [drawingState.startX + width, drawingState.startY],
         ],
       }
-
       setShapes([...shapes, newRectangle])
       setNextId(nextId + 1)
     }
@@ -311,12 +293,7 @@ export default function DrawingCanvas({ isOpen, onClose }) {
       .filter((shape) => shape.type === "rectangle")
       .map((rect) => ({
         id: rect.id,
-        // type: "rectangle",
         vertices: rect.vertices,
-        // x: rect.x,
-        // y: rect.y,
-        // width: rect.width,
-        // height: rect.height,
         name: rect.name,
         instruction: rect.instruction,
       }))
@@ -329,9 +306,7 @@ export default function DrawingCanvas({ isOpen, onClose }) {
 
   return (
     <div className="relative w-full h-[calc(100vh-2rem)] flex flex-col items-center justify-center">
-      
       <div className="relative">
-        
         <canvas
           ref={canvasRef}
           className={`bg-white shadow-md rounded-lg ${selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"}`}
@@ -341,18 +316,18 @@ export default function DrawingCanvas({ isOpen, onClose }) {
           onMouseLeave={stopDrawing}
         />
         <button
-    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
-    onClick={onClose}
-  >
-    <X size={18} />
-  </button>
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
+          onClick={onClose}
+        >
+          <X size={18} />
+        </button>
 
         {textInput.isActive && (
           <div
             className="absolute bg-white p-2 rounded shadow-md"
             style={{
-              left: textInput.x,
-              top: textInput.y,
+              left: textInput.x + canvasWidth / 2,
+              top: textInput.y + canvasHeight / 2,
             }}
           >
             <input
@@ -370,16 +345,10 @@ export default function DrawingCanvas({ isOpen, onClose }) {
               }}
             />
             <div className="flex mt-1 gap-1">
-              <button
-                className="bg-gray-200 text-xs px-2 py-1 rounded"
-                onClick={() => handleTextSubmit(textInput.text)}
-              >
+              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => handleTextSubmit(textInput.text)}>
                 Add
               </button>
-              <button
-                className="bg-gray-200 text-xs px-2 py-1 rounded"
-                onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}
-              >
+              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}>
                 Cancel
               </button>
             </div>
@@ -396,7 +365,6 @@ export default function DrawingCanvas({ isOpen, onClose }) {
               border: "1px solid #E5E7EB",
             }}
           >
-            {/* Close button */}
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
               onClick={closeShapeDialog}
@@ -449,10 +417,7 @@ export default function DrawingCanvas({ isOpen, onClose }) {
                 <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]" onClick={closeShapeDialog}>
                   Cancel
                 </button>
-                <button
-                  className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm"
-                  onClick={handleShapeDialogSave}
-                >
+                <button className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm" onClick={handleShapeDialogSave}>
                   Save
                 </button>
               </div>
@@ -470,4 +435,3 @@ export default function DrawingCanvas({ isOpen, onClose }) {
     </div>
   )
 }
-
