@@ -1,11 +1,12 @@
 import React from "react";
 import logo from "../assets/logo.png";
 import { Plus, ChevronRight } from "lucide-react";
-import { Store, X, Upload } from "lucide-react";
+import { Store, X, Upload,Pencil} from "lucide-react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import DrawCanvasDrawer from "./DrawCanvasDrawer";
 
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +21,8 @@ export default function ManageStore() {
   const imageRef = useRef(null);
   const navigate = useNavigate();
   const [tsmName, setTsmName] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -299,27 +302,41 @@ export default function ManageStore() {
                 />
               </div>
 
-              <div className="flex items-center">
-                <label className="text-sm font-medium text-gray-700 w-40">
-                  Upload Planogram:
-                </label>
-                {/* Hidden File Input */}
-                <input
-                  type="file"
-                  accept="image/*"
-                  id="fileUpload"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                {/* Label for file input */}
-                <label
-                  htmlFor="fileUpload"
-                  className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer p-[2px] bg-[#F2F2FF]"
-                >
-                  <Upload className="h-4 w-4 text-[#717AEA]" />
-                  <span className="text-black text-sm">Upload</span>
-                </label>
-              </div>
+<div className="flex items-center justify-between w-full">
+  {/* Upload Label & Button */}
+  <div className="flex items-center">
+    <label className="text-sm font-medium text-gray-700 w-40" htmlFor="fileUpload">
+      Upload Planogram:
+    </label>
+    <input
+      type="file"
+      accept="image/*"
+      id="fileUpload"
+      onChange={handleImageChange}
+      className="hidden"
+    />
+    <label
+      htmlFor="fileUpload"
+      className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer p-[2px] bg-[#F2F2FF] hover:bg-indigo-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+      role="button"
+      tabIndex={0}
+      aria-label="Upload planogram image"
+    >
+      <Upload className="h-4 w-4 text-[#717AEA]" />
+      <span className="text-black text-sm">Upload</span>
+    </label>
+  </div>
+  <button
+  type="button"
+  onClick={() => setIsDrawerOpen(true)}
+  style={{ marginRight: "550px" }}
+  className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer bg-[#F2F2FF]"
+>
+  <Pencil className="h-4 w-4 text-[#717AEA]" />
+  <span className="text-black text-sm">Draw</span>
+</button>
+   
+</div>
 
               {/* Planogram Preview Area */}
               <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
@@ -378,6 +395,7 @@ export default function ManageStore() {
           </div>
         </div>
       )}
+      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
     </>
   );
 }
