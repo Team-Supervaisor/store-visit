@@ -12,7 +12,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
     <div className="mb-2">
-      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden ${isOpen ? 'shadow-sm' : ''}`}>
+      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden ${isOpen ? '' : ''}`}>
         <button
           className="w-full p-3 flex justify-between items-center"
           onClick={onClick}
@@ -78,16 +78,16 @@ const INSTRUCTIONS_DATA = [
     title: "Start Point12",
     content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
   },
-  {
-    id: "startpoint5",
-    title: "Start Point12",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
-  {
-    id: "startpoint5",
-    title: "Start Point12",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
+  // {
+  //   id: "startpoint5",
+  //   title: "Start Point12",
+  //   content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  // },
+  // {
+  //   id: "startpoint5",
+  //   title: "Start Point12",
+  //   content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  // },
 ];
 
 
@@ -516,24 +516,25 @@ export default function ManageStore() {
                   }
                 />
               </div> */}
-                <div className="w-[400px]">
-                  <h2 className="text-lg font-medium text-black mb-4">
-                    Instructions
-                  </h2>
-                  <div className="max-h-[500px] overflow-y-auto pr-2">
-                    {INSTRUCTIONS_DATA.map((item) => (
-                      <Accordion
-                        key={item.id}
-                        title={item.title}
-                        content={item.content}
-                        isOpen={openAccordion === item.id}
-                        onClick={() =>
-                          setOpenAccordion(openAccordion === item.id ? null : item.id)
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
+              // Find this section in your code and modify it:
+            <div className="w-[400px]">
+              <h2 className="text-lg font-medium text-black mb-4">
+                Instructions
+              </h2>
+              <div className="max-h-[500px] overflow-y-auto pr-2 hide-scrollbar">
+                {INSTRUCTIONS_DATA.map((item) => (
+                  <Accordion
+                    key={item.id}
+                    title={item.title}
+                    content={item.content}
+                    isOpen={openAccordion === item.id}
+                    onClick={() =>
+                      setOpenAccordion(openAccordion === item.id ? null : item.id)
+                    }
+                  />
+                ))}
+              </div>
+            </div>
               </div>
 
                
