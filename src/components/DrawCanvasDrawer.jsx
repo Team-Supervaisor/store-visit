@@ -215,10 +215,10 @@ export default function DrawingCanvas({ isOpen, onClose }) {
         width: width,
         height: height,
         vertices: [
-          [drawingState.startX, drawingState.startY],
-          [drawingState.startX, drawingState.startY + height],
-          [drawingState.startX + width, drawingState.startY + height],
-          [drawingState.startX + width, drawingState.startY],
+          [drawingState.startX, -drawingState.startY],
+          [drawingState.startX, -(drawingState.startY + height)],
+          [drawingState.startX + width, -(drawingState.startY + height)],
+          [drawingState.startX + width, -drawingState.startY],
         ],
       }
       setShapes([...shapes, newRectangle])
