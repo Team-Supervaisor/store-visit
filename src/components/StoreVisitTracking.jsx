@@ -32,27 +32,30 @@ const StoreVisitTracking = () => {
   const [imageHistory, setImageHistory] = useState([]);
   const [totalDistance, setTotalDistance] = useState(0);
   const [imagePointMap, setImagePointMap] = useState(new Map());
-const [vizDimensions, setVizDimensions] = useState({ width: 0, height: 0 });
-const vizElement = document.getElementById('visualization');
-const [polygons, setPolygons] = useState([]);
-const [centerX, setCenterX] = useState(0);
-const [centerZ, setCenterZ] = useState(0);
-const [nearestStructure, setNearestStructure] = useState(null);
-const [squareCoordinates, setSquareCoordinates] = useState([]);
-const [square, setSquare] = useState();
-const [centerCoord, setCenterCoord] = useState([]);
-const [expandedCards, setExpandedCards] = useState({});
-const distanceDisplayRef = useRef(null);
-const [perpendicularCoord, setPerpendicularCoord] = useState([]);
-const [selectedImage, setSelectedImage] = useState();
-const [pstructures, setPstructures] = useState([]);
-const [pPolygons, setPPolygons] = useState([]);
-const [isHovering, setIsHovering] = useState();
-const [aiDetails, setAIDetails] = useState();
-const [distCoord,setDistcoord]=useState([]);
-const [save,setSave]=useState(false);
-const [itr,setItr]=useState(0);
-
+  const [vizDimensions, setVizDimensions] = useState({ width: 0, height: 0 });
+  const vizElement = document.getElementById('visualization');
+  const [polygons, setPolygons] = useState([]);
+  const [centerX, setCenterX] = useState(0);
+  const [centerZ, setCenterZ] = useState(0);
+  const [nearestStructure, setNearestStructure] = useState(null);
+  const [squareCoordinates, setSquareCoordinates] = useState([]);
+  const [square, setSquare] = useState();
+  const [centerCoord, setCenterCoord] = useState([]);
+  const [expandedCards, setExpandedCards] = useState({});
+  const distanceDisplayRef = useRef(null);
+  const [perpendicularCoord, setPerpendicularCoord] = useState([]);
+  const [selectedImage, setSelectedImage] = useState();
+  const [pstructures, setPstructures] = useState([]);
+  const [pPolygons, setPPolygons] = useState([]);
+  const [isHovering, setIsHovering] = useState();
+  const [aiDetails, setAIDetails] = useState();
+  const [distCoord,setDistcoord]=useState([]);
+  const [save,setSave]=useState(false);
+  const [itr,setItr]=useState(0);
+  const [planstructures,setPlanstructures]=useState([]);
+  const [storeVisitDetails, setStoreVisitDetails] = useState([]);
+  const [lastStructure,setLastStructure]=useState('');
+  let planogram_coords;
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -68,134 +71,136 @@ const vizRef = useRef(null);
     // handleClearButton();
   }, [])
   
-  const structures = [
-    // {
-    //   id: 'shelf-1',
-    //   name: 'A',
-    //   type: 'shelf',
-    //   coordinates: [[-500,-250], [-500, 250], [500, 250], [500, -250]]  
-    // },
-    // {
-    //   id:'origin',
-    //   name: 'o',
-    //   type: 'entrance',
-    //   coordinates: [[0,0], [0,0], [0, 0], [0, 0]]
+  // const structures = [
+  //   // {
+  //   //   id: 'shelf-1',
+  //   //   name: 'A',
+  //   //   type: 'shelf',
+  //   //   coordinates: [[-500,-250], [-500, 250], [500, 250], [500, -250]]  
+  //   // },
+  //   // {
+  //   //   id:'origin',
+  //   //   name: 'o',
+  //   //   type: 'entrance',
+  //   //   coordinates: [[0,0], [0,0], [0, 0], [0, 0]]
   
-    // },
-    {
-      id: 'bottom-entry',
-      name: 'B',
-      type: 'counter',
-      coordinates:  [[-500, -250], [-500, -150], [-450, -150], [-450, -250]] 
-    },
-    {
-      id: 'top-entry',
-      name: 'C',
-      type: 'counter',
-      coordinates: [[-500, 250], [-500, 150], [-450, 150], [-450, 250]] 
-    },
-    {
-      id: 'wearables',
-      name: 'D',
-      type: 'entrance',
-      coordinates: [[-450, -250], [-450, -220], [50, -220], [50, -250]] 
-    },
-    {
-      id: 'home appliance',
-      name: 'E',
-      type: 'entrance',
-      coordinates:   [[50, -250], [50, -190], [500, -190], [500, -250]]  
-    },
-    // {
-    //   id: 'PC-notebook',
-    //   name: 'F',
-    //   type: 'display',
-    //   coordinates: [[-400, -220], [-400, -110], [50, -110], [50, -220]]  
-    // },
-    {
-      id: 'apple-accesory',
-      name: 'G',
-      type: 'entrance',
-      coordinates: [[-450, 250], [-450, 220], [50, 220], [50, 250]]  
-    },
-    // {
-    //   id: 'samsung-wallbay',
-    //   name: 'H',
-    //   type: 'entrance',
-    //   coordinates: [[50, 250], [50, 220], [500, 220], [500, 250]]  
-    // },
-    // {
-    //   id: 'Cashier',
-    //   name: 'I',
-    //   type: 'shelf',
-    //   coordinates: [[460, -160], [460, -60], [500, -60], [500, -160]]  
-    // },
-    // {
-    //   id: 'samsung-tv',
-    //   name: 'J',
-    //   type: 'shelf',
-    //   coordinates: [[460, -10], [460, 220], [500, 220], [500, -10]]  
-    // },
-    // {
-    //   id:'tv-monitor',
-    //   name: 'K',
-    //   type: 'display',
-    //   coordinates: [[-400, -110], [-400, 30], [-210, 30], [-210, -110]]
-    // },
-    {
-      id:'wall',
-      name: 'L',
-      type: 'counter',
-      coordinates: [[-200, -110], [-200, 30], [-170, 30], [-170, -110]]
-    },
-    {
-      id:'pc-notebook',
-      name: 'M',
-      type: 'display',
-      coordinates: [[-160, -100], [-160, 0], [50, 0], [50, -100]]
-    },
-    // {
-    //   id:'oppo',
-    //   name: 'N',
-    //   type: 'display',
-    //   coordinates: [[-140, 10], [-140, 70], [30, 70], [30, 10]]
-    // },
-    // {
-    //   id:'apple-tomb-table',
-    //   name: 'O',
-    //   type: 'shelf',
-    //   coordinates: [[-360, 100], [-360, 160], [-170, 160], [-170, 100]]
-    // },
-    // {
-    //   id:'samsung-smart1',
-    //   name: 'P',
-    //   type: 'entrance',
-    //   coordinates:[[150,80],[150,180],[200,180],[200,80]]
-    // },
-    {
-      id:'samsung-smart2',
-      name: 'Q',
-      type: 'entrance',
-      coordinates:[[250,80],[250,180],[300,180],[300,80]]
-    },
-    {
-      id:'best-denki',
-      name: 'R',
-      type: 'shelf',
-      coordinates:[[120,-110],[120,40],[220,40],[220,-110]]
-    },
-    {
-      id:'samsung-oled',
-      name: 'S',
-      type: 'shelf',
-      coordinates:[[260,-50],[260,20],[390,20],[390,-50]]
-    }
-  ];
+  //   // },
+  //   {
+  //     id: 'bottom-entry',
+  //     name: 'B',
+  //     type: 'counter',
+  //     coordinates:  [[-500, -250], [-500, -150], [-450, -150], [-450, -250]] 
+  //   },
+  //   {
+  //     id: 'top-entry',
+  //     name: 'C',
+  //     type: 'counter',
+  //     coordinates: [[-500, 250], [-500, 150], [-450, 150], [-450, 250]] 
+  //   },
+  //   {
+  //     id: 'wearables',
+  //     name: 'D',
+  //     type: 'entrance',
+  //     coordinates: [[-450, -250], [-450, -220], [50, -220], [50, -250]] 
+  //   },
+  //   {
+  //     id: 'home appliance',
+  //     name: 'E',
+  //     type: 'entrance',
+  //     coordinates:   [[50, -250], [50, -190], [500, -190], [500, -250]]  
+  //   },
+  //   // {
+  //   //   id: 'PC-notebook',
+  //   //   name: 'F',
+  //   //   type: 'display',
+  //   //   coordinates: [[-400, -220], [-400, -110], [50, -110], [50, -220]]  
+  //   // },
+  //   {
+  //     id: 'apple-accesory',
+  //     name: 'G',
+  //     type: 'entrance',
+  //     coordinates: [[-450, 250], [-450, 220], [50, 220], [50, 250]]  
+  //   },
+  //   // {
+  //   //   id: 'samsung-wallbay',
+  //   //   name: 'H',
+  //   //   type: 'entrance',
+  //   //   coordinates: [[50, 250], [50, 220], [500, 220], [500, 250]]  
+  //   // },
+  //   // {
+  //   //   id: 'Cashier',
+  //   //   name: 'I',
+  //   //   type: 'shelf',
+  //   //   coordinates: [[460, -160], [460, -60], [500, -60], [500, -160]]  
+  //   // },
+  //   // {
+  //   //   id: 'samsung-tv',
+  //   //   name: 'J',
+  //   //   type: 'shelf',
+  //   //   coordinates: [[460, -10], [460, 220], [500, 220], [500, -10]]  
+  //   // },
+  //   // {
+  //   //   id:'tv-monitor',
+  //   //   name: 'K',
+  //   //   type: 'display',
+  //   //   coordinates: [[-400, -110], [-400, 30], [-210, 30], [-210, -110]]
+  //   // },
+  //   {
+  //     id:'wall',
+  //     name: 'L',
+  //     type: 'counter',
+  //     coordinates: [[-200, -110], [-200, 30], [-170, 30], [-170, -110]]
+  //   },
+  //   {
+  //     id:'pc-notebook',
+  //     name: 'M',
+  //     type: 'display',
+  //     coordinates: [[-160, -100], [-160, 0], [50, 0], [50, -100]]
+  //   },
+  //   // {
+  //   //   id:'oppo',
+  //   //   name: 'N',
+  //   //   type: 'display',
+  //   //   coordinates: [[-140, 10], [-140, 70], [30, 70], [30, 10]]
+  //   // },
+  //   // {
+  //   //   id:'apple-tomb-table',
+  //   //   name: 'O',
+  //   //   type: 'shelf',
+  //   //   coordinates: [[-360, 100], [-360, 160], [-170, 160], [-170, 100]]
+  //   // },
+  //   // {
+  //   //   id:'samsung-smart1',
+  //   //   name: 'P',
+  //   //   type: 'entrance',
+  //   //   coordinates:[[150,80],[150,180],[200,180],[200,80]]
+  //   // },
+  //   {
+  //     id:'samsung-smart2',
+  //     name: 'Q',
+  //     type: 'entrance',
+  //     coordinates:[[250,80],[250,180],[300,180],[300,80]]
+  //   },
+  //   {
+  //     id:'best-denki',
+  //     name: 'R',
+  //     type: 'shelf',
+  //     coordinates:[[120,-110],[120,40],[220,40],[220,-110]]
+  //   },
+  //   {
+  //     id:'samsung-oled',
+  //     name: 'S',
+  //     type: 'shelf',
+  //     coordinates:[[260,-50],[260,20],[390,20],[390,-50]]
+  //   }
+  // ];
 
-  
+  let last='';
   const check_inside_structure  = (x, z) => {
-    for (const structure of structures) {
-      const coords = structure.coordinates;
+    console.log("checking inside structure",x,z);
+    console.log("structures",planogram_coords);
+    planogram_coords.map((structure) => {
+      const coords = structure.vertices;
   
       const xs = coords.map(c => c[0]);
       const zs = coords.map(c => c[1]);
@@ -204,14 +209,51 @@ const vizRef = useRef(null);
       const maxX = Math.max(...xs);
       const minZ = Math.min(...zs);
       const maxZ = Math.max(...zs);
-  
+      console.log("minX,maxX,minZ,maxZ",minX,maxX,minZ,maxZ);
       if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
         // return structure;
         console.log("Inside structure:", structure.name);
+        if(structure.name!=last){
+          console.log("Inside structure:", structure.name);
+          console.log("sending instruction")
+        setLastStructure(structure.name);
+        last=structure.name;
+        sendInstructions(structure);
+        }
+
       }
-    }
+    })
     // return null;
   };
+
+  const sendInstructions = (structure) => {
+    let data = JSON.stringify({
+      "region_id": structure?.id||"N/A",
+      "region_name":structure?.name||"N/A",
+      "instruction_set": {
+        "message": structure?.instruction||"N/A",
+      }
+    });
+    
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://store-visit-85801868683.us-central1.run.app/api/region',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    
+  }
 
   function getAI(imageurl) {
       //     const myHeaders = new Headers();
@@ -383,7 +425,7 @@ axios.request(config)
     // x=(x/100)*500;
     // z=(z/100)*250;
     console.log(x,z);
-    if (!structures || structures.length === 0) {
+    if (!planstructures || planstructures.length === 0) {
       console.error("No structures found!");
       return;
   }
@@ -411,7 +453,7 @@ axios.request(config)
   //         nearestStructure = structure;
   //     }
   // });
-  structures.forEach(structure => {
+  planstructures.forEach(structure => {
     let minEdgeDistance = Infinity;
     let closestPointOnEdge = null; 
   
@@ -515,7 +557,29 @@ axios.request(config)
     return [newX, newZ];
 }
 
+const get_store_visit_details = (store_visit_id) => {
+  let url1 = `https://store-visit-85801868683.us-central1.run.app/api/get_store_visit_details?store_visit_id=${store_visit_id}`;
+  
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: url1,
+    headers: { }
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log((response.data));
+    setItr(1);
+    setPlanstructures(response.data.planogram_coords)
+    setStoreVisitDetails(response.data)
 
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+  
+}
 
   function renderAllImages(history) {
     console.log("render images")
@@ -595,7 +659,8 @@ axios.request(config)
   }
   useEffect(() => {
 
-    if (!structures.length || !vizDimensions) return;
+    if (!planstructures?.length || !vizDimensions) return;
+
       // console.log(vizDimensions.width,vizDimensions.height);
       setCenterX(vizDimensions.width / 2);
       setCenterZ(vizDimensions.height / 2);
@@ -603,9 +668,9 @@ axios.request(config)
      const centerz = vizDimensions.height / 2;
 
 
-    const newPolygons = structures.map((structure) => {
+    const newPolygons = planstructures.map((structure) => {
       let pathData = "";
-      structure.coordinates.forEach((coord, index) => {
+      structure.vertices.forEach((coord, index) => {
         const screenX = centerx + coord[0];
         const screenZ = centerz + coord[1];
 
@@ -614,7 +679,7 @@ axios.request(config)
 
       pathData += "Z"; // Close the polygon
 
-      const centerCoord = getPolygonCenter(structure.coordinates);
+      const centerCoord = getPolygonCenter(structure.vertices);
       const textX = centerx + centerCoord[0];
       const textY = centerz + centerCoord[1];
 
@@ -630,7 +695,8 @@ axios.request(config)
     });
 
     setPolygons(newPolygons);
-  }, [vizDimensions]);
+    console.log('planstructures:',planstructures);
+  }, [planstructures,vizDimensions]);
 
 
   const pPolygonsRef = useRef([]);
@@ -747,11 +813,23 @@ useEffect(() => {
       //updateImagePointMap();
       //renderAllImages(history);
     });
-  
+    socketRef.current.on("store-id",(data)=>{
+      setPlanstructures(data.planogram_coords)
+      planogram_coords=data.planogram_coords;
+      setStoreVisitDetails(data);
+
+    });
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
       // console.log("New coordinate received:", data);
+      // if(itr==0)
+      // {
+      //   get_store_visit_details(data.store_visit_id);
+      // }
+      if(planogram_coords?.length>0){
+      console.log("planstructures",planogram_coords);
       check_inside_structure(data.x,data.z);
+      }
       if(data.photoCapture===1)
       {
         console.log("Photo capture",data);
@@ -898,6 +976,8 @@ const savePlanogram = () => {
     setPstructures([]);
     setAIDetails([]);
     setDistcoord([]);
+    setPlanstructures([]);
+
   };
   
   const handleStartButton = () => {
@@ -1159,6 +1239,8 @@ return (
     <div className="layout-container" >
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
+        backgroundImage:planstructures?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
+        
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
@@ -1183,7 +1265,7 @@ return (
       <polyline
         points={
           coordinates
-            .map(point => `${centerX + point.x},${centerZ + point.y}`)
+            .map(point => `${centerX + point.x},${centerZ + point.z}`)
             .join(' ')
         }
         fill="none"
