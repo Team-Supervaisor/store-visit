@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ isOpen, onClose }) {
+export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -299,6 +299,10 @@ export default function DrawingCanvas({ isOpen, onClose }) {
       }))
 
     console.log("Saved Shapes:", rectangleData)
+
+    if (onSaveShapes) {
+      onSaveShapes(rectangleData); // Send to parent
+    }
   }
 
   // Instructions dropdown options

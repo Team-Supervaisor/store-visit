@@ -98,13 +98,13 @@ export default function ManageStore() {
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [storeData, setStoreData] = useState([]);
-  const [clickPosition, setClickPosition] = useState();
+  const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef(null);
   const navigate = useNavigate();
   const [tsmName, setTsmName] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(null);
-
+  const [rectangleData, setRectangleData] = useState([]);
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -114,17 +114,20 @@ export default function ManageStore() {
       setPreviewImage(imageUrl);
     }
   };
-
+  const handleSaveShapes = (data) => {
+    setRectangleData(data);
+    console.log("Received from child:", data);
+  };
   const handleCreate = async () => {
     if (!storeName || !storeId) {
       alert("Please fill all the fields");
       return;
     }
-    if (!image) {
-      alert("Please select an image to upload");
-      return;
-    }
-    if (!clickPosition) {
+    // if (!image) {
+    //   alert("Please select an image to upload");
+    //   return;
+    // }
+    if (image && !clickPosition) {
       alert("Please click on the image to set the start point");
       return;
     }
@@ -138,6 +141,7 @@ export default function ManageStore() {
         scale: 1.0,
       }),
       startpoint: JSON.stringify(clickPosition),
+      planogram_coords:JSON.stringify(rectangleData)
     };
 
     const url = updateStore
@@ -282,7 +286,7 @@ export default function ManageStore() {
                         </td>
                         <td className="px-6 py-2 text-[14px]">
                           <img
-                            src="/sample.svg"
+                            src={store?.planogram_url}
                             alt="Store Planogram"
                             className="h-20 w-30 rounded-md"
                           />
@@ -522,7 +526,7 @@ export default function ManageStore() {
       {isDrawerOpen && isModalOpen && (
         <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]">
 
-      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}  onSaveShapes={handleSaveShapes}/>
       </div>
 
       )}
