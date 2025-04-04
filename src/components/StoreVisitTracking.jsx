@@ -1092,7 +1092,7 @@ return (
       // onClick={() => navigate('/')}
     >
       <div style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
-        <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
+        <img src={logo} alt="Logo" style={{ height: '25px', marginRight: '10px' }} />
         <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }}>Store Visit Tracking</h1>
       </div>
       <div className="control-panel" style={{ textAlign: 'right' }}>
@@ -1150,14 +1150,14 @@ return (
     </div>
 
 {/* Distance Display */}
-<div className="info-display">
+{/* <div className="info-display">
   <span className="distance-box">
     <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
       Distance: {totalDistance?.toFixed(2)}
     </span>
     <span className="arrow">◀</span>
   </span>
-</div>
+</div> */}
 
 
 
@@ -1171,9 +1171,37 @@ return (
         borderRadius:'26px',
         transition: "background 0.5s ease-in-out",
         backgroundColor:'white',
-        border:"none"
+        border:"none",
+        position: 'relative',
+        margin:"4px",
+        marginBottom: "7px"
         // zIndex:10 // Full height of the viewport
       }}>
+
+        {/* Distance Display - Updated */}
+        <div 
+  className="info-display absolute top-4 left-0" 
+  style={{ zIndex: 10 }}
+>
+  <div 
+    style={{
+      borderTopRightRadius: '12px',
+      borderBottomRightRadius: '12px'
+    }}
+    className="bg-[#EFF0FF] text-[#777FE3] items-center py-2 pl-4 pr-6"
+  >
+    <span 
+      id="distance" 
+      ref={distanceDisplayRef} 
+      className="font-medium"
+    >
+      {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+    </span>
+
+    <span className="arrow">◀</span>
+  </div>
+</div>
+
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
@@ -1329,7 +1357,14 @@ return (
 
 
       </div>
-      <div className="right-container">
+      <div
+        style={{
+            margin:"5px",
+            marginBottom: "7px"
+        }}
+       className="right-container"
+      
+      >
         <div
           style={{
             paddingLeft: '14px',

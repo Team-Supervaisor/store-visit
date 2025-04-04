@@ -10,6 +10,7 @@ import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { Upload } from 'lucide-react';
 
 export default function StoreVisitLoad() {
     const location = useLocation();
@@ -279,7 +280,7 @@ useEffect(() => {
       onClick={() => navigate('/')}
       
       >
-        <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
+        <img src={logo} alt="Logo" style={{ height: '25px', marginRight: '10px' }} />
         <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }} 
         
         >Store Visit Tracking</h1>
@@ -320,7 +321,7 @@ useEffect(() => {
           </label>
 
           <label className="toggle-container">
-            <span>Structure</span>
+            <span>Planogram</span>
             <input
               type="checkbox"
               id="structureToggle"
@@ -329,19 +330,30 @@ useEffect(() => {
             />
             <span className="slider"></span>
           </label>
+
+          <div>
+          <div className="bg-[#E1E9FD] text-[#777FE3] items-center py-2 pl-4 pr-6 rounded-xl flex gap-2">
+          <Upload size={20} color="#4F4FDC" />
+          <span className="font-medium text-[#4F4FDC]">
+            Upload Planogram
+          </span>
+         
+        </div>
+      </div> 
+      <img src="/profile.svg" alt="profile" className=" w-[51px]" />
         </div>
       </div>
     </div>
 
 {/* Distance Display */}
-<div className="info-display">
+{/* <div className="info-display">
   <span className="distance-box">
     <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
       Distance: {totalDistance?.toFixed(2)}
     </span>
     <span className="arrow">◀</span>
   </span>
-</div>
+</div> */}
 
 
 
@@ -354,9 +366,38 @@ useEffect(() => {
         backgroundRepeat: "no-repeat", 
         borderRadius:'26px',
         transition: "background 0.5s ease-in-out",
-        backgroundColor:'white'
+        backgroundColor:'white',
+        position: 'relative',
+               margin:"4px",
+        marginBottom: "7px"
         // zIndex:10 // Full height of the viewport
       }}>
+
+  {/* Distance Display - Updated */}
+  <div 
+  className="info-display absolute top-4 left-0" 
+  style={{ zIndex: 10 }}
+>
+  <div 
+    style={{
+      borderTopRightRadius: '12px',
+      borderBottomRightRadius: '12px'
+    }}
+    className="bg-[#EFF0FF] text-[#777FE3] items-center py-2 pl-4 pr-6"
+  >
+    <span 
+      id="distance" 
+      ref={distanceDisplayRef} 
+      className="font-medium"
+    >
+      {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+    </span>
+
+    <span className="arrow">◀</span>
+  </div>
+</div>
+
+
 <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
@@ -515,18 +556,29 @@ useEffect(() => {
 
 
       </div>
-      <div className="right-container">
+      <div
+       style={{
+            margin:"5px",
+            marginBottom: "7px"
+        }}
+       className="right-container">
         <div
           style={{
-            paddingLeft: '10px',
+            paddingLeft: '14px',
             paddingTop: '10px',
             fontWeight: 'bold',
-            boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
-            color: 'black'
+            // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
+            borderBottom: '1px solid #EFF4FE',
+            color: 'black',
+            paddingBottom: '5px',
+            
           }}
         >
           Reports
         </div>
+        
+        {/* report numbers */}
+
         <div id="imageContainer">
           {imageHistory.length > 0 ? (
             // console.log("ai details",imageHistory,aiDetails),
@@ -601,8 +653,16 @@ useEffect(() => {
               );
             })
           ) : (
-            <div className="no-images-message">
-              No reports available. Start tracking to capture store data.
+           
+            <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
+              <img 
+                src="/empty.svg" 
+                alt="arrow" 
+                className="h-40 object-contain "
+              />
+              <p className="text-gray-400 text-lg">
+                Seems like the planogram is lonely
+              </p>
             </div>
           )}
         </div>
