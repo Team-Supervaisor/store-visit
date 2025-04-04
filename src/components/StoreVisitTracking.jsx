@@ -191,6 +191,28 @@ const vizRef = useRef(null);
       coordinates:[[260,-50],[260,20],[390,20],[390,-50]]
     }
   ];
+
+  
+  const check_inside_structure  = (x, z) => {
+    for (const structure of structures) {
+      const coords = structure.coordinates;
+  
+      const xs = coords.map(c => c[0]);
+      const zs = coords.map(c => c[1]);
+  
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minZ = Math.min(...zs);
+      const maxZ = Math.max(...zs);
+  
+      if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
+        // return structure;
+        console.log("Inside structure:", structure.name);
+      }
+    }
+    // return null;
+  };
+
   function getAI(imageurl) {
       //     const myHeaders = new Headers();
       // myHeaders.append("Content-Type", "application/json");
@@ -729,6 +751,7 @@ useEffect(() => {
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
       // console.log("New coordinate received:", data);
+      check_inside_structure(data.x,data.z);
       if(data.photoCapture===1)
       {
         console.log("Photo capture",data);
@@ -1135,7 +1158,7 @@ return (
     {/* Main Layout */}
     <div className="layout-container" >
       <div className="left-container"style={{
-        backgroundImage:isStructureVisible ? `url(${layout})` : "none",
+        // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
@@ -1190,7 +1213,7 @@ return (
 
   {/* Store structure overlay and other SVG elements remain unchanged */}
   {isStructureVisible && <div className="overlay"></div>}
-  {/* {isStructureVisible && (
+  {isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       {polygons.map((polygon) => (
         <g key={polygon.id} className={`structure ${polygon.type}`} title={polygon.name}>
@@ -1215,7 +1238,7 @@ return (
         </g>
       ))}
     </svg>
-  )} */}
+  )}
 
   {isPathVisible  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>

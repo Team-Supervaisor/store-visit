@@ -232,10 +232,10 @@ export default function DrawingCanvas({ isOpen, onClose }) {
         width: width,
         height: height,
         vertices: [
-          { x: drawingState.startX, y: drawingState.startY },
-          { x: drawingState.startX + width, y: drawingState.startY },
-          { x: drawingState.startX + width, y: drawingState.startY + height },
-          { x: drawingState.startX, y: drawingState.startY + height },
+          [  drawingState.startX,  drawingState.startY ],
+         [ drawingState.startX , drawingState.startY ],
+          [ drawingState.startX + width,  drawingState.startY + height ],
+          [ drawingState.startX,  drawingState.startY + height ],
         ],
       }
 
