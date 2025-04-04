@@ -420,7 +420,7 @@ export default function ManageStore() {
                       aria-label="Upload planogram image"
                     >
                       <Upload className="h-4 w-4 text-[#717AEA]" />
-                      <span className="text-black text-sm">Uploadss</span>
+                      <span className="text-black text-sm">Upload</span>
                     </label>
                   </div>
                   <button
@@ -473,68 +473,26 @@ export default function ManageStore() {
 
               <div>
 
-                    {/* Instructions Section */}
+              
 
-               {/* <div className="w-[400px]">
-                <h2 className="text-lg font-medium text-black mb-4">
-                  Instructions
-                </h2>
+              <div className="w-[400px]">
+            <h2 className="text-lg font-medium text-black mb-4">
+              Instructions
+            </h2>
+            <div className="max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+              {INSTRUCTIONS_DATA.map((item) => (
                 <Accordion
-                  title="Store Details"
-                  content="Enter the store name and unique store ID. For existing stores, the ID field will be disabled."
-                  isOpen={openAccordion === "store"}
+                  key={item.id}
+                  title={item.title}
+                  content={item.content}
+                  isOpen={openAccordion === item.id}
                   onClick={() =>
-                    setOpenAccordion(openAccordion === "store" ? null : "store")
+                    setOpenAccordion(openAccordion === item.id ? null : item.id)
                   }
                 />
-                <Accordion
-                  title="TSM Information"
-                  content="Enter the Territory Sales Manager (TSM) name who is responsible for this store."
-                  isOpen={openAccordion === "tsm"}
-                  onClick={() =>
-                    setOpenAccordion(openAccordion === "tsm" ? null : "tsm")
-                  }
-                />
-                <Accordion
-                  title="Planogram Upload"
-                  content="Upload a clear image of the store planogram. You can either upload an existing image or draw a new one using the Draw feature."
-                  isOpen={openAccordion === "planogram"}
-                  onClick={() =>
-                    setOpenAccordion(
-                      openAccordion === "planogram" ? null : "planogram"
-                    )
-                  }
-                />
-                <Accordion
-                  title="Start Point"
-                  content="After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-                  isOpen={openAccordion === "startpoint"}
-                  onClick={() =>
-                    setOpenAccordion(
-                      openAccordion === "startpoint" ? null : "startpoint"
-                    )
-                  }
-                />
-              </div> */}
-              // Find this section in your code and modify it:
-            <div className="w-[400px]">
-              <h2 className="text-lg font-medium text-black mb-4">
-                Instructions
-              </h2>
-              <div className="max-h-[500px] overflow-y-auto pr-2 hide-scrollbar">
-                {INSTRUCTIONS_DATA.map((item) => (
-                  <Accordion
-                    key={item.id}
-                    title={item.title}
-                    content={item.content}
-                    isOpen={openAccordion === item.id}
-                    onClick={() =>
-                      setOpenAccordion(openAccordion === item.id ? null : item.id)
-                    }
-                  />
-                ))}
-              </div>
+              ))}
             </div>
+          </div>
               </div>
 
                
