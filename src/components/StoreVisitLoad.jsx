@@ -52,6 +52,7 @@ const [pPolygons, setPPolygons] = useState([]);
 const [isHovering, setIsHovering] = useState();
 const [aiDetails, setAIDetails] = useState();
 const [distCoord,setDistcoord]=useState([]);
+const [structures,setStructures]=useState();
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -97,9 +98,51 @@ useEffect(() => {
         setPstructures(storeVisitDetails.polygon_coordinates);
         setImageHistory(storeVisitDetails.images);
         setTotalDistance(storeVisitDetails.distance);
+        setStructures(storeVisitDetails.planogram_coords);
         
       }
     }, []);
+
+
+    useEffect(() => {
+      if (!structures?.length || !vizDimensions) return;
+      // console.log(vizDimensions.width,vizDimensions.height);
+      console.log(structures)
+      setCenterX(vizDimensions.width / 2);
+      setCenterZ(vizDimensions.height / 2);
+     const centerx = vizDimensions.width / 2;
+     const centerz = vizDimensions.height / 2;
+
+
+    const newPolygons = structures.map((structure) => {
+      let pathData = "";
+      structure.vertices.forEach((coord, index) => {
+        const screenX = centerx + coord[0];
+        const screenZ = centerz + coord[1];
+
+        pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+      });
+
+      pathData += "Z"; // Close the polygon
+
+      const centerCoord = getPolygonCenter(structure.vertices);
+      const textX = centerx + centerCoord[0];
+      const textY = centerz + centerCoord[1];
+
+      return {
+        id: structure.id,
+        name: structure.name,
+        type: structure.type,
+        pathData,
+        textX,
+        textY,
+        color: '#E1E9FD',
+      };
+    });
+
+    setPolygons(newPolygons);
+    }, [structures,vizDimensions])
+    
 
     function getPolygonCenter(coords) {
       // console.log("polygon center:",coords);
@@ -305,7 +348,7 @@ useEffect(() => {
     {/* Main Layout */}
     <div className="layout-container" >
       <div className="left-container"style={{
-        backgroundImage:isStructureVisible ? `url(${storeVisitDetails.planogram_url})` : "none",
+        backgroundImage:structures?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
@@ -351,7 +394,7 @@ useEffect(() => {
         return(
         <div
           key={index}
-          className={`point ${point?.photoCapture ? 'photo-captured' : ''}`}
+          className={`point ${point?.photoCapture==1 ? 'photo-captured' : ''}`}
           style={{
             left: `${centerX+ point.x}px`,
             top: `${centerZ+point.y}px`
@@ -363,7 +406,7 @@ useEffect(() => {
 
   {/* Store structure overlay and other SVG elements remain unchanged */}
   {isStructureVisible && <div className="overlay"></div>}
-  {/* {isStructureVisible && (
+  {isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
       {polygons.map((polygon) => (
         <g key={polygon.id} className={`structure ${polygon.type}`} title={polygon.name}>
@@ -388,7 +431,7 @@ useEffect(() => {
         </g>
       ))}
     </svg>
-  )} */}
+  )}
 
   {isPathVisible  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>

@@ -233,9 +233,9 @@ export default function DrawingCanvas({ isOpen, onClose }) {
         height: height,
         vertices: [
           [  drawingState.startX,  drawingState.startY ],
-         [ drawingState.startX , drawingState.startY ],
+         [ drawingState.startX,  drawingState.startY + height ],
           [ drawingState.startX + width,  drawingState.startY + height ],
-          [ drawingState.startX,  drawingState.startY + height ],
+          [ drawingState.startX +width, drawingState.startY ]
         ],
       }
 
