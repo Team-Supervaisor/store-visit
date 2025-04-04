@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { MousePointer, Square, RectangleHorizontal, Undo, Redo } from "lucide-react"
 import { Button } from "../components/ui/button"
 
@@ -11,7 +11,7 @@ export default function ToolBar({ selectedTool, setSelectedTool, clearCanvas, sa
   ]
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 flex items-center gap-2">
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 pl-4 pr-4 flex items-center gap-2">
       <div className="flex items-center gap-2">
         {tools.map((tool) => (
           <Button
@@ -21,7 +21,7 @@ export default function ToolBar({ selectedTool, setSelectedTool, clearCanvas, sa
             onClick={() => setSelectedTool(tool.name)}
             className={`${tool.bgColor} rounded-md h-9 w-9 ${selectedTool === tool.name ? " bg-[#6366F1] ring-2 ring-blue-300" : ""}`}
           >
-            {tool.icon}
+            {React.cloneElement(tool.icon, { color: selectedTool===tool.name ? "#FFF" : "#333" })}
           </Button>
         ))}
       </div>
