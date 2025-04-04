@@ -81,3 +81,7 @@ button:focus-visible {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.arrocdian-button, button:focus, button:focus-visible {
+  outline:none;
+}

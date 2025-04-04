@@ -12,9 +12,9 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
     <div className="mb-2">
-      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden ${isOpen ? '' : ''}`}>
+      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden`}>
         <button
-          className="w-full p-3 flex justify-between items-center focus:none"
+          className="w-full p-3 flex justify-between items-center focus:ring-0 focus:outline-none hover:bg-[#E5EDFD] transition-colors"
           onClick={onClick}
         >
           <span className="font-medium text-sm text-gray-700">{title}</span>
@@ -25,16 +25,14 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
           )}
         </button>
         {isOpen && (
-         
           <div className="p-4 bg-white rounded-lg m-1 shadow-sm">
-          <p className="text-sm text-gray-600">{content}</p>
-        </div>
+            <p className="text-sm text-gray-600">{content}</p>
+          </div>
         )}
       </div>
     </div>
   );
 };
-
 
 const INSTRUCTIONS_DATA = [
   {
@@ -172,6 +170,7 @@ export default function ManageStore() {
     setAllowClickPosition(false);
     setUpdateStore(false);
     setTsmName("");
+    setOpenAccordion(null);
   };
 
   const handleImageClick = (event) => {
