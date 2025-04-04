@@ -303,6 +303,7 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
     if (onSaveShapes) {
       onSaveShapes(rectangleData); // Send to parent
     }
+    onClose(); // Close the drawer
   }
 
   // Instructions dropdown options
