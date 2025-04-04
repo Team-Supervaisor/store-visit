@@ -119,8 +119,8 @@ useEffect(() => {
       if(pstructures.length>0){
     console.log((pstructures[0]))
 
-    console.log(JSON.parse(pstructures[0]))
-    console.log(typeof(JSON.parse(pstructures[0])))
+    // console.log(JSON.parse(pstructures[0]))
+    // console.log(typeof(JSON.parse(pstructures[0])))
       }
     setCenterX(vizDimensions.width / 2);
     setCenterZ(vizDimensions.height / 2);

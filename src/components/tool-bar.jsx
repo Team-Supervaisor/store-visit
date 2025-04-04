@@ -5,9 +5,9 @@ import { Button } from "../components/ui/button"
 
 export default function ToolBar({ selectedTool, setSelectedTool, clearCanvas, saveShapes }) {
   const tools = [
-    { name: "pointer", icon: <MousePointer size={18} color="white" />, bgColor: "bg-[#6366F1]" },
+    { name: "pointer", icon: <MousePointer size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
     { name: "rectangle", icon: <Square size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
-    { name: "rectangle-h", icon: <RectangleHorizontal size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
+    // { name: "rectangle-h", icon: <RectangleHorizontal size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
   ]
 
   return (
@@ -19,7 +19,7 @@ export default function ToolBar({ selectedTool, setSelectedTool, clearCanvas, sa
             variant="ghost"
             size="icon"
             onClick={() => setSelectedTool(tool.name)}
-            className={`${tool.bgColor} rounded-md h-9 w-9 ${selectedTool === tool.name ? "ring-2 ring-blue-300" : ""}`}
+            className={`${tool.bgColor} rounded-md h-9 w-9 ${selectedTool === tool.name ? " bg-[#6366F1] ring-2 ring-blue-300" : ""}`}
           >
             {tool.icon}
           </Button>
