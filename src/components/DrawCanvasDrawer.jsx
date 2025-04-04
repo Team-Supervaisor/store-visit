@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
+import { ChevronDown, X } from "lucide-react"
 
 export default function DrawingCanvas() {
   const canvasRef = useRef(null)
@@ -21,6 +22,15 @@ export default function DrawingCanvas() {
     x: 0,
     y: 0,
     text: "",
+  })
+  const [selectedShape, setSelectedShape] = useState(null)
+  const [shapeDialog, setShapeDialog] = useState({
+    isOpen: false,
+    x: 0,
+    y: 0,
+    shapeId: null,
+    name: "",
+    instruction: "",
   })
 
   // Canvas dimensions - using natural canvas coordinates now
@@ -58,16 +68,30 @@ export default function DrawingCanvas() {
     // Draw all shapes
     shapes.forEach((shape) => {
       if (shape.type === "rectangle") {
-        ctx.strokeStyle = "#000000"
-        ctx.lineWidth = 2
+        // Highlight selected shape
+        if (selectedShape && selectedShape.id === shape.id) {
+          ctx.strokeStyle = "#6366F1" // Purple for selected shape
+          ctx.lineWidth = 2.5
+        } else {
+          ctx.strokeStyle = "#000000"
+          ctx.lineWidth = 2
+        }
+
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
 
         // Draw ID in the top-left corner of the rectangle
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
         ctx.fillText(`ID: ${shape.id}`, shape.x + 5, shape.y + 15)
+
+        // If shape has a name, display it
+        if (shape.name) {
+          ctx.fillStyle = "#6366F1"
+          ctx.font = "14px Arial"
+          ctx.fillText(shape.name, shape.x + 5, shape.y + 35)
+        }
       } else if (shape.type === "text") {
-        ctx.fillStyle = "#000000"
+        ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
         ctx.font = "16px Arial"
         ctx.fillText(shape.text, shape.x, shape.y)
       }
@@ -91,7 +115,30 @@ export default function DrawingCanvas() {
       // Reset line dash
       ctx.setLineDash([])
     }
-  }, [shapes, ctx, drawingState])
+  }, [shapes, ctx, drawingState, selectedShape])
+
+  // Find shape at position
+  const findShapeAtPosition = (x, y) => {
+    // Check in reverse order (top-most shape first)
+    for (let i = shapes.length - 1; i >= 0; i--) {
+      const shape = shapes[i]
+
+      if (shape.type === "rectangle") {
+        // Check if point is inside rectangle
+        if (x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height) {
+          return shape
+        }
+      } else if (shape.type === "text") {
+        // Simple hit test for text (could be improved)
+        const textWidth = ctx.measureText(shape.text).width
+        if (x >= shape.x && x <= shape.x + textWidth && y >= shape.y - 16 && y <= shape.y) {
+          return shape
+        }
+      }
+    }
+
+    return null
+  }
 
   // Handle mouse events
   const startDrawing = (e) => {
@@ -103,7 +150,27 @@ export default function DrawingCanvas() {
     const canvasX = e.clientX - rect.left
     const canvasY = e.clientY - rect.top
 
-    if (selectedTool === "rectangle") {
+    if (selectedTool === "pointer") {
+      // Check if we clicked on a shape
+      const clickedShape = findShapeAtPosition(canvasX, canvasY)
+
+      if (clickedShape) {
+        setSelectedShape(clickedShape)
+
+        // Open the shape dialog
+        setShapeDialog({
+          isOpen: true,
+          x: clickedShape.x + clickedShape.width / 2,
+          y: clickedShape.y + clickedShape.height / 2,
+          shapeId: clickedShape.id,
+          name: clickedShape.name || "",
+          instruction: clickedShape.instruction || "",
+        })
+      } else {
+        setSelectedShape(null)
+        setShapeDialog({ ...shapeDialog, isOpen: false })
+      }
+    } else if (selectedTool === "rectangle") {
       setDrawingState({
         isDrawing: true,
         startX: canvasX,
@@ -111,6 +178,8 @@ export default function DrawingCanvas() {
         currentX: canvasX,
         currentY: canvasY,
       })
+      setSelectedShape(null)
+      setShapeDialog({ ...shapeDialog, isOpen: false })
     } else if (selectedTool === "text") {
       // Position for new text
       setTextInput({
@@ -119,6 +188,8 @@ export default function DrawingCanvas() {
         y: canvasY,
         text: "",
       })
+      setSelectedShape(null)
+      setShapeDialog({ ...shapeDialog, isOpen: false })
     }
   }
 
@@ -201,8 +272,37 @@ export default function DrawingCanvas() {
     setTextInput({ isActive: false, x: 0, y: 0, text: "" })
   }
 
+  const handleShapeDialogSave = () => {
+    // Update the shape with the new name and instruction
+    const updatedShapes = shapes.map((shape) => {
+      if (shape.id === shapeDialog.shapeId) {
+        return {
+          ...shape,
+          name: shapeDialog.name,
+          instruction: shapeDialog.instruction,
+        }
+      }
+      return shape
+    })
+
+    setShapes(updatedShapes)
+    setShapeDialog({ ...shapeDialog, isOpen: false })
+
+    console.log("Shape updated:", {
+      shapeId: shapeDialog.shapeId,
+      name: shapeDialog.name,
+      instruction: shapeDialog.instruction,
+    })
+  }
+
+  const closeShapeDialog = () => {
+    setShapeDialog({ ...shapeDialog, isOpen: false })
+  }
+
   const clearCanvas = () => {
     setShapes([])
+    setSelectedShape(null)
+    setShapeDialog({ ...shapeDialog, isOpen: false })
   }
 
   const saveShapes = () => {
@@ -217,10 +317,15 @@ export default function DrawingCanvas() {
         y: rect.y,
         width: rect.width,
         height: rect.height,
+        name: rect.name,
+        instruction: rect.instruction,
       }))
 
     console.log("Saved Shapes:", rectangleData)
   }
+
+  // Instructions dropdown options
+  const instructionOptions = ["Check inventory", "Restock items", "Clean area", "Verify pricing", "Arrange products"]
 
   return (
     <div className="relative w-full h-[calc(100vh-2rem)] flex flex-col items-center justify-center">
@@ -269,6 +374,80 @@ export default function DrawingCanvas() {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        )}
+
+        {shapeDialog.isOpen && (
+          <div
+            className="absolute bg-white p-4 rounded-xl shadow-lg w-[350px]"
+            style={{
+              left: `${shapeDialog.x}px`,
+              top: `${shapeDialog.y}px`,
+              transform: "translate(-50%, -50%)",
+              border: "1px solid #E5E7EB",
+            }}
+          >
+            {/* Close button */}
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
+              onClick={closeShapeDialog}
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <label className="font-medium text-gray-700 w-24">Name</label>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    placeholder="Enter the name of the Table"
+                    value={shapeDialog.name}
+                    onChange={(e) => setShapeDialog({ ...shapeDialog, name: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button className="bg-[#6366F1] text-white text-sm px-3 py-1 rounded-md">Map to</button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <label className="font-medium text-gray-700 w-24">Instruction</label>
+                <div className="flex-1 relative">
+                  <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none"
+                    value={shapeDialog.instruction}
+                    onChange={(e) => setShapeDialog({ ...shapeDialog, instruction: e.target.value })}
+                  >
+                    <option value="" disabled>
+                      Select from below
+                    </option>
+                    {instructionOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <ChevronDown size={16} className="text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 mt-2">
+                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm" onClick={closeShapeDialog}>
+                  Cancel
+                </button>
+                <button
+                  className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm"
+                  onClick={handleShapeDialogSave}
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         )}
