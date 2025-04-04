@@ -311,12 +311,12 @@ export default function DrawingCanvas({ isOpen, onClose }) {
       .filter((shape) => shape.type === "rectangle")
       .map((rect) => ({
         id: rect.id,
-        type: "rectangle",
+        // type: "rectangle",
         vertices: rect.vertices,
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height,
+        // x: rect.x,
+        // y: rect.y,
+        // width: rect.width,
+        // height: rect.height,
         name: rect.name,
         instruction: rect.instruction,
       }))
