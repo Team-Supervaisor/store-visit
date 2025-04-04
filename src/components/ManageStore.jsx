@@ -7,6 +7,89 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DrawCanvasDrawer from "./DrawCanvasDrawer";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+const Accordion = ({ title, content, isOpen, onClick }) => {
+  return (
+    <div className="mb-2">
+      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden ${isOpen ? 'shadow-sm' : ''}`}>
+        <button
+          className="w-full p-3 flex justify-between items-center"
+          onClick={onClick}
+        >
+          <span className="font-medium text-sm text-gray-700">{title}</span>
+          {isOpen ? (
+            <ChevronUp className="h-4 w-4 text-gray-600" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-gray-600" />
+          )}
+        </button>
+        {isOpen && (
+         
+          <div className="p-4 bg-white rounded-lg m-1 shadow-sm">
+          <p className="text-sm text-gray-600">{content}</p>
+        </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+const INSTRUCTIONS_DATA = [
+  {
+    id: "store",
+    title: "Store Details",
+    content: "Enter the store name and unique store ID. For existing stores, the ID field will be disabled."
+  },
+  {
+    id: "tsm",
+    title: "TSM Information",
+    content: "Enter the Territory Sales Manager (TSM) name who is responsible for this store."
+  },
+  {
+    id: "planogram",
+    title: "Planogram Upload",
+    content: "Upload a clear image of the store planogram. You can either upload an existing image or draw a new one using the Draw feature."
+  },
+  {
+    id: "firestore",
+    title: "Start Point12we",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  }
+  ,
+  {
+    id: "startpoint1",
+    title: "Start Point1223",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+  {
+    id: "startpoint2",
+    title: "Start Point122",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+  {
+    id: "startpoint3",
+    title: "Start Point12",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+  {
+    id: "startpoint8",
+    title: "Start Point12",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+  {
+    id: "startpoint5",
+    title: "Start Point12",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+  {
+    id: "startpoint5",
+    title: "Start Point12",
+    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+  },
+];
+
 
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,7 +105,7 @@ export default function ManageStore() {
   const navigate = useNavigate();
   const [tsmName, setTsmName] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
+  const [openAccordion, setOpenAccordion] = useState(null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -251,128 +334,211 @@ export default function ManageStore() {
               </button>
             </div>
 
-            {/* Form Content */}
-            <div className="p-4 space-y-6">
-              <div className="flex items-center w-[450px]">
-                <label
-                  htmlFor="storeName"
-                  className="text-sm font-medium text-gray-700 w-40"
-                >
-                  Store Name:
-                </label>
-                <input
-                  id="storeName"
-                  type="text"
-                  value={storeName}
-                  onChange={(e) => setStoreName(e.target.value)}
-                  className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                />
-              </div>
-
-              <div className="flex items-center w-[450px]">
-                <label
-                  htmlFor="storeId"
-                  className="text-sm font-medium text-gray-700 w-40"
-                >
-                  Store ID:
-                </label>
-                <input
-                  id="storeId"
-                  disabled={updateStore}
-                  type="text"
-                  value={storeId}
-                  onChange={(e) => setStoreId(e.target.value)}
-                  className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                />
-              </div>
-
-              <div className="flex items-center w-[450px]">
-                <label
-                  htmlFor="tsmName"
-                  className="text-sm font-medium text-gray-700 w-40"
-                >
-                  TSM Name:
-                </label>
-                <input
-                  id="tsmName"
-                  type="text"
-                  value={tsmName}
-                  onChange={(e) => setTsmName(e.target.value)}
-                  className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                />
-              </div>
-
-<div className="flex items-center justify-between w-full">
-  {/* Upload Label & Button */}
-  <div className="flex items-center">
-    <label className="text-sm font-medium text-gray-700 w-40" htmlFor="fileUpload">
-      Upload Planogram:
-    </label>
-    <input
-      type="file"
-      accept="image/*"
-      id="fileUpload"
-      onChange={handleImageChange}
-      className="hidden"
-    />
-    <label
-      htmlFor="fileUpload"
-      className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer p-[2px] bg-[#F2F2FF] hover:bg-indigo-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-      role="button"
-      tabIndex={0}
-      aria-label="Upload planogram image"
-    >
-      <Upload className="h-4 w-4 text-[#717AEA]" />
-      <span className="text-black text-sm">Upload</span>
-    </label>
-  </div>
-  <button
-  type="button"
-  onClick={() => setIsDrawerOpen(true)}
-  style={{ marginRight: "550px" }}
-  className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer bg-[#F2F2FF]"
->
-  <Pencil className="h-4 w-4 text-[#717AEA]" />
-  <span className="text-black text-sm">Draw</span>
-</button>
-   
-</div>
-
-              {/* Planogram Preview Area */}
-              <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
-                {previewImage ? (
-                  <div className="relative w-full h-full" ref={imageRef}>
-                    <img
-                      src={previewImage}
-                      onClick={handleImageClick}
-                      alt="Planogram Preview"
-                    />
-                    {clickPosition && (
-                      <img
-                        src="/pointer.svg"
-                        className="absolute w-5 h-5"
-                        style={{
-                          left: `${((clickPosition.x + 500) / 1000) * 100}%`,
-                          top: `${((clickPosition.y + 250) / 500) * 100}%`,
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      ></img>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">Upload to view</p>
-                )}
-              </div>
-              {previewImage && (
-                <div className="flex items-center">
-                  <button
-                    className="flex items-center bg-[#EFF4FE] text-[#4F4FDC] border border-[#4F4FDC] px-4 py-2 rounded-lg font-bold"
-                    onClick={() => setAllowClickPosition(true)}
+            {/* Form Content Container */}
+            <div className="p-4 flex gap-6">
+              {/* Existing Form Content */}
+              <div className="space-y-6">
+         
+                 <div>
+                <div className="flex items-center w-[450px]">
+                  <label
+                    htmlFor="storeName"
+                    className="text-sm font-medium text-gray-700 w-40"
                   >
-                    <Plus size={16} /> Pick Start Point
+                    Store Name:
+                  </label>
+                  <input
+                    id="storeName"
+                    type="text"
+                    value={storeName}
+                    onChange={(e) => setStoreName(e.target.value)}
+                    className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                  />
+                </div>
+
+                <div className="flex items-center w-[450px]">
+                  <label
+                    htmlFor="storeId"
+                    className="text-sm font-medium text-gray-700 w-40"
+                  >
+                    Store ID:
+                  </label>
+                  <input
+                    id="storeId"
+                    disabled={updateStore}
+                    type="text"
+                    value={storeId}
+                    onChange={(e) => setStoreId(e.target.value)}
+                    className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                  />
+                </div>
+
+                <div className="flex items-center w-[450px]">
+                  <label
+                    htmlFor="tsmName"
+                    className="text-sm font-medium text-gray-700 w-40"
+                  >
+                    TSM Name:
+                  </label>
+                  <input
+                    id="tsmName"
+                    type="text"
+                    value={tsmName}
+                    onChange={(e) => setTsmName(e.target.value)}
+                    className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                  />
+                </div>
+
+
+                 </div>
+
+              
+
+
+
+                <div className="flex items-center justify-around">
+                  {/* Upload Label & Button */}
+                  <div className="flex items-center">
+                    <label
+                      className="text-sm font-medium text-gray-700 w-40"
+                      htmlFor="fileUpload"
+                    >
+                      Upload Planogram:
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="fileUpload"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="fileUpload"
+                      className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer p-[2px] bg-[#F2F2FF] hover:bg-indigo-100 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Upload planogram image"
+                    >
+                      <Upload className="h-4 w-4 text-[#717AEA]" />
+                      <span className="text-black text-sm">Uploadss</span>
+                    </label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsDrawerOpen(true)}
+                   
+                    className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer bg-[#F2F2FF]"
+                  >
+                    <Pencil className="h-4 w-4 text-[#717AEA]" />
+                    <span className="text-black text-sm">Draw</span>
                   </button>
                 </div>
-              )}
+
+                {/* Planogram Preview Area */}
+                <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
+                  {previewImage ? (
+                    <div className="relative w-full h-full" ref={imageRef}>
+                      <img
+                        src={previewImage}
+                        onClick={handleImageClick}
+                        alt="Planogram Preview"
+                      />
+                      {clickPosition && (
+                        <img
+                          src="/pointer.svg"
+                          className="absolute w-5 h-5"
+                          style={{
+                            left: `${((clickPosition.x + 500) / 1000) * 100}%`,
+                            top: `${((clickPosition.y + 250) / 500) * 100}%`,
+                            transform: "translate(-50%, -50%)",
+                          }}
+                        ></img>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">Upload to view</p>
+                  )}
+                </div>
+                {previewImage && (
+                  <div className="flex items-center">
+                    <button
+                      className="flex items-center bg-[#EFF4FE] text-[#4F4FDC] border border-[#4F4FDC] px-4 py-2 rounded-lg font-bold"
+                      onClick={() => setAllowClickPosition(true)}
+                    >
+                      <Plus size={16} /> Pick Start Point
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div>
+
+                    {/* Instructions Section */}
+
+               {/* <div className="w-[400px]">
+                <h2 className="text-lg font-medium text-black mb-4">
+                  Instructions
+                </h2>
+                <Accordion
+                  title="Store Details"
+                  content="Enter the store name and unique store ID. For existing stores, the ID field will be disabled."
+                  isOpen={openAccordion === "store"}
+                  onClick={() =>
+                    setOpenAccordion(openAccordion === "store" ? null : "store")
+                  }
+                />
+                <Accordion
+                  title="TSM Information"
+                  content="Enter the Territory Sales Manager (TSM) name who is responsible for this store."
+                  isOpen={openAccordion === "tsm"}
+                  onClick={() =>
+                    setOpenAccordion(openAccordion === "tsm" ? null : "tsm")
+                  }
+                />
+                <Accordion
+                  title="Planogram Upload"
+                  content="Upload a clear image of the store planogram. You can either upload an existing image or draw a new one using the Draw feature."
+                  isOpen={openAccordion === "planogram"}
+                  onClick={() =>
+                    setOpenAccordion(
+                      openAccordion === "planogram" ? null : "planogram"
+                    )
+                  }
+                />
+                <Accordion
+                  title="Start Point"
+                  content="After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
+                  isOpen={openAccordion === "startpoint"}
+                  onClick={() =>
+                    setOpenAccordion(
+                      openAccordion === "startpoint" ? null : "startpoint"
+                    )
+                  }
+                />
+              </div> */}
+                <div className="w-[400px]">
+                  <h2 className="text-lg font-medium text-black mb-4">
+                    Instructions
+                  </h2>
+                  <div className="max-h-[500px] overflow-y-auto pr-2">
+                    {INSTRUCTIONS_DATA.map((item) => (
+                      <Accordion
+                        key={item.id}
+                        title={item.title}
+                        content={item.content}
+                        isOpen={openAccordion === item.id}
+                        onClick={() =>
+                          setOpenAccordion(openAccordion === item.id ? null : item.id)
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+               
+
+             
             </div>
 
             {/* Footer */}
