@@ -3,7 +3,7 @@ import { CircleUserRound, Check, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoginModal from './LoginModal';
+
 
 const Button = ({ children, styling, onClick }) => (
   <button
@@ -167,54 +167,43 @@ const StoreVisitTracking = () => {
   const [date, setDate] = useState("");
   const [storeVisit,setStoreVisit] = useState([])
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(true);
+
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
     setIsAuthenticated(true); // Set authenticated when login is successful
   };
 
-  // Only fetch data when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      getStore_dropdown();
-    }
-  }, [isAuthenticated]);
 
-  if (!isAuthenticated) {
-    return <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />;
-  }
-
-  function getStore_dropdown(){
-
-    let config = {
-      method: 'get',
-      maxBodyLength: Infinity,
-      url: 'https://store-visit-85801868683.us-central1.run.app/api/store_ids_and_dates',
-      headers: { }
-    };
-    
-    axios.request(config)
-    .then((response) => {
-      console.log((response.data));
-      const updatedStoreIds = ["All", ...response.data.store_ids];
-      const updatedDates = ["All", ...response.data.dates];
-
-      setStoreId(updatedStoreIds);
-      setDate(updatedDates);
-      setSelectedStore(updatedStoreIds[0]);
-      setSelectedDate(updatedDates[0]);
-      handleGo();
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
-  // useEffect(() => {
   
-  //   getStore_dropdown();
-  // }, [])
+  useEffect(() => {
+    function getStore_dropdown(){
+
+      let config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: 'https://store-visit-85801868683.us-central1.run.app/api/store_ids_and_dates',
+        headers: { }
+      };
+      
+      axios.request(config)
+      .then((response) => {
+        console.log((response.data));
+        const updatedStoreIds = ["All", ...response.data.store_ids];
+        const updatedDates = ["All", ...response.data.dates];
+
+        setStoreId(updatedStoreIds);
+        setDate(updatedDates);
+        setSelectedStore(updatedStoreIds[0]);
+        setSelectedDate(updatedDates[0]);
+        handleGo();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }
+    getStore_dropdown();
+  }, [])
   
   const handleGo = () => {
     setStoreVisitDetails([]);
@@ -276,14 +265,11 @@ const StoreVisitTracking = () => {
   
 
 
-  // const handleCloseLoginModal = () => {
-  //   setIsLoginModalOpen(false);
-  // };
-  
+
 
   return (
     <div className="bg-[#F7FAFF] min-h-screen min-w-screen font-[Urbanist]">
-    <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
+   
       <header className="flex p-4 bg-[#F7FAFF] justify-between items-center">
         <div style={{ display: "flex", alignItems: "center", marginLeft: 15 }}>
           <img

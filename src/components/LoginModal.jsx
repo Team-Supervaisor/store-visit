@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
-import logo from "../assets/logo.png";
-const LoginModal = ({ isOpen, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context';
+
+const LoginModal = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { login } = useAppContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Hardcoded credentials check
-    if (email === 'admin' && password === 'admin') {
+    if (email.trim() === 'admin' && password === 'admin') {
       setLoading(true);
-      
-      // Simulate loading for 1 second
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setLoading(false);
-      onClose(); // Close the modal
+      login(); // Set authenticated state
+      navigate('/'); // Redirect to home page
     } else {
       alert('Invalid credentials');
     }
