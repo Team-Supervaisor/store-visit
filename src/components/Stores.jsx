@@ -3,6 +3,8 @@ import { CircleUserRound, Check, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoginModal from './LoginModal';
+
 const Button = ({ children, styling, onClick }) => (
   <button
     className={`p-2 rounded-xl bg-[#E1E9FD] text-[#4F4FDC] ${styling}`}
@@ -113,8 +115,48 @@ const Dropdown = ({ options, selected, onChange }) => {
   );
 };
 
-
-
+const TableSkeleton = () => (
+  <div className="m-5 bg-[#EFF4FE] animate-pulse">
+    <div className="overflow-auto">
+      <table className="w-full text-sm text-left bg-white rounded-lg border-[2px] border-[#EFF4FE]">
+        <thead className="bg-[#EFF4FE]">
+          <tr>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-20"></div></th>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-24"></div></th>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-28"></div></th>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-28"></div></th>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-24"></div></th>
+            <th className="p-4"><div className="h-6 bg-gray-200 rounded w-32"></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...Array(5)].map((_, index) => (
+            <tr key={index} className="border-[#EFF4FE] border-[2px]">
+              <td className="p-4 border-[#EFF4FE]">
+                <div className="h-20 w-30 bg-gray-200 rounded"></div>
+              </td>
+              <td className="p-4 border-[#EFF4FE] border-2">
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+              </td>
+              <td className="p-4 border-[#EFF4FE] border-2">
+                <div className="h-4 bg-gray-200 rounded w-28"></div>
+              </td>
+              <td className="p-4 border-[#EFF4FE] border-2">
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </td>
+              <td className="p-4 border-[#EFF4FE] border-2">
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+              </td>
+              <td className="p-4 border-[#EFF4FE] border-2">
+                <div className="h-4 bg-gray-200 rounded w-32"></div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
 
 const StoreVisitTracking = () => {
   const navigate = useNavigate();
@@ -125,34 +167,54 @@ const StoreVisitTracking = () => {
   const [date, setDate] = useState("");
   const [storeVisit,setStoreVisit] = useState([])
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(true);
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+    setIsAuthenticated(true); // Set authenticated when login is successful
+  };
+
+  // Only fetch data when authenticated
   useEffect(() => {
-    function getStore_dropdown(){
-
-      let config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: 'https://store-visit-85801868683.us-central1.run.app/api/store_ids_and_dates',
-        headers: { }
-      };
-      
-      axios.request(config)
-      .then((response) => {
-        console.log((response.data));
-        const updatedStoreIds = ["All", ...response.data.store_ids];
-        const updatedDates = ["All", ...response.data.dates];
-
-        setStoreId(updatedStoreIds);
-        setDate(updatedDates);
-        setSelectedStore(updatedStoreIds[0]);
-        setSelectedDate(updatedDates[0]);
-        handleGo();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (isAuthenticated) {
+      getStore_dropdown();
     }
-    getStore_dropdown();
-  }, [])
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />;
+  }
+
+  function getStore_dropdown(){
+
+    let config = {
+      method: 'get',
+      maxBodyLength: Infinity,
+      url: 'https://store-visit-85801868683.us-central1.run.app/api/store_ids_and_dates',
+      headers: { }
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log((response.data));
+      const updatedStoreIds = ["All", ...response.data.store_ids];
+      const updatedDates = ["All", ...response.data.dates];
+
+      setStoreId(updatedStoreIds);
+      setDate(updatedDates);
+      setSelectedStore(updatedStoreIds[0]);
+      setSelectedDate(updatedDates[0]);
+      handleGo();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+  // useEffect(() => {
+  
+  //   getStore_dropdown();
+  // }, [])
   
   const handleGo = () => {
     setStoreVisitDetails([]);
@@ -213,8 +275,15 @@ const StoreVisitTracking = () => {
   };
   
 
+
+  // const handleCloseLoginModal = () => {
+  //   setIsLoginModalOpen(false);
+  // };
+  
+
   return (
     <div className="bg-[#F7FAFF] min-h-screen min-w-screen font-[Urbanist]">
+    <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
       <header className="flex p-4 bg-[#F7FAFF] justify-between items-center">
         <div style={{ display: "flex", alignItems: "center", marginLeft: 15 }}>
           <img
@@ -339,78 +408,82 @@ const StoreVisitTracking = () => {
 
 
         <Card className="p-4 rounded-3xl shadow-sm">
-          <div className="m-5 bg-[#EFF4FE]">
-            <div className="overflow-auto">
-              <table className="w-full text-sm text-left bg-white rounded-lg border-[2px] border-[#EFF4FE] pt-[20px] pb-[20px] pr-[32px] pl-[32px] ">
-                <thead className="bg-[#EFF4FE] text-[#717AEA] text-[16px] font-[600]">
-                  <tr className="">
-                    <th className="p-4">Image</th>
-                    <th className="p-4">Store Name</th>
-                    <th className="p-4">Date of Visit</th>
-                    <th className="p-4">Time of Visit</th>
-                    <th className="p-4">TSM Name</th>
-                    <th className="p-4 flex">
-                      <img src="/AIstar.svg" alt="star" className="mr-1"/>
-                      AI Generated Analysis
-                      </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {storeVisitDetails.length > 0 ? <>
-                    {storeVisitDetails
-                    .filter((item) => {
-                      if (selectedTab === "in-progress") return item.status !== "finished";
-                      if (selectedTab === "completed") return item.status === "finished";
-                      return true; // Show all if "all" is selected
-                    })
-                    .map((item, index) => {
-                      if(item.x_y_coords){
-                      // console.log(item);
-                      // console.log(item.x_y_coords,item.x_y_coords.length,typeof(item.x_y_coords));
-                      }
-                      return (
-                        <tr
-                          key={index}
-                          className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
-                          onClick={() => {
-                            if (item.status==="finished") {
-                              navigate('/storevisit', { state: { storeVisitDetails: item } });
-                            } else {
-                              navigate('/store-visit-tracking');
-                            }
-                          }}
-                        >
-                          <td className="p-4 border-[#EFF4FE] flex items-center">
-                            <div
-                              className={`w-[7px] h-[7px] rounded-full mr-4 ${
-                                item.status === "finished" ? "bg-red-500" : "bg-green-500"
-                              }`}
-                            ></div>
-                            <img
-                              src={item.planogram_url}
-                              alt="image"
-                              className="h-20 w-30 rounded-md"
-                            />
-                          </td>
-                          <td className="p-4 border-[#EFF4FE] border-2">{item.store_name || "N/A"}</td>
-                          <td className="p-4 border-[#EFF4FE] border-2">{item.date?.slice(0, 10) || "N/A"}</td>
-                          <td className="p-4 border-[#EFF4FE] border-2">{item.date?.slice(11) || "N/A"}</td>
-                          <td className="p-4 border-[#EFF4FE] border-2">{item.TSM_name||"N/A"}</td>
-                          <td className="p-4 border-[#EFF4FE] border-2 pl-8">
-                            <span className="bg-[#F6F9FF] p-3 rounded-lg">
-                              {item?.analysis || "N/A"}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
+          {storeVisitDetails.length === 0 ? (
+            <TableSkeleton />
+          ) : (
+            <div className="m-5 bg-[#EFF4FE]">
+              <div className="overflow-auto">
+                <table className="w-full text-sm text-left bg-white rounded-lg border-[2px] border-[#EFF4FE] pt-[20px] pb-[20px] pr-[32px] pl-[32px] ">
+                  <thead className="bg-[#EFF4FE] text-[#717AEA] text-[16px] font-[600]">
+                    <tr className="">
+                      <th className="p-4">Image</th>
+                      <th className="p-4">Store Name</th>
+                      <th className="p-4">Date of Visit</th>
+                      <th className="p-4">Time of Visit</th>
+                      <th className="p-4">TSM Name</th>
+                      <th className="p-4 flex">
+                        <img src="/AIstar.svg" alt="star" className="mr-1"/>
+                        AI Generated Analysis
+                        </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {storeVisitDetails.length > 0 ? <>
+                      {storeVisitDetails
+                      .filter((item) => {
+                        if (selectedTab === "in-progress") return item.status !== "finished";
+                        if (selectedTab === "completed") return item.status === "finished";
+                        return true; // Show all if "all" is selected
+                      })
+                      .map((item, index) => {
+                        if(item.x_y_coords){
+                        // console.log(item);
+                        // console.log(item.x_y_coords,item.x_y_coords.length,typeof(item.x_y_coords));
+                        }
+                        return (
+                          <tr
+                            key={index}
+                            className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[10px] hover:bg-[#F6F9FF]"
+                            onClick={() => {
+                              if (item.status==="finished") {
+                                navigate('/storevisit', { state: { storeVisitDetails: item } });
+                              } else {
+                                navigate('/store-visit-tracking');
+                              }
+                            }}
+                          >
+                            <td className="p-4 border-[#EFF4FE] flex items-center">
+                              <div
+                                className={`w-[7px] h-[7px] rounded-full mr-4 ${
+                                  item.status === "finished" ? "bg-red-500" : "bg-green-500"
+                                }`}
+                              ></div>
+                              <img
+                                src={item.planogram_url}
+                                alt="image"
+                                className="h-20 w-30 rounded-md"
+                              />
+                            </td>
+                            <td className="p-4 border-[#EFF4FE] border-2">{item.store_name || "N/A"}</td>
+                            <td className="p-4 border-[#EFF4FE] border-2">{item.date?.slice(0, 10) || "N/A"}</td>
+                            <td className="p-4 border-[#EFF4FE] border-2">{item.date?.slice(11) || "N/A"}</td>
+                            <td className="p-4 border-[#EFF4FE] border-2">{item.TSM_name||"N/A"}</td>
+                            <td className="p-4 border-[#EFF4FE] border-2 pl-8">
+                              <span className="bg-[#F6F9FF] p-3 rounded-lg">
+                                {item?.analysis || "N/A"}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
 
-                  </>:<></>}
-                  
-                </tbody>
-              </table>
+                    </>:<></>}
+                    
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </Card>
       </div>
     </div>
