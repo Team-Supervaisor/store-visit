@@ -14,7 +14,7 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
     <div className="mb-2">
       <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden ${isOpen ? '' : ''}`}>
         <button
-          className="w-full p-3 flex justify-between items-center"
+          className="w-full p-3 flex justify-between items-center focus:none"
           onClick={onClick}
         >
           <span className="font-medium text-sm text-gray-700">{title}</span>
