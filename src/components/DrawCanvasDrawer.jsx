@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas() {
+export default function DrawingCanvas({ isOpen, onClose }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -329,15 +329,23 @@ export default function DrawingCanvas() {
 
   return (
     <div className="relative w-full h-[calc(100vh-2rem)] flex flex-col items-center justify-center">
+      
       <div className="relative">
+        
         <canvas
           ref={canvasRef}
-          className="bg-white shadow-md rounded-lg cursor-crosshair"
+          className={`bg-white shadow-md rounded-lg ${selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"}`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
         />
+        <button
+    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
+    onClick={onClose}
+  >
+    <X size={18} />
+  </button>
 
         {textInput.isActive && (
           <div
@@ -396,13 +404,13 @@ export default function DrawingCanvas() {
               <X size={18} />
             </button>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 mt-[25px]">
               <div className="flex items-center gap-3">
                 <label className="font-medium text-gray-700 w-24">Name</label>
                 <div className="flex-1">
                   <input
                     type="text"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-[black]"
                     placeholder="Enter the name of the Table"
                     value={shapeDialog.name}
                     onChange={(e) => setShapeDialog({ ...shapeDialog, name: e.target.value })}
@@ -418,7 +426,7 @@ export default function DrawingCanvas() {
                 <label className="font-medium text-gray-700 w-24">Instruction</label>
                 <div className="flex-1 relative">
                   <select
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
                     value={shapeDialog.instruction}
                     onChange={(e) => setShapeDialog({ ...shapeDialog, instruction: e.target.value })}
                   >
@@ -438,7 +446,7 @@ export default function DrawingCanvas() {
               </div>
 
               <div className="flex justify-end gap-2 mt-2">
-                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm" onClick={closeShapeDialog}>
+                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]" onClick={closeShapeDialog}>
                   Cancel
                 </button>
                 <button

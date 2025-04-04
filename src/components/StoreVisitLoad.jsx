@@ -351,7 +351,7 @@ useEffect(() => {
         return(
         <div
           key={index}
-          className={`point ${point.photoCapture ? 'photo-captured' : ''}`}
+          className={`point ${point?.photoCapture ? 'photo-captured' : ''}`}
           style={{
             left: `${centerX+ point.x}px`,
             top: `${centerZ+point.y}px`
