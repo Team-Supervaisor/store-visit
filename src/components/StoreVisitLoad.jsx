@@ -94,13 +94,90 @@ useEffect(() => {
       console.log('Store Visit Details:', storeVisitDetails);
       if(storeVisitDetails.status=='finished'){
         setCoordinates(storeVisitDetails.x_y_coords);
-        setPPolygons(storeVisitDetails.polygon_coordinates);
+        setPstructures(storeVisitDetails.polygon_coordinates);
         setImageHistory(storeVisitDetails.images);
         setTotalDistance(storeVisitDetails.distance);
         
       }
     }, []);
-    const createRipple = (event) => {
+
+    function getPolygonCenter(coords) {
+      // console.log("polygon center:",coords);
+      let sumX = 0;
+      let sumZ = 0;
+      
+      coords.forEach(coord => {
+        sumX += coord[0];
+        sumZ += coord[1];
+      });
+      
+      return [sumX / coords.length, sumZ / coords.length];
+    }
+    const pPolygonsRef = useRef([]);
+
+    useEffect(() => {
+      if(pstructures.length>0){
+    console.log((pstructures[0]))
+
+    console.log(JSON.parse(pstructures[0]))
+    console.log(typeof(JSON.parse(pstructures[0])))
+      }
+    setCenterX(vizDimensions.width / 2);
+    setCenterZ(vizDimensions.height / 2);
+    const centerx = vizDimensions.width / 2;
+    const centerz = vizDimensions.height / 2;
+    if(pstructures.length>0){
+    const newPolygons = pstructures.map((structure, structureIndex) => {
+      // const parsedStructure = JSON.parse(structure);
+      let pathData = "";
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  
+      structure.forEach((coord, index) => {
+        const screenX = centerx + coord[0];
+        const screenZ = centerz + coord[1];
+    
+        pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+        minX = Math.min(minX, screenX);
+        maxX = Math.max(maxX, screenX);
+        minY = Math.min(minY, screenZ);
+        maxY = Math.max(maxY, screenZ);
+      });
+  
+      pathData += "Z"; // Close the polygon
+  
+      const centerCoord = getPolygonCenter(structure);
+      const textX = centerx + centerCoord[0];
+      const textY = centerz + centerCoord[1];
+  
+      const imageWidth = maxX - minX - 10;
+      const imageHeight = maxY - minY - 10;
+      const imageX = minX + 5;
+      const imageY = minY + 5;
+      
+      return {
+        image_id: structureIndex.toString(),
+        name: "",
+        type: 'counter',
+        coordinates: structure.coordinates,
+        pathData,
+        textX,
+        textY,
+        color: 'white',
+        imageX,
+        imageY,
+        imageWidth,
+        imageHeight,
+      };
+    });
+
+    setPPolygons(newPolygons);
+    pPolygonsRef.current = newPolygons; // Update the ref with the latest polygons
+    }
+  },[pstructures,vizDimensions]);
+    
+  
+  
+  const createRipple = (event) => {
       const button = event.currentTarget;
       const circle = document.createElement('span');
       const diameter = Math.max(button.clientWidth, button.clientHeight);
@@ -228,7 +305,7 @@ useEffect(() => {
     {/* Main Layout */}
     <div className="layout-container" >
       <div className="left-container"style={{
-        backgroundImage:isStructureVisible ? `url(${layout})` : "none",
+        backgroundImage:isStructureVisible ? `url(${storeVisitDetails.planogram_url})` : "none",
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
