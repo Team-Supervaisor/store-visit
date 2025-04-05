@@ -297,8 +297,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
       if (shape.id === shapeDialog.shapeId) {
         return {
           ...shape,
-          name: shapeDialog.name,
-          instruction: shapeDialog.instruction,
+          name: shapeDialog.name||"N/A",
+          instruction: shapeDialog.instruction||"N/A",
         }
       }
       return shape
@@ -414,7 +414,12 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
               <X size={18} />
             </button>
 
-            <div className="flex flex-col gap-4 mt-[25px]">
+            <div className="flex flex-col gap-4 ">
+            <div className="flex items-center justify-center mb-1">
+                <span className="text-sm font-semibold bg-gray-100 px-3 py-1 rounded-full text-gray-700">
+                  ID: {shapeDialog.shapeId}
+                </span>
+              </div>
               <div className="flex items-center gap-3">
                 <label className="font-medium text-gray-700 w-24">Name</label>
                 <div className="flex-1">
