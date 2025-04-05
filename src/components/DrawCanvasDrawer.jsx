@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -33,23 +33,18 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
     instruction: "",
   })
 
-  
   const canvasWidth = 1000
   const canvasHeight = 500
-
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-   
     canvas.width = canvasWidth
     canvas.height = canvasHeight
 
-   
     const context = canvas.getContext("2d")
     if (context) {
- 
       context.lineCap = "round"
       context.lineJoin = "round"
       setCtx(context)
@@ -63,11 +58,9 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
     ctx.fillStyle = "#ffffff"
     ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
-   
     ctx.save()
     ctx.translate(canvasWidth / 2, canvasHeight / 2)
 
-   
     shapes.forEach((shape) => {
       if (shape.type === "rectangle") {
         if (selectedShape && selectedShape.id === shape.id) {
@@ -78,16 +71,24 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
           ctx.lineWidth = 2
         }
 
+        // Draw the rectangle
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
+        
+        // Calculate the normalized coordinates for text placement
+        // This ensures text is always in the top-left corner of the visible rectangle
+        const textX = shape.width >= 0 ? shape.x + 5 : shape.x + shape.width + 5
+        const textY = shape.height >= 0 ? shape.y + 15 : shape.y + shape.height + 15
+        
+        // Draw ID text
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
-        ctx.fillText(`ID: ${shape.id}`, shape.x + 5, shape.y + 15)
+        ctx.fillText(`ID: ${shape.id}`, textX, textY)
 
-
+        // Draw name if it exists
         if (shape.name) {
           ctx.fillStyle = "#6366F1"
           ctx.font = "14px Arial"
-          ctx.fillText(shape.name, shape.x + 5, shape.y + 35)
+          ctx.fillText(shape.name, textX, textY + 20)
         }
       } else if (shape.type === "text") {
         ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
@@ -96,11 +97,9 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
       }
     })
 
-
     if (drawingState.isDrawing && selectedTool === "rectangle") {
       const width = drawingState.currentX - drawingState.startX
       const height = drawingState.currentY - drawingState.startY
-
 
       ctx.strokeStyle = "rgba(99, 102, 241, 0.6)"
       ctx.lineWidth = 2
@@ -124,12 +123,24 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
   }
 
   const findShapeAtPosition = (x, y) => {
-   
     for (let i = shapes.length - 1; i >= 0; i--) {
       const shape = shapes[i]
 
       if (shape.type === "rectangle") {
-        if (x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height) {
+        // Normalize rectangle coordinates for hit testing
+        const normalizedRect = {
+          x: shape.width < 0 ? shape.x + shape.width : shape.x,
+          y: shape.height < 0 ? shape.y + shape.height : shape.y,
+          width: Math.abs(shape.width),
+          height: Math.abs(shape.height)
+        }
+        
+        if (
+          x >= normalizedRect.x && 
+          x <= normalizedRect.x + normalizedRect.width && 
+          y >= normalizedRect.y && 
+          y <= normalizedRect.y + normalizedRect.height
+        ) {
           return shape
         }
       } else if (shape.type === "text") {
@@ -152,10 +163,23 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
 
       if (clickedShape) {
         setSelectedShape(clickedShape)
+        
+        // Calculate the center of the rectangle properly for dialog positioning
+        // Use absolute values to ensure center is calculated correctly regardless of dimensions
+        const normalizedRect = {
+          x: clickedShape.width < 0 ? clickedShape.x + clickedShape.width : clickedShape.x,
+          y: clickedShape.height < 0 ? clickedShape.y + clickedShape.height : clickedShape.y,
+          width: Math.abs(clickedShape.width),
+          height: Math.abs(clickedShape.height)
+        }
+        
+        const centerX = normalizedRect.x + (normalizedRect.width / 2)
+        const centerY = normalizedRect.y + (normalizedRect.height / 2)
+        
         setShapeDialog({
           isOpen: true,
-          x: clickedShape.x + clickedShape.width / 2 + canvasWidth / 2,
-          y: clickedShape.y + clickedShape.height / 2 + canvasHeight / 2,
+          x: centerX + canvasWidth / 2,
+          y: centerY + canvasHeight / 2,
           shapeId: clickedShape.id,
           name: clickedShape.name || "",
           instruction: clickedShape.instruction || "",
@@ -206,7 +230,24 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
+    
+    // Only create rectangle if it has a reasonable size
     if (Math.abs(width) > 5 && Math.abs(height) > 5) {
+      // Calculate the corner coordinates for vertices correctly
+      const x1 = drawingState.startX;
+      const y1 = drawingState.startY;
+      const x2 = canvasX;
+      const y2 = canvasY;
+      
+      // Calculate vertices in clockwise order regardless of drawing direction
+      // Note: we negate y values for vertices as per the original logic
+      const vertices = [
+        [Math.min(x1, x2), -Math.min(y1, y2)],
+        [Math.min(x1, x2), -Math.max(y1, y2)],
+        [Math.max(x1, x2), -Math.max(y1, y2)],
+        [Math.max(x1, x2), -Math.min(y1, y2)],
+      ];
+      
       const newRectangle = {
         id: nextId,
         type: "rectangle",
@@ -214,13 +255,9 @@ export default function DrawingCanvas({ isOpen, onClose,onSaveShapes  }) {
         y: drawingState.startY,
         width: width,
         height: height,
-        vertices: [
-          [drawingState.startX, -drawingState.startY],
-          [drawingState.startX, -(drawingState.startY + height)],
-          [drawingState.startX + width, -(drawingState.startY + height)],
-          [drawingState.startX + width, -drawingState.startY],
-        ],
+        vertices: vertices,
       }
+      
       setShapes([...shapes, newRectangle])
       setNextId(nextId + 1)
     }
