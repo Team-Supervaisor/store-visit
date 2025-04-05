@@ -12,6 +12,39 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import ConnectionErrorModal from './ConnectionErrorModal';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
+import ErrorBoundary from './ErrorBoundary';
+
+
+
+// Update the SafePolyline component in StoreVisitTracking.jsx
+const SafePolyline = ({ coordinates, centerX, centerZ, onError }) => {
+  try {
+    const points = coordinates
+      ?.filter(point => point && point.x !== undefined && point.z !== undefined)
+      .map(point => `${centerX + point.x},${centerZ + point.z}`)
+      .join(' ');
+
+    if (!points) {
+      throw new Error('Invalid coordinates data');
+    }
+
+    return (
+      <polyline
+        points={points}
+        fill="none"
+        stroke="blue"
+        strokeWidth="2"
+      />
+    );
+  } catch (error) {
+    console.error('Error rendering polyline:', error);
+    onError(); // Trigger the modal
+    return null;
+  }
+};
+
+
+
 
 const StoreVisitTracking = () => {
   // State variables
@@ -1277,7 +1310,7 @@ return (
       }}>
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
-  {isPathVisible && coordinates.length > 0 && (
+  {/* {isPathVisible && coordinates.length > 0 && (
     <svg
       width="100%"
       height="100%"
@@ -1294,12 +1327,39 @@ return (
             .map(point => `${centerX + point.x},${centerZ + point.z}`)
             .join(' ')
         }
+        
         fill="none"
         stroke="blue"
         strokeWidth="2"
       />
     </svg>
-  )}
+  )} */}
+
+  {isPathVisible && coordinates.length > 0 && (
+  <svg
+    width="100%"
+    height="100%"
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      pointerEvents: 'none'
+    }}
+  >
+    <ErrorBoundary
+      fallback={null}
+      onError={() => setShowConnectionModal(true)}
+    >
+  
+      <SafePolyline 
+        coordinates={coordinates}
+        centerX={centerX}
+        centerZ={centerZ}
+        onError={() => setShowConnectionModal(true)}
+      />
+    </ErrorBoundary>
+  </svg>
+)}
 
   {/* Render individual coordinate points */}
   {isPathVisible && (
