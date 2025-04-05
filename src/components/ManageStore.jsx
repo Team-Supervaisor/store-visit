@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DrawCanvasDrawer from "./DrawCanvasDrawer";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import OverlayAddStore from "./OverlayAddStore";
 
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
@@ -437,6 +438,10 @@ export default function ManageStore() {
   const [openAccordion, setOpenAccordion] = useState(null);
   const [rectangleData, setRectangleData] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   // let snapshot = null;
 
   const initialShapes = [
@@ -484,31 +489,33 @@ export default function ManageStore() {
     // console.log("Received from child:", data.snapshot);
   };
   const handleCreate = async () => {
-    if (!storeName || !storeId) {
-      alert("Please fill all the fields");
+    if (!storeName || !storeId || !tsmName) {
+      setShowStatusModal(true);
+      setIsSuccess(false);
       return;
     }
-    // if (!image) {
-    //   alert("Please select an image to upload");
-    //   return;
-    // }
-    if (!image && rectangleData.length === 0) {
-      alert("Please upload an image or draw ");
+   
+    if(!image && rectangleData.length === 0){
+      setShowStatusModal(true);
+      setErrorMessage("Please upload an image or draw ");
+      setIsSuccess(false);
       return;
     }
     console.log("clickPosition", clickPosition);
     if (image && !clickPosition) {
-      alert("Please click on the image to set the start point");
+      setShowStatusModal(true);
+      setErrorMessage("Please click on the image to set the start point")
       return;
     }
+
+
     console.log("rectangleData", rectangleData.length);
     // console.log("clickPosition", clickPosition);
     if (rectangleData.length > 0 && !clickPosition) {
       alert("Please click on the image to set the start pointss");
       return;
     }
-
-    // return;
+    
 
     const formData = {
       name: storeName,
@@ -538,9 +545,22 @@ export default function ManageStore() {
       })
       .then((res) => {
         console.log(res.data);
-        if (updateStore) alert("Store updated successfully");
-        else alert("Store added successfully");
+
+
+
+        if (updateStore) {
+          setIsSuccess(true);
+         setShowStatusModal(true);
+         setSuccessMessage("Store updated successfully");
+        }
+        else {
+          setIsSuccess(true);
+          setShowStatusModal(true);
+          setSuccessMessage("Store added successfully");
+          }
+       
         handleClose();
+        fethStores();
       })
       .catch((err) => {
         console.log(err);
@@ -573,7 +593,7 @@ export default function ManageStore() {
     setClickPosition({ x: mappedX, y: mappedY });
   };
 
-  useEffect(() => {
+  const fethStores  = () => {
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -590,10 +610,43 @@ export default function ManageStore() {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  useEffect(() => {
+    fethStores();
+    // let config = {
+    //   method: "get",
+    //   maxBodyLength: Infinity,
+    //   url: "https://store-visit-85801868683.us-central1.run.app/stores",
+    //   headers: {},
+    // };
+
+    // axios
+    //   .request(config)
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     setStoreData(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   }, []);
 
   return (
     <>
+    <OverlayAddStore 
+        message={errorMessage}
+        setErrorMessage={setErrorMessage}
+        successMessage={successMessage}
+      isOpen={showStatusModal}
+      onClose={() => {
+        setShowStatusModal(false);
+        if (isSuccess) {
+          handleClose();
+        }
+      }}
+      isSuccess={isSuccess}
+    />
       <div className="bg-[#F7FAFF] p-5 h-fit font-[Urbanist]">
         {/* Flex container for image and text */}
         <div className="flex justify-between">
