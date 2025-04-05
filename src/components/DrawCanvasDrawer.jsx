@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleData }) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -15,8 +15,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
     currentX: 0,
     currentY: 0,
   })
-  const [shapes, setShapes] = useState(rectangleData || []) // Initialize with rectangleData if provided
-  // console.log("Shapes:", rectangleData)
+  const [shapes, setShapes] = useState([])
   const [nextId, setNextId] = useState(1)
   const [textInput, setTextInput] = useState({
     isActive: false,
@@ -33,9 +32,25 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
     name: "",
     instruction: "",
   })
+  // Track all selected instructions to manage availability
+  const [selectedInstructions, setSelectedInstructions] = useState({})
+  // Track available instructions for each shape
+  const [availableInstructions, setAvailableInstructions] = useState({})
 
   const canvasWidth = 1000
   const canvasHeight = 500
+
+  // Initialize available instructions when instruction_data changes
+  useEffect(() => {
+    if (instruction_data) {
+      const initialAvailable = {}
+      // For each shape, set all instructions as initially available
+      shapes.forEach(shape => {
+        initialAvailable[shape.id] = instruction_data.map(item => item.id)
+      })
+      setAvailableInstructions(initialAvailable)
+    }
+  }, [instruction_data, shapes.length])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -76,7 +91,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
         
         // Calculate the normalized coordinates for text placement
-        // This ensures text is always in the top-left corner of the visible rectangle
         const textX = shape.width >= 0 ? shape.x + 5 : shape.x + shape.width + 5
         const textY = shape.height >= 0 ? shape.y + 15 : shape.y + shape.height + 15
         
@@ -114,6 +128,31 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
     }
     ctx.restore()
   }, [shapes, ctx, drawingState, selectedShape])
+
+  // Update available instructions when selectedInstructions change
+  useEffect(() => {
+    if (!instruction_data) return;
+    
+    // Create a new object for available instructions
+    const newAvailable = {};
+    
+    shapes.forEach(shape => {
+      // Get all instruction IDs
+      const allInstructionIds = instruction_data.map(item => item.id);
+      
+      // Filter out instructions that are selected by other shapes
+      const availableForShape = allInstructionIds.filter(id => {
+        // Include if it's this shape's current selection
+        if (selectedInstructions[shape.id] === id) return true;
+        // Or if it's not selected by any other shape
+        return !Object.values(selectedInstructions).includes(id);
+      });
+      
+      newAvailable[shape.id] = availableForShape;
+    });
+    
+    setAvailableInstructions(newAvailable);
+  }, [selectedInstructions, shapes, instruction_data]);
 
   const getCustomCoordinates = (e) => {
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -166,7 +205,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
         setSelectedShape(clickedShape)
         
         // Calculate the center of the rectangle properly for dialog positioning
-        // Use absolute values to ensure center is calculated correctly regardless of dimensions
         const normalizedRect = {
           x: clickedShape.width < 0 ? clickedShape.x + clickedShape.width : clickedShape.x,
           y: clickedShape.height < 0 ? clickedShape.y + clickedShape.height : clickedShape.y,
@@ -241,7 +279,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
       const y2 = canvasY;
       
       // Calculate vertices in clockwise order regardless of drawing direction
-      // Note: we negate y values for vertices as per the original logic
       const vertices = [
         [Math.min(x1, x2), -Math.min(y1, y2)],
         [Math.min(x1, x2), -Math.max(y1, y2)],
@@ -260,6 +297,17 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
       }
       
       setShapes([...shapes, newRectangle])
+      
+      // Add entry in availableInstructions for the new shape
+      if (instruction_data) {
+        setAvailableInstructions(prev => ({
+          ...prev,
+          [nextId]: instruction_data
+            .map(item => item.id)
+            .filter(id => !Object.values(selectedInstructions).includes(id))
+        }));
+      }
+      
       setNextId(nextId + 1)
     }
 
@@ -292,14 +340,39 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
     setTextInput({ isActive: false, x: 0, y: 0, text: "" })
   }
 
+  const handleInstructionChange = (e) => {
+    const newInstructionId = e.target.value;
+    const shapeId = shapeDialog.shapeId;
+    
+    // Update the shapeDialog state
+    setShapeDialog({ 
+      ...shapeDialog, 
+      instruction: newInstructionId 
+    });
+    
+    // Update the selectedInstructions tracking
+    setSelectedInstructions(prev => {
+      const newSelected = { ...prev };
+      
+      // If empty/none selected, remove from tracking
+      if (!newInstructionId) {
+        delete newSelected[shapeId];
+      } else {
+        newSelected[shapeId] = newInstructionId;
+      }
+      
+      return newSelected;
+    });
+  };
+
   const handleShapeDialogSave = () => {
     // Update the shape with the new name and instruction
     const updatedShapes = shapes.map((shape) => {
       if (shape.id === shapeDialog.shapeId) {
         return {
           ...shape,
-          name: shapeDialog.name||"N/A",
-          instruction: shapeDialog.instruction||"N/A",
+          name: shapeDialog.name || "N/A",
+          instruction: shapeDialog.instruction || "N/A",
         }
       }
       return shape
@@ -316,6 +389,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
   }
 
   const closeShapeDialog = () => {
+    // Reset to previous instruction if dialog is closed without saving
     setShapeDialog({ ...shapeDialog, isOpen: false })
   }
 
@@ -323,40 +397,57 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
     setShapes([])
     setSelectedShape(null)
     setShapeDialog({ ...shapeDialog, isOpen: false })
+    setSelectedInstructions({})
+    setAvailableInstructions({})
   }
 
   const saveShapes = () => {
-    // Take a snapshot of the canvas
     const canvas = canvasRef.current;
-    // Create a data URL representing the canvas content as a PNG image
     const canvasSnapshot = canvas.toDataURL("image/png");
     
-    // Extract rectangle coordinates
     const rectangle = shapes
       .filter((shape) => shape.type === "rectangle")
-      .map((rect) => ({
-        id: rect.id,
-        vertices: rect.vertices,
-        name: rect.name,
-        instruction: rect.instruction,
-      }))
-  
-    // console.log("Saved Shapes:", rectangle)
-    // console.log("Canvas Snapshot URL:", canvasSnapshot)
+      .map((rect) => {
+        // Find the complete instruction data object based on the selected instruction ID
+        const instructionData = rect.instruction && instruction_data.find(item => 
+          item.id === rect.instruction
+        );
+        
+        return {
+          id: rect.id,
+          vertices: rect.vertices,
+          name: rect.name,
+          // instruction: rect.instruction,
+          // Include the full instruction data if it exists
+          instructionData: instructionData || null
+        };
+      });
   
     if (onSaveShapes) {
-      // Send both shape data and snapshot to parent
       onSaveShapes({
         shapes: rectangle,
         snapshot: canvasSnapshot
       });
     }
-    onClose(); // Close the drawer
+    onClose();
   }
-  
 
-  // Instructions dropdown options
-  const instructionOptions = ["Check inventory", "Restock items", "Clean area", "Verify pricing", "Arrange products"]
+  // Get the filtered instruction options for the current shape
+  const getFilteredInstructions = () => {
+    if (!instruction_data || !shapeDialog.shapeId) return [];
+    
+    const currentShapeId = shapeDialog.shapeId;
+    const availableIds = availableInstructions[currentShapeId] || [];
+    
+    // Always include currently selected instruction if any
+    if (shapeDialog.instruction && !availableIds.includes(shapeDialog.instruction)) {
+      availableIds.push(shapeDialog.instruction);
+    }
+    
+    return instruction_data.filter(option => 
+      availableIds.includes(option.id)
+    );
+  };
 
   return (
     <div className="relative w-full h-[calc(100vh-2rem)] flex flex-col items-center justify-center">
@@ -427,7 +518,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
             </button>
 
             <div className="flex flex-col gap-4 ">
-            <div className="flex items-center justify-center mb-1">
+              <div className="flex items-center justify-center mb-1">
                 <span className="text-sm font-semibold bg-gray-100 px-3 py-1 rounded-full text-gray-700">
                   ID: {shapeDialog.shapeId}
                 </span>
@@ -455,14 +546,14 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleD
                   <select
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
                     value={shapeDialog.instruction}
-                    onChange={(e) => setShapeDialog({ ...shapeDialog, instruction: e.target.value })}
+                    onChange={handleInstructionChange}
                   >
                     <option value="" disabled>
                       Select from below
                     </option>
-                    {instructionOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
+                    {getFilteredInstructions().map((option) => (
+                      <option key={option.id} value={option.id} className="text-black-[500]">
+                        {option.title}
                       </option>
                     ))}
                   </select>
