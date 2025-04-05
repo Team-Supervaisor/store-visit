@@ -588,7 +588,7 @@
             /* Adjust for transparency */
             z-index: 1;
             /* Ensures it stays on top */
-            pointer-events: none;
+            /* pointer-events: none; */
             /* Prevents interaction with the overlay */
         }
 
@@ -643,9 +643,13 @@
 .structure svg path {
     transition: fill-opacity 0.3s ease;
   }
+  .structure {
+    pointer-events: all;
+    cursor: pointer; /* Optional: shows clickable pointer */
+  }
   
   .structure svg text {
-    pointer-events: none; /* Prevents text from interfering with hover effects */
+    /* pointer-events: none; */
     text-shadow: 0 0 3px white; /* Makes text more readable */
   }
   

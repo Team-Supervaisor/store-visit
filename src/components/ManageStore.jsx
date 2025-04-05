@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import DrawCanvasDrawer from "./DrawCanvasDrawer";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import OverlayAddStore from "./OverlayAddStore";
+import fallback from '../assets/fallback.svg';
 
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
@@ -722,7 +723,7 @@ export default function ManageStore() {
                         </td>
                         <td className="px-6 py-2 text-[14px]">
                           <img
-                            src={store?.planogram_url}
+                            src={store?.planogram_url|| fallback}
                             alt="Store Planogram"
                             className="h-20 w-30 rounded-md"
                           />
@@ -872,7 +873,7 @@ export default function ManageStore() {
                   {previewImage || snapshot ? (
                     <div className="relative w-full h-full" ref={imageRef}>
                       <img
-                        src={previewImage || snapshot}
+                        src={previewImage || snapshot }
                         onClick={handleImageClick}
                         alt="Planogram Preview"
                       />

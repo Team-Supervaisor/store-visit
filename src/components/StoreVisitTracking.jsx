@@ -3,12 +3,13 @@ import io from 'socket.io-client';
 import './store.css';
 import logo from '../assets/logo.png'
 import star from '../assets/star.png'
-import axios from 'axios';
+import axios, { all } from 'axios';
 import samsung from '../assets/samsung.png'
 import googlei from '../assets/google.png' 
 import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 import ConnectionErrorModal from './ConnectionErrorModal';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -56,6 +57,8 @@ const StoreVisitTracking = () => {
   const [planstructures,setPlanstructures]=useState([]);
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
   const [lastStructure,setLastStructure]=useState('');
+  const [modalData, setModalData] = useState(null);
+  const [instructionModal,setInstructionModal]=useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   let planogram_coords;
@@ -199,10 +202,11 @@ const vizRef = useRef(null);
   // ];
 
   let last='';
-  const check_inside_structure  = (x, z) => {
-    console.log("checking inside structure",x,z);
-    console.log("structures",planogram_coords);
-    planogram_coords.map((structure) => {
+  const check_inside_structure = (x, z) => {
+    console.log("checking inside structure", x, z);
+    console.log("structures", planogram_coords);
+  
+    for (const structure of planogram_coords) {
       const coords = structure.vertices;
   
       const xs = coords.map(c => c[0]);
@@ -212,22 +216,28 @@ const vizRef = useRef(null);
       const maxX = Math.max(...xs);
       const minZ = Math.min(...zs);
       const maxZ = Math.max(...zs);
-      console.log("minX,maxX,minZ,maxZ",minX,maxX,minZ,maxZ);
+  
+      console.log("minX,maxX,minZ,maxZ", minX, maxX, minZ, maxZ);
+  
       if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
-        // return structure;
         console.log("Inside structure:", structure.name);
-        if(structure.name!=last){
-          console.log("Inside structure:", structure.name);
-          console.log("sending instruction")
-        setLastStructure(structure.name);
-        last=structure.name;
-        sendInstructions(structure);
+        if (structure.name !== last) {
+          console.log("sending instruction");
+          setLastStructure(structure.name);
+          last = structure.name;
+          sendInstructions(structure);
+          break;
+           // skip remaining logic and move to next structure
         }
-
+        else{
+          continue;
+        }
       }
-    })
-    // return null;
+  
+      last = '';
+    }
   };
+  
 
   const sendInstructions = (structure) => {
     let data = JSON.stringify({
@@ -692,6 +702,7 @@ const get_store_visit_details = (store_visit_id) => {
         textX,
         textY,
         color: '#E1E9FD',
+        instructionData: structure.instructionData,
       };
     });
 
@@ -1251,7 +1262,7 @@ return (
     <div className="layout-container" >
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
-        backgroundImage:planstructures?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
+        backgroundImage:storeVisitDetails.planogram_coords?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
         
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
@@ -1308,29 +1319,44 @@ return (
   {/* Store structure overlay and other SVG elements remain unchanged */}
   {isStructureVisible && <div className="overlay"></div>}
   {isStructureVisible && (
-    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-      {polygons.map((polygon) => (
-        <g key={polygon.id} className={`structure ${polygon.type}`} title={polygon.name}>
-          <path
-            d={polygon.pathData}
-            fill={polygon.color}
-            stroke="#000"
-            strokeWidth="2"
-            fillOpacity="0.5"
-          />
-          <text
-            x={polygon.textX}
-            y={polygon.textY}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize="12px"
-            fill="#000"
-            fontWeight="bold"
+    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:10,pointerEvents:"all",cursor:"point"}}>
+      {polygons.map((polygon,index) => 
+        {
+          // console.log(polygon)
+          return(
+            <g
+            key={polygon.id}
+            className={`structure ${polygon.type} `}
+            title={polygon.name}
+            onClick={() => {
+              console.log('hello');
+              setInstructionModal(true);
+              setModalData(polygon);
+            }}
           >
-            {polygon.name}
-          </text>
-        </g>
-      ))}
+                            <path
+                              d={polygon.pathData}
+                              fill={polygon.color}
+                              stroke="#000"
+                              strokeWidth="2"
+                              fillOpacity="0.5"
+                            />
+                            <text
+                              x={polygon.textX}
+                              y={polygon.textY}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="12px"
+                              fill="#000"
+                              fontWeight="bold"
+                            >
+                              {polygon.name}
+                              {/* {polygon.instructionData} */}
+                            </text>
+                          </g>
+        )}
+        
+      )}
     </svg>
   )}
 
@@ -1520,6 +1546,55 @@ return (
         </div>
       </div>
     )}
+
+    {
+      instructionModal && (
+        <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]" style={{ zIndex: 20 }}>
+  <div className="bg-white rounded-[34px] shadow-lg w-full max-w-3xl  ">
+    {/* Header */}
+    <div className="flex items-center justify-between p-4 border-b border-gray-200 rounded-[33px] bg-[#EFF4FE]">
+      <div className="flex items-center ">
+        <h1 className="text-lg font-medium text-black ml-2">
+          {modalData?.instructionData?.title || 'Instruction Details'}
+        </h1>
+      </div>
+      <button
+        className="text-gray-500 hover:text-gray-700 bg-[#F8F8F8] p-[4px] rounded-full"
+        onClick={() => setInstructionModal(false)}
+      >
+        <X className="h-5 w-5" />
+      </button>
+    </div>
+
+    {/* Content */}
+    <div className="p-4 space-y-4">
+
+      {/* Instruction Content */}
+      <div>
+        <h2 className="text-md font-semibold text-black mb-1">Content</h2>
+        <p className="text-sm text-gray-700">
+          {modalData?.instructionData?.content}
+        </p>
+      </div>
+
+      {/* Questions */}
+      <div>
+        <h2 className="text-md font-semibold text-black mb-2">Questions</h2>
+        <ul className="space-y-2">
+          {modalData?.instructionData?.questions?.map((q, index) => (
+            <li key={q.id} className="text-sm text-gray-800">
+              <span className="font-medium">{index + 1}. </span>{q.question}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+      )
+
+    }
 
      <ConnectionErrorModal isOpen={showConnectionModal} />
   </div>

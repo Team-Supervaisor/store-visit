@@ -3,6 +3,7 @@ import { CircleUserRound, Check, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import fallback from '../assets/fallback.svg';
 
 
 const Button = ({ children, styling, onClick }) => (
@@ -445,7 +446,7 @@ const StoreVisitTracking = () => {
                                 }`}
                               ></div>
                               <img
-                                src={item.planogram_url}
+                                src={item.planogram_url||fallback}
                                 alt="image"
                                 className="h-20 w-30 rounded-md"
                               />
