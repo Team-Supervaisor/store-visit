@@ -10,6 +10,7 @@ import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
+import {ChevronUp, ChevronDown } from 'lucide-react';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -1098,7 +1099,7 @@ return (
       <div className="control-panel" style={{ textAlign: 'right' }}>
         <div>
        
-          {/* <button
+          <button
             // id="startButton"
             type="button"
             style={{backgroundColor:"white", color:"black"}}
@@ -1109,7 +1110,7 @@ return (
             }}
           >
             Start
-          </button> */}
+          </button>
           <button
             id="clearButton"
             type="button"
@@ -1357,114 +1358,169 @@ return (
 
 
       </div>
-      <div
-        style={{
-            margin:"5px",
-            marginBottom: "7px"
-        }}
-       className="right-container"
-      
-      >
-        <div
-          style={{
-            paddingLeft: '14px',
-            paddingTop: '10px',
-            fontWeight: 'bold',
-            // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
-            borderBottom: '1px solid #EFF4FE',
-            color: 'black',
-            paddingBottom: '5px',
-            
-          }}
-        >
-          Reports
-        </div>
-        <div id="imageContainer">
-          {imageHistory.length > 0 ? (
-            // console.log("ai details",imageHistory,aiDetails),
-            imageHistory.map((image, index) => {
-              let a = parseImageUrl(image.url);
-              // let ai = getAI(image.url);
-              // console.log("AI:",ai);  
-              return (
-                <div
-                  key={index}
-                  className={`card ${selectedImage === index ? 'active' : ''}`}
-                  ref={(el) => (imageRefs.current[index] = el)}
-                >
-                  <div className="card-image-container">
-                    {/* NEW LINE: onClick added here to open modal */}
-                    <img
-                      src={image.url}
-                      alt={`Report ${index}`}
-                      className="card-image"
-                      onClick={() => openModal(image.url)}
-                    />
-                  </div>
-                  <div className="card-content">
-                    <div className="card-info">
-                      <div className="card-info-row">
-                        <span className="card-info-label">Brand</span>
-                        <span className="card-info-label">Merchandise</span>
-                        <span className="card-info-label">Product</span>
-                        <span className="card-info-label">Measurement</span>
-                      </div>
-                      <div className="card-info-row">
-                        <span className="card-info-value">{a.brand || 'N/A'}</span>
-                        <span className="card-info-value">{a.merchandise || 'N/A'}</span>
-                        <span className="card-info-value">{a.product || 'N/A'}</span>
-                        <span className="card-info-value">
-                          {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Toggle button */}
-
-                    {/* Extra Content - Conditionally rendered */}
-                    {expandedCards[index] && (
-                      <div className="extra-content-container">
-                        <div className="extra-header">
-                          <img src={star} alt="Icon" className="extra-icon" />
-                          <span className="extra-title" style={{ fontWeight: 400, color: 'black' }}>
-                            AI Analysis
-                          </span>
-                        </div>
-                        {/* <p class="extra-description">
-               Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
-           </p> */}
-                        <p className="extra-details">
-                          <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
-                          <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
-                          <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
-                        </p>
-                        {/* <p>
-                          {aiDetails[index]?.summary || 'No AI analysis available.'}
-                        </p> */}
-                      </div>
-                    )}
-                    <div className="card-toggle" onClick={() => toggleCard(index)}>
-                      <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
-                      <span className="arrow">{expandedCards[index] ? '▲' : '▼'}</span>
-                    </div>
+           <div
+             style={{
+                  margin:"5px",
+                  marginBottom: "7px"
+              }}
+             className="right-container">
+              <div
+                style={{
+                  paddingLeft: '14px',
+                  paddingTop: '10px',
+                  fontWeight: 'bold',
+                  // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
+                  borderBottom: '1px solid #EFF4FE',
+                  color: 'black',
+                  paddingBottom: '5px',
+                  
+                }}
+              >
+                Reports
+              </div>
+              
+              {/* report numbers */}
+              {/* <div className="flex gap-4 px-4 py-3 text-black">
+              <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+                <div  className="text-sm font-medium mb-1">SOV</div>
+                <div className="flex items-center">
+                  <span className="text-xl font-medium mr-2">240</span>
+                  <img src="/trending_up.svg" alt="trending up" className="w-4 h-4 " />
+                  <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+                    14%
                   </div>
                 </div>
-              );
-            })
-          ) : (
-            <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
-              <img 
-                src="/empty.svg" 
-                alt="arrow" 
-                className="h-40 object-contain "
-              />
-              <p className="text-gray-400 text-lg">
-                Seems like the planogram is lonely
-              </p>
+              </div>
+      
+              <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+                <div className="text-sm font-medium mb-1">Compliance</div>
+                <div className="flex items-center">
+                  <span className="text-xl font-medium mr-2">240</span>
+                  <img src="/trending_up.svg" alt="trending up" className="w-4 h-4" />
+                  <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+                    14%
+                  </div>
+                </div>
+              </div>
+      
+              <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+                <div className="text-sm font-medium mb-1">Placement</div>
+                <div className="flex items-center">
+                  <span className="text-xl font-medium mr-2">240</span>
+                  <img src="/trending_up.svg" alt="trending up" className="w-4 h-4" />
+                  <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+                    14%
+                  </div>
+                </div>
+              </div>
+            </div> */}
+      
+            <div id="imageContainer">
+                {imageHistory.length > 0 ? (
+                  // console.log("ai details",imageHistory,aiDetails),
+                  imageHistory.map((image, index) => {
+                    // console.log("image",image);
+                    let a = parseImageUrl(image.url);
+                    // let ai = getAI(image.url);
+                    // console.log("AI:",ai);  
+                    return (
+                      <div
+                        
+      
+                      key={index}
+                      className={`card bg-[#F9F9FF] border border-[#EFF1FF] rounded-xl overflow-hidden transition-all duration-300 ${
+                        selectedImage === index ? 'active' : ''
+                      }`}
+                      ref={(el) => (imageRefs.current[index] = el)}
+                      >
+                           <div className='p-3 rounded-full'>
+                           <div className="card-image-container">
+                          {/* NEW LINE: onClick added here to open modal */}
+                          <img
+                       src={image.url}
+                       alt={`Report ${index}`}
+                        className=" w-full rounded-lg "
+                        onClick={() => openModal(image.url)}
+                      />
+                        </div>
+      
+      
+                           </div>
+      
+                        <div className="card-content">
+                          <div className="card-info px-4 py-3">
+                            <div className="card-info-row">
+                              <span className="card-info-label">Brand</span>
+                              <span className="card-info-label">Merchandise</span>
+                              <span className="card-info-label">Product</span>
+                              <span className="card-info-label">Measurement</span>
+                            </div>
+                            <div className="card-info-row">
+                              <span className="card-info-value">{a?.brand || 'N/A'}</span>
+                              <span className="card-info-value">{a?.merchandise || 'N/A'}</span>
+                              <span className="card-info-value">{a?.product || 'N/A'}</span>
+                              <span className="card-info-value">
+                              {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
+                              </span>
+                            </div>
+                          </div>
+      
+                          {/* Toggle button */}
+      
+                          {/* Extra Content - Conditionally rendered */}
+                          {expandedCards[index] && (
+                         
+                  <div className="extra-content-container m-4 p-4 rounded-lg bg-white animate-fadeIn"
+                    style={{
+                      animation: 'fadeIn 0.3s ease-in-out'
+                    }}>
+                              <div className="extra-header mb-3">
+                      <img src={star} alt="Icon" className="extra-icon" />
+                      <span className="extra-title font-normal text-black">
+                        AI Analysis
+                      </span>
+                    </div>
+                       
+                 <p className="extra-details">
+                    <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
+                    <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
+                    <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
+                 </p>
+                            
+                  </div>
+                      
+          
+                  )}
+                  <div 
+                  className="card-toggle px-4 py-3 flex items-center justify-center gap-2 cursor-pointer  transition-colors"
+                  onClick={() => toggleCard(index)}
+                   >
+                  <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
+                  {expandedCards[index] ? (
+                    <ChevronUp size={20} color="#717AEA" />
+                  ) : (
+                    <ChevronDown size={20} color="#717AEA" />
+                  )}
+                </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                 
+                  <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
+                    <img 
+                      src="/empty.svg" 
+                      alt="arrow" 
+                      className="h-40 object-contain "
+                    />
+                    <p className="text-gray-400 text-lg">
+                      Seems like the planogram is lonely
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      </div>
     </div>
 
     {/* NEW LINES: Modal Popup with Close Button */}
