@@ -34,60 +34,59 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
   );
 };
 
-const INSTRUCTIONS_DATA = [
-  {
-    id: "store",
-    title: "Store Details",
-    content: "Enter the store name and unique store ID. For existing stores, the ID field will be disabled."
-  },
-  {
-    id: "tsm",
-    title: "TSM Information",
-    content: "Enter the Territory Sales Manager (TSM) name who is responsible for this store."
-  },
-  {
-    id: "planogram",
-    title: "Planogram Upload",
-    content: "Upload a clear image of the store planogram. You can either upload an existing image or draw a new one using the Draw feature."
-  },
-  {
-    id: "firestore",
-    title: "Start Point12we",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  }
-  ,
-  {
-    id: "startpoint1",
-    title: "Start Point1223",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
-  {
-    id: "startpoint2",
-    title: "Start Point122",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
-  {
-    id: "startpoint3",
-    title: "Start Point12",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
-  {
-    id: "startpoint8",
-    title: "Start Point12",
-    content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  },
-  // {
-  //   id: "startpoint5",
-  //   title: "Start Point12",
-  //   content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  // },
-  // {
-  //   id: "startpoint5",
-  //   title: "Start Point12",
-  //   content: "After uploading the planogram, select a start point by clicking the 'Pick Start Point' button and then clicking on the desired location in the image."
-  // },
-];
-
+const INSTRUCTIONS_DATA = 
+  [
+    {
+      "id": "store",
+      "title": "Store Identification",
+      "content": "Enter the official store name and its unique store ID. For existing stores, the store ID will be pre-filled and cannot be edited."
+    },
+    {
+      "id": "tsm",
+      "title": "Territory Sales Manager (TSM)",
+      "content": "Enter the full name of the Territory Sales Manager (TSM) responsible for managing this store's operations and execution."
+    },
+    {
+      "id": "storeAddress",
+      "title": "Store Address",
+      "content": "Provide the complete store address, including street, city, state, and postal code to ensure accurate mapping and logistics."
+    },
+    {
+      "id": "storeType",
+      "title": "Store Format",
+      "content": "Select the store format (e.g., Hypermarket, Supermarket, Kirana, Modern Trade) to tailor execution plans accordingly."
+    },
+    {
+      "id": "storeSize",
+      "title": "Store Size (sq. ft.)",
+      "content": "Input the approximate size of the store in square feet to help categorize layout and inventory planning."
+    },
+    {
+      "id": "contactPerson",
+      "title": "Primary Contact Person",
+      "content": "Enter the name and mobile number of the primary store contact for coordination and updates."
+    },
+    {
+      "id": "operatingHours",
+      "title": "Operating Hours",
+      "content": "Specify the store’s daily operating hours, including opening and closing times."
+    },
+    {
+      "id": "storeStatus",
+      "title": "Store Status",
+      "content": "Indicate the current operational status of the store (Active, Temporarily Closed, Under Renovation, etc.)."
+    },
+    {
+      "id": "salesRegion",
+      "title": "Sales Region",
+      "content": "Assign the store to the appropriate sales region or zone for reporting and oversight purposes."
+    },
+    {
+      "id": "dateOfOnboarding",
+      "title": "Date of Onboarding",
+      "content": "Select the official date when the store was or will be onboarded into the system."
+    }
+  ];
 
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
