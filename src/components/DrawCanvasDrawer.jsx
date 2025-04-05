@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes,rectangleData }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -15,7 +15,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
     currentX: 0,
     currentY: 0,
   })
-  const [shapes, setShapes] = useState([])
+  const [shapes, setShapes] = useState(rectangleData || []) // Initialize with rectangleData if provided
+  // console.log("Shapes:", rectangleData)
   const [nextId, setNextId] = useState(1)
   const [textInput, setTextInput] = useState({
     isActive: false,
@@ -325,8 +326,13 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
   }
 
   const saveShapes = () => {
+    // Take a snapshot of the canvas
+    const canvas = canvasRef.current;
+    // Create a data URL representing the canvas content as a PNG image
+    const canvasSnapshot = canvas.toDataURL("image/png");
+    
     // Extract rectangle coordinates
-    const rectangleData = shapes
+    const rectangle = shapes
       .filter((shape) => shape.type === "rectangle")
       .map((rect) => ({
         id: rect.id,
@@ -334,14 +340,20 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes }) {
         name: rect.name,
         instruction: rect.instruction,
       }))
-
-    console.log("Saved Shapes:", rectangleData)
-
+  
+    // console.log("Saved Shapes:", rectangle)
+    // console.log("Canvas Snapshot URL:", canvasSnapshot)
+  
     if (onSaveShapes) {
-      onSaveShapes(rectangleData); // Send to parent
+      // Send both shape data and snapshot to parent
+      onSaveShapes({
+        shapes: rectangle,
+        snapshot: canvasSnapshot
+      });
     }
     onClose(); // Close the drawer
   }
+  
 
   // Instructions dropdown options
   const instructionOptions = ["Check inventory", "Restock items", "Clean area", "Verify pricing", "Arrange products"]

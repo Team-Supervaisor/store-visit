@@ -97,13 +97,44 @@ export default function ManageStore() {
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [storeData, setStoreData] = useState([]);
-  const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
+  // const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
+  const [clickPosition, setClickPosition] = useState(null);
   const imageRef = useRef(null);
   const navigate = useNavigate();
   const [tsmName, setTsmName] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(null);
   const [rectangleData, setRectangleData] = useState([]);
+  const [snapshot, setSnapshot] = useState(null);
+  // let snapshot = null;
+
+  const initialShapes = [
+    {
+      id: 1,
+      type: "rectangle",
+      x: -100,
+      y: -50,
+      width: 200,
+      height: 100,
+      vertices: [
+        [-100, 50],
+        [-100, -50],
+        [100, -50],
+        [100, 50],
+      ],
+      name: "Main Area",
+      instruction: "Start here",
+    },
+    {
+      id: 2,
+      type: "text",
+      x: -50,
+      y: -70,
+      text: "Welcome Zone",
+    }
+  ]
+  
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -114,8 +145,13 @@ export default function ManageStore() {
     }
   };
   const handleSaveShapes = (data) => {
-    setRectangleData(data);
     console.log("Received from child:", data);
+    setRectangleData(data.shapes);
+    // console.log(data.snapshot)
+    setSnapshot(data.snapshot);
+    // snapshot = data.snapshot;
+    // console.log("Received from child:", data.shapes);
+    // console.log("Received from child:", data.snapshot);
   };
   const handleCreate = async () => {
     if (!storeName || !storeId) {
@@ -126,10 +162,24 @@ export default function ManageStore() {
     //   alert("Please select an image to upload");
     //   return;
     // }
+    if(!image && rectangleData.length === 0){
+      alert("Please upload an image or draw ");
+      return;
+      
+    }
+    console.log("clickPosition", clickPosition);
     if (image && !clickPosition) {
       alert("Please click on the image to set the start point");
       return;
     }
+    console.log("rectangleData", rectangleData.length);
+    // console.log("clickPosition", clickPosition);
+    if(rectangleData.length>0 && !clickPosition){
+      alert("Please click on the image to set the start pointss");
+      return;
+    }
+    
+    return;
 
     const formData = {
       name: storeName,
@@ -413,6 +463,7 @@ export default function ManageStore() {
                       id="fileUpload"
                       onChange={handleImageChange}
                       className="hidden"
+                      disabled={snapshot?true:false} 
                     />
                     <label
                       htmlFor="fileUpload"
@@ -428,7 +479,7 @@ export default function ManageStore() {
                   <button
                     type="button"
                     onClick={() => setIsDrawerOpen(true)}
-                   
+                    disabled={previewImage?true:false}
                     className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer bg-[#F2F2FF]"
                   >
                     <Pencil className="h-4 w-4 text-[#717AEA]" />
@@ -438,10 +489,11 @@ export default function ManageStore() {
 
                 {/* Planogram Preview Area */}
                 <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
-                  {previewImage ? (
+                  {previewImage || snapshot ?
+                   (
                     <div className="relative w-full h-full" ref={imageRef}>
                       <img
-                        src={previewImage}
+                        src={previewImage||snapshot}
                         onClick={handleImageClick}
                         alt="Planogram Preview"
                       />
@@ -461,7 +513,7 @@ export default function ManageStore() {
                     <p className="text-gray-500 text-sm">Upload to view</p>
                   )}
                 </div>
-                {previewImage && (
+                {(previewImage || snapshot) && (
                   <div className="flex items-center">
                     <button
                       className="flex items-center bg-[#EFF4FE] text-[#4F4FDC] border border-[#4F4FDC] px-4 py-2 rounded-lg font-bold"
@@ -525,7 +577,7 @@ export default function ManageStore() {
       {isDrawerOpen && isModalOpen && (
         <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]">
 
-      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}  onSaveShapes={handleSaveShapes}/>
+      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}  onSaveShapes={handleSaveShapes} shapes={initialShapes} />
       </div>
 
       )}
