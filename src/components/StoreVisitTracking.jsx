@@ -201,10 +201,9 @@ const vizRef = useRef(null);
   //   }
   // ];
 
-  let last='';
-  const check_inside_structure = (x, z) => {
-    console.log("checking inside structure", x, z);
-    console.log("structures", planogram_coords);
+let currentStructure = null; // Tracks which structure the user is currently inside
+const check_inside_structure = (x, z) => {
+    let foundStructure = null;
   
     for (const structure of planogram_coords) {
       const coords = structure.vertices;
@@ -217,26 +216,30 @@ const vizRef = useRef(null);
       const minZ = Math.min(...zs);
       const maxZ = Math.max(...zs);
   
-      console.log("minX,maxX,minZ,maxZ", minX, maxX, minZ, maxZ);
-  
       if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
-        console.log("Inside structure:", structure.name);
-        if (structure.name !== last) {
-          console.log("sending instruction");
-          setLastStructure(structure.name);
-          last = structure.name;
-          sendInstructions(structure);
-          break;
-           // skip remaining logic and move to next structure
-        }
-        else{
-          continue;
-        }
+        foundStructure = structure;
+        break; // found the structure we're in, no need to check others
       }
+    }
   
-      last = '';
+    if (foundStructure) {
+      if (!currentStructure || currentStructure.name !== foundStructure.name) {
+        // User entered a new structure (or any structure for the first time)
+        console.log("Entered new structure:", foundStructure.name);
+        currentStructure = foundStructure;
+        sendInstructions(foundStructure);
+        setLastStructure(foundStructure.name);
+      }
+      // else: still inside same structure, do nothing
+    } else {
+      // Not inside any structure now — reset
+      if (currentStructure !== null) {
+        console.log("Exited structure:", currentStructure.name);
+      }
+      currentStructure = null;
     }
   };
+  
   
 
   const sendInstructions = (structure) => {
