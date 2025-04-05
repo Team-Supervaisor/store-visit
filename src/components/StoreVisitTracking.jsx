@@ -230,7 +230,7 @@ const vizRef = useRef(null);
     let data = JSON.stringify({
       "region_id": structure?.id||"N/A",
       "region_name":structure?.name||"N/A",
-    "instruction_set": structure?.instruction_data||"N/A",
+    "instruction_set": structure?.instructionData||"N/A",
     });
     
     let config = {
