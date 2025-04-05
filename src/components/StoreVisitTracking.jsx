@@ -1161,6 +1161,32 @@ return (
 </div> */}
 
 
+<div className="flex" style={{ width: '70%', display:"inline-block" }}>  {/* Match left-container width */}
+    {/* Store Name and Distance container */}
+    <div className="flex justify-between items-center mb-4 px-4 w-full">
+      {/* Store Name */}
+      <div className=" text-[#777FE3] items-center py-2 px-6 rounded-full">
+        {/* <span className="font-medium">
+          {storeVisitDetails.store_name || 'Store Name'}
+        </span> */}
+      </div>
+
+      {/* Distance Display */}
+      <div className="info-display">
+        <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
+          <span 
+            id="distance" 
+            ref={distanceDisplayRef} 
+            className="font-medium"
+          >
+            {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 
     {/* Main Layout */}
     <div className="layout-container" >
@@ -1179,29 +1205,7 @@ return (
         // zIndex:10 // Full height of the viewport
       }}>
 
-        {/* Distance Display - Updated */}
-        <div 
-  className="info-display absolute top-4 left-0" 
-  style={{ zIndex: 10 }}
->
-  <div 
-    style={{
-      borderTopRightRadius: '12px',
-      borderBottomRightRadius: '12px'
-    }}
-    className="bg-[#EFF0FF] text-[#777FE3] items-center py-2 pl-4 pr-6"
-  >
-    <span 
-      id="distance" 
-      ref={distanceDisplayRef} 
-      className="font-medium"
-    >
-      {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
-    </span>
-
-    <span className="arrow">◀</span>
-  </div>
-</div>
+ 
 
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}

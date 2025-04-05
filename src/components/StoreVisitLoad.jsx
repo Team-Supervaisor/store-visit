@@ -346,20 +346,39 @@ useEffect(() => {
       </div>
     </div>
 
-{/* Distance Display */}
-{/* <div className="info-display">
-  <span className="distance-box">
-    <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
-      Distance: {totalDistance?.toFixed(2)}
-    </span>
-    <span className="arrow">◀</span>
-  </span>
-</div> */}
 
+
+
+
+<div className="flex" style={{ width: '70%', display:"inline-block" }}>  {/* Match left-container width */}
+    {/* Store Name and Distance container */}
+    <div className="flex justify-between items-center mb-4 px-4 w-full">
+      {/* Store Name */}
+      <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
+        <span className="font-medium">
+          {storeVisitDetails.store_name || 'Store Name'}
+        </span>
+      </div>
+
+      {/* Distance Display */}
+      <div className="info-display">
+        <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
+          <span 
+            id="distance" 
+            ref={distanceDisplayRef} 
+            className="font-medium"
+          >
+            {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
     {/* Main Layout */}
     <div className="layout-container" >
+   
       <div className="left-container"style={{
         backgroundImage:structures?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
         backgroundSize: "cover",  // Ensures the image covers the entire container
@@ -374,8 +393,11 @@ useEffect(() => {
         // zIndex:10 // Full height of the viewport
       }}>
 
+
+      
+
   {/* Distance Display - Updated */}
-  <div 
+  {/* <div 
   className="info-display absolute top-4 left-0" 
   style={{ zIndex: 10 }}
 >
@@ -396,7 +418,7 @@ useEffect(() => {
 
     <span className="arrow">◀</span>
   </div>
-</div>
+</div> */}
 
 
 <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
@@ -579,6 +601,7 @@ useEffect(() => {
         </div>
         
         {/* report numbers */}
+      {  imageHistory.length > 0 && ( 
         <div className="flex gap-4 px-4 py-3 text-black">
         <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
           <div  className="text-sm font-medium mb-1">SOV</div>
@@ -613,6 +636,8 @@ useEffect(() => {
           </div>
         </div>
       </div>
+        )}
+       
 
       <div id="imageContainer" className="">
           {imageHistory.length > 0 ? (
@@ -623,6 +648,8 @@ useEffect(() => {
               // let ai = getAI(image.url);
               // console.log("AI:",ai);  
               return (
+
+                
                 <div
                   
 
