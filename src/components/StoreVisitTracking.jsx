@@ -9,6 +9,7 @@ import googlei from '../assets/google.png'
 import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
+import ConnectionErrorModal from './ConnectionErrorModal';
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -55,6 +56,8 @@ const StoreVisitTracking = () => {
   const [planstructures,setPlanstructures]=useState([]);
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
   const [lastStructure,setLastStructure]=useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
   let planogram_coords;
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
@@ -784,9 +787,18 @@ useEffect(() => {
     socketRef.current = io("https://store-visit-85801868683.us-central1.run.app");
     socketRef.current.on("connect", () => {
       console.log("Connected to server with ID:", socketRef.current.id);
+      setIsConnected(true);
+      setShowConnectionModal(false);
     });
     socketRef.current.on("connect_error", (err) => {
       console.error("Connection error:", err.message);
+      setIsConnected(false);
+      setShowConnectionModal(true);
+    });
+
+    socketRef.current.on("disconnect", () => {
+      setIsConnected(false);
+      setShowConnectionModal(true);
     });
     
     // Receive coordinate history
@@ -1499,7 +1511,7 @@ return (
 
     {/* NEW LINES: Modal Popup with Close Button */}
     {modalImage && (
-      <div className="modal" onClick={closeModal} style={{zIndex:20}}>
+      <div className="modal" onClick={closeModal}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <button className="modal-close" onClick={closeModal}>
             &times;
@@ -1508,6 +1520,8 @@ return (
         </div>
       </div>
     )}
+
+     <ConnectionErrorModal isOpen={showConnectionModal} />
   </div>
 );
 };
