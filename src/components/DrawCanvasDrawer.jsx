@@ -31,7 +31,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     shapeId: null,
     name: "",
     instruction: "",
-    is_bricked: false,
   })
   // Track all selected instructions to manage availability
   const [selectedInstructions, setSelectedInstructions] = useState({})
@@ -46,8 +45,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     if (instruction_data) {
       const initialAvailable = {}
       // For each shape, set all instructions as initially available
-      shapes.forEach((shape) => {
-        initialAvailable[shape.id] = instruction_data.map((item) => item.id)
+      shapes.forEach(shape => {
+        initialAvailable[shape.id] = instruction_data.map(item => item.id)
       })
       setAvailableInstructions(initialAvailable)
     }
@@ -81,74 +80,29 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     shapes.forEach((shape) => {
       if (shape.type === "rectangle") {
         if (selectedShape && selectedShape.id === shape.id) {
-          ctx.strokeStyle = "#6366F1"
+          ctx.strokeStyle = "#6366F1" 
           ctx.lineWidth = 2.5
         } else {
           ctx.strokeStyle = "#000000"
           ctx.lineWidth = 2
         }
 
-        // Fill with brick pattern if is_bricked is true
-        if (shape.is_bricked) {
-          // Normalize rectangle coordinates for proper filling
-          const normalizedRect = {
-            x: shape.width < 0 ? shape.x + shape.width : shape.x,
-            y: shape.height < 0 ? shape.y + shape.height : shape.y,
-            width: Math.abs(shape.width),
-            height: Math.abs(shape.height),
-          }
-
-          // Save the current context state
-          ctx.save()
-
-          // Create a clipping path for the rectangle
-          ctx.beginPath()
-          ctx.rect(normalizedRect.x, normalizedRect.y, normalizedRect.width, normalizedRect.height)
-          ctx.clip()
-
-          // Set the brick color
-          ctx.fillStyle = "#8897F1"
-
-          // Draw the brick pattern within the clipped area
-          const brickWidth = 20
-          const brickHeight = 10
-
-          for (let y = normalizedRect.y; y < normalizedRect.y + normalizedRect.height; y += brickHeight * 2) {
-            // First row of bricks
-            for (let x = normalizedRect.x; x < normalizedRect.x + normalizedRect.width; x += brickWidth) {
-              ctx.fillRect(x, y, brickWidth - 2, brickHeight - 1)
-            }
-
-            // Second row of bricks (offset)
-            for (
-              let x = normalizedRect.x - brickWidth / 2;
-              x < normalizedRect.x + normalizedRect.width;
-              x += brickWidth
-            ) {
-              ctx.fillRect(x, y + brickHeight, brickWidth - 2, brickHeight - 1)
-            }
-          }
-
-          // Restore the context to remove the clipping path
-          ctx.restore()
-        }
-
         // Draw the rectangle
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
-
+        
         // Calculate the normalized coordinates for text placement
         const textX = shape.width >= 0 ? shape.x + 5 : shape.x + shape.width + 5
         const textY = shape.height >= 0 ? shape.y + 15 : shape.y + shape.height + 15
-
+        
         // Draw ID text
         ctx.fillStyle = "#000000"
-        ctx.font = "bold 12px Arial"
+        ctx.font = "12px Arial"
         ctx.fillText(`ID: ${shape.id}`, textX, textY)
 
         // Draw name if it exists
         if (shape.name) {
-          ctx.fillStyle = "#000000"
-          ctx.font = "bold 14px Arial"
+          ctx.fillStyle = "#6366F1"
+          ctx.font = "14px Arial"
           ctx.fillText(shape.name, textX, textY + 20)
         }
       } else if (shape.type === "text") {
@@ -177,28 +131,28 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
   // Update available instructions when selectedInstructions change
   useEffect(() => {
-    if (!instruction_data) return
-
+    if (!instruction_data) return;
+    
     // Create a new object for available instructions
-    const newAvailable = {}
-
-    shapes.forEach((shape) => {
+    const newAvailable = {};
+    
+    shapes.forEach(shape => {
       // Get all instruction IDs
-      const allInstructionIds = instruction_data.map((item) => item.id)
-
+      const allInstructionIds = instruction_data.map(item => item.id);
+      
       // Filter out instructions that are selected by other shapes
-      const availableForShape = allInstructionIds.filter((id) => {
+      const availableForShape = allInstructionIds.filter(id => {
         // Include if it's this shape's current selection
-        if (selectedInstructions[shape.id] === id) return true
+        if (selectedInstructions[shape.id] === id) return true;
         // Or if it's not selected by any other shape
-        return !Object.values(selectedInstructions).includes(id)
-      })
-
-      newAvailable[shape.id] = availableForShape
-    })
-
-    setAvailableInstructions(newAvailable)
-  }, [selectedInstructions, shapes, instruction_data])
+        return !Object.values(selectedInstructions).includes(id);
+      });
+      
+      newAvailable[shape.id] = availableForShape;
+    });
+    
+    setAvailableInstructions(newAvailable);
+  }, [selectedInstructions, shapes, instruction_data]);
 
   const getCustomCoordinates = (e) => {
     const rect = canvasRef.current?.getBoundingClientRect()
@@ -218,13 +172,13 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
           x: shape.width < 0 ? shape.x + shape.width : shape.x,
           y: shape.height < 0 ? shape.y + shape.height : shape.y,
           width: Math.abs(shape.width),
-          height: Math.abs(shape.height),
+          height: Math.abs(shape.height)
         }
-
+        
         if (
-          x >= normalizedRect.x &&
-          x <= normalizedRect.x + normalizedRect.width &&
-          y >= normalizedRect.y &&
+          x >= normalizedRect.x && 
+          x <= normalizedRect.x + normalizedRect.width && 
+          y >= normalizedRect.y && 
           y <= normalizedRect.y + normalizedRect.height
         ) {
           return shape
@@ -249,18 +203,18 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
       if (clickedShape) {
         setSelectedShape(clickedShape)
-
+        
         // Calculate the center of the rectangle properly for dialog positioning
         const normalizedRect = {
           x: clickedShape.width < 0 ? clickedShape.x + clickedShape.width : clickedShape.x,
           y: clickedShape.height < 0 ? clickedShape.y + clickedShape.height : clickedShape.y,
           width: Math.abs(clickedShape.width),
-          height: Math.abs(clickedShape.height),
+          height: Math.abs(clickedShape.height)
         }
-
-        const centerX = normalizedRect.x + normalizedRect.width / 2
-        const centerY = normalizedRect.y + normalizedRect.height / 2
-
+        
+        const centerX = normalizedRect.x + (normalizedRect.width / 2)
+        const centerY = normalizedRect.y + (normalizedRect.height / 2)
+        
         setShapeDialog({
           isOpen: true,
           x: centerX + canvasWidth / 2,
@@ -268,7 +222,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
           shapeId: clickedShape.id,
           name: clickedShape.name || "",
           instruction: clickedShape.instruction || "",
-          is_bricked: clickedShape.is_bricked || false,
         })
       } else {
         setSelectedShape(null)
@@ -316,23 +269,23 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
-
+    
     // Only create rectangle if it has a reasonable size
     if (Math.abs(width) > 5 && Math.abs(height) > 5) {
       // Calculate the corner coordinates for vertices correctly
-      const x1 = drawingState.startX
-      const y1 = drawingState.startY
-      const x2 = canvasX
-      const y2 = canvasY
-
+      const x1 = drawingState.startX;
+      const y1 = drawingState.startY;
+      const x2 = canvasX;
+      const y2 = canvasY;
+      
       // Calculate vertices in clockwise order regardless of drawing direction
       const vertices = [
         [Math.min(x1, x2), -Math.min(y1, y2)],
         [Math.min(x1, x2), -Math.max(y1, y2)],
         [Math.max(x1, x2), -Math.max(y1, y2)],
         [Math.max(x1, x2), -Math.min(y1, y2)],
-      ]
-
+      ];
+      
       const newRectangle = {
         id: nextId,
         type: "rectangle",
@@ -342,19 +295,19 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         height: height,
         vertices: vertices,
       }
-
+      
       setShapes([...shapes, newRectangle])
-
+      
       // Add entry in availableInstructions for the new shape
       if (instruction_data) {
-        setAvailableInstructions((prev) => ({
+        setAvailableInstructions(prev => ({
           ...prev,
           [nextId]: instruction_data
-            .map((item) => item.id)
-            .filter((id) => !Object.values(selectedInstructions).includes(id)),
-        }))
+            .map(item => item.id)
+            .filter(id => !Object.values(selectedInstructions).includes(id))
+        }));
       }
-
+      
       setNextId(nextId + 1)
     }
 
@@ -388,29 +341,29 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   }
 
   const handleInstructionChange = (e) => {
-    const newInstructionId = e.target.value
-    const shapeId = shapeDialog.shapeId
-
+    const newInstructionId = e.target.value;
+    const shapeId = shapeDialog.shapeId;
+    
     // Update the shapeDialog state
-    setShapeDialog({
-      ...shapeDialog,
-      instruction: newInstructionId,
-    })
-
+    setShapeDialog({ 
+      ...shapeDialog, 
+      instruction: newInstructionId 
+    });
+    
     // Update the selectedInstructions tracking
-    setSelectedInstructions((prev) => {
-      const newSelected = { ...prev }
-
+    setSelectedInstructions(prev => {
+      const newSelected = { ...prev };
+      
       // If empty/none selected, remove from tracking
       if (!newInstructionId) {
-        delete newSelected[shapeId]
+        delete newSelected[shapeId];
       } else {
-        newSelected[shapeId] = newInstructionId
+        newSelected[shapeId] = newInstructionId;
       }
-
-      return newSelected
-    })
-  }
+      
+      return newSelected;
+    });
+  };
 
   const handleShapeDialogSave = () => {
     // Update the shape with the new name and instruction
@@ -420,7 +373,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
           ...shape,
           name: shapeDialog.name || "N/A",
           instruction: shapeDialog.instruction || "N/A",
-          is_bricked: shapeDialog.is_bricked || false,
         }
       }
       return shape
@@ -433,7 +385,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       shapeId: shapeDialog.shapeId,
       name: shapeDialog.name,
       instruction: shapeDialog.instruction,
-      is_bricked: shapeDialog.is_bricked,
     })
   }
 
@@ -451,49 +402,52 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   }
 
   const saveShapes = () => {
-    const canvas = canvasRef.current
-    const canvasSnapshot = canvas.toDataURL("image/png")
-
+    const canvas = canvasRef.current;
+    const canvasSnapshot = canvas.toDataURL("image/png");
+    
     const rectangle = shapes
       .filter((shape) => shape.type === "rectangle")
       .map((rect) => {
         // Find the complete instruction data object based on the selected instruction ID
-        const instructionData = rect.instruction && instruction_data.find((item) => item.id === rect.instruction)
-
+        const instructionData = rect.instruction && instruction_data.find(item => 
+          item.id === rect.instruction
+        );
+        
         return {
           id: rect.id,
           vertices: rect.vertices,
           name: rect.name,
           // instruction: rect.instruction,
           // Include the full instruction data if it exists
-          instructionData: instructionData || null,
-          is_bricked: rect.is_bricked || false,
-        }
-      })
-
+          instructionData: instructionData || null
+        };
+      });
+  
     if (onSaveShapes) {
       onSaveShapes({
         shapes: rectangle,
-        snapshot: canvasSnapshot,
-      })
+        snapshot: canvasSnapshot
+      });
     }
-    onClose()
+    onClose();
   }
 
   // Get the filtered instruction options for the current shape
   const getFilteredInstructions = () => {
-    if (!instruction_data || !shapeDialog.shapeId) return []
-
-    const currentShapeId = shapeDialog.shapeId
-    const availableIds = availableInstructions[currentShapeId] || []
-
+    if (!instruction_data || !shapeDialog.shapeId) return [];
+    
+    const currentShapeId = shapeDialog.shapeId;
+    const availableIds = availableInstructions[currentShapeId] || [];
+    
     // Always include currently selected instruction if any
     if (shapeDialog.instruction && !availableIds.includes(shapeDialog.instruction)) {
-      availableIds.push(shapeDialog.instruction)
+      availableIds.push(shapeDialog.instruction);
     }
-
-    return instruction_data.filter((option) => availableIds.includes(option.id))
-  }
+    
+    return instruction_data.filter(option => 
+      availableIds.includes(option.id)
+    );
+  };
 
   return (
     <div className="relative w-full h-[calc(100vh-2rem)] flex flex-col items-center justify-center">
@@ -536,16 +490,10 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
               }}
             />
             <div className="flex mt-1 gap-1">
-              <button
-                className="bg-gray-200 text-xs px-2 py-1 rounded"
-                onClick={() => handleTextSubmit(textInput.text)}
-              >
+              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => handleTextSubmit(textInput.text)}>
                 Add
               </button>
-              <button
-                className="bg-gray-200 text-xs px-2 py-1 rounded"
-                onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}
-              >
+              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}>
                 Cancel
               </button>
             </div>
@@ -615,29 +563,11 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="font-medium text-gray-700 w-24">Is Bricked</label>
-                <div className="flex-1">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    checked={shapeDialog.is_bricked}
-                    onChange={(e) => setShapeDialog({ ...shapeDialog, is_bricked: e.target.checked })}
-                  />
-                </div>
-              </div>
-
               <div className="flex justify-end gap-2 mt-2">
-                <button
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]"
-                  onClick={closeShapeDialog}
-                >
+                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]" onClick={closeShapeDialog}>
                   Cancel
                 </button>
-                <button
-                  className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm"
-                  onClick={handleShapeDialogSave}
-                >
+                <button className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm" onClick={handleShapeDialogSave}>
                   Save
                 </button>
               </div>
@@ -655,4 +585,3 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     </div>
   )
 }
-
