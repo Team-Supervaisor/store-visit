@@ -1,7 +1,7 @@
 import React from "react";
 import logo from "../assets/logo.png";
 import { Plus, ChevronRight } from "lucide-react";
-import { Store, X, Upload,Pencil} from "lucide-react";
+import { Store, X, Upload, Pencil } from "lucide-react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -34,59 +34,151 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
   );
 };
 
-const INSTRUCTIONS_DATA = 
-  [
-    {
-      "id": "store",
-      "title": "Store Identification",
-      "content": "Enter the official store name and its unique store ID. For existing stores, the store ID will be pre-filled and cannot be edited."
-    },
-    {
-      "id": "tsm",
-      "title": "Territory Sales Manager (TSM)",
-      "content": "Enter the full name of the Territory Sales Manager (TSM) responsible for managing this store's operations and execution."
-    },
-    {
-      "id": "storeAddress",
-      "title": "Store Address",
-      "content": "Provide the complete store address, including street, city, state, and postal code to ensure accurate mapping and logistics."
-    },
-    {
-      "id": "storeType",
-      "title": "Store Format",
-      "content": "Select the store format (e.g., Hypermarket, Supermarket, Kirana, Modern Trade) to tailor execution plans accordingly."
-    },
-    {
-      "id": "storeSize",
-      "title": "Store Size (sq. ft.)",
-      "content": "Input the approximate size of the store in square feet to help categorize layout and inventory planning."
-    },
-    {
-      "id": "contactPerson",
-      "title": "Primary Contact Person",
-      "content": "Enter the name and mobile number of the primary store contact for coordination and updates."
-    },
-    {
-      "id": "operatingHours",
-      "title": "Operating Hours",
-      "content": "Specify the store’s daily operating hours, including opening and closing times."
-    },
-    {
-      "id": "storeStatus",
-      "title": "Store Status",
-      "content": "Indicate the current operational status of the store (Active, Temporarily Closed, Under Renovation, etc.)."
-    },
-    {
-      "id": "salesRegion",
-      "title": "Sales Region",
-      "content": "Assign the store to the appropriate sales region or zone for reporting and oversight purposes."
-    },
-    {
-      "id": "dateOfOnboarding",
-      "title": "Date of Onboarding",
-      "content": "Select the official date when the store was or will be onboarded into the system."
-    }
-  ];
+const INSTRUCTIONS_DATA = [
+  {
+    id: "fridge",
+    title: "Fridge – Whirlpool",
+    type: "section",
+    content: "Collect observations for Whirlpool refrigerators.",
+    questions: [
+      { question: "How many Whirlpool fridge SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Whirlpool POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Hitachi or LG? Mention the offer.", type: "string" },
+      { question: "How many Whirlpool fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "smartphone",
+    title: "Smartphones – Google",
+    type: "section",
+    content: "Collect observations for Google smartphones.",
+    questions: [
+      { question: "How many Google smartphone SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Google POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Apple or Samsung? Mention the offer.", type: "string" },
+      { question: "How many Google fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "washingMachine",
+    title: "Washing Machines – Whirlpool",
+    type: "section",
+    content: "Collect observations for Whirlpool washing machines.",
+    questions: [
+      { question: "How many Whirlpool washing machine SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Whirlpool POSMs?", type: "string" },
+      { question: "Is there any competitive offer from IFB or LG? Mention the offer.", type: "string" },
+      { question: "How many Whirlpool fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "tv",
+    title: "TV – Samsung",
+    type: "section",
+    content: "Collect observations for Samsung TVs.",
+    questions: [
+      { question: "How many Samsung TV SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Samsung POSMs?", type: "string" },
+      { question: "Is there any competitive offer from LG or Sony? Mention the offer.", type: "string" },
+      { question: "How many Samsung fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "laptop",
+    title: "Laptops – HP",
+    type: "section",
+    content: "Collect observations for HP laptops.",
+    questions: [
+      { question: "How many HP laptop SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to HP POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Dell or Lenovo? Mention the offer.", type: "string" },
+      { question: "How many HP fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "ac",
+    title: "Air Conditioners – Voltas",
+    type: "section",
+    content: "Collect observations for Voltas air conditioners.",
+    questions: [
+      { question: "How many Voltas AC SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Voltas POSMs?", type: "string" },
+      { question: "Is there any competitive offer from LG or Daikin? Mention the offer.", type: "string" },
+      { question: "How many Voltas fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "tablet",
+    title: "Tablets – Apple",
+    type: "section",
+    content: "Collect observations for Apple tablets.",
+    questions: [
+      { question: "How many Apple tablet SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Apple POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Samsung or Lenovo? Mention the offer.", type: "string" },
+      { question: "How many Apple fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "smartwatch",
+    title: "Smartwatches – Boat",
+    type: "section",
+    content: "Collect observations for Boat smartwatches.",
+    questions: [
+      { question: "How many Boat smartwatch SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Boat POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Noise or Fire-Boltt? Mention the offer.", type: "string" },
+      { question: "How many Boat fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "waterPurifier",
+    title: "Water Purifiers – Aquaguard",
+    type: "section",
+    content: "Collect observations for Aquaguard water purifiers.",
+    questions: [
+      { question: "How many Aquaguard SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Aquaguard POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Kent or Livpure? Mention the offer.", type: "string" },
+      { question: "How many Aquaguard fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "printer",
+    title: "Printers – Canon",
+    type: "section",
+    content: "Collect observations for Canon printers.",
+    questions: [
+      { question: "How many Canon printer SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to Canon POSMs?", type: "string" },
+      { question: "Is there any competitive offer from HP or Epson? Mention the offer.", type: "string" },
+      { question: "How many Canon fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  },
+  {
+    id: "speaker",
+    title: "Speakers – JBL",
+    type: "section",
+    content: "Collect observations for JBL speakers.",
+    questions: [
+      { question: "How many JBL speaker SKUs are available in the store?", type: "integer" },
+      { question: "Any damage to JBL POSMs?", type: "string" },
+      { question: "Is there any competitive offer from Sony or Boat? Mention the offer.", type: "string" },
+      { question: "How many JBL fixtures are there and what type?", type: "string" },
+      { question: "Any additional insights?", type: "string" }
+    ]
+  }
+];
 
 export default function ManageStore() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -131,9 +223,8 @@ export default function ManageStore() {
       x: -50,
       y: -70,
       text: "Welcome Zone",
-    }
-  ]
-  
+    },
+  ];
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -162,10 +253,9 @@ export default function ManageStore() {
     //   alert("Please select an image to upload");
     //   return;
     // }
-    if(!image && rectangleData.length === 0){
+    if (!image && rectangleData.length === 0) {
       alert("Please upload an image or draw ");
       return;
-      
     }
     console.log("clickPosition", clickPosition);
     if (image && !clickPosition) {
@@ -174,12 +264,12 @@ export default function ManageStore() {
     }
     console.log("rectangleData", rectangleData.length);
     // console.log("clickPosition", clickPosition);
-    if(rectangleData.length>0 && !clickPosition){
+    if (rectangleData.length > 0 && !clickPosition) {
       alert("Please click on the image to set the start pointss");
       return;
     }
-    
-    return;
+
+    // return;
 
     const formData = {
       name: storeName,
@@ -190,7 +280,7 @@ export default function ManageStore() {
         scale: 1.0,
       }),
       startpoint: JSON.stringify(clickPosition),
-      planogram_coords:JSON.stringify(rectangleData)
+      planogram_coords: JSON.stringify(rectangleData),
     };
 
     const url = updateStore
@@ -390,63 +480,56 @@ export default function ManageStore() {
             <div className="p-4 flex gap-6">
               {/* Existing Form Content */}
               <div className="space-y-6">
-         
-                 <div>
-                <div className="flex items-center w-[450px]">
-                  <label
-                    htmlFor="storeName"
-                    className="text-sm font-medium text-gray-700 w-40"
-                  >
-                    Store Name:
-                  </label>
-                  <input
-                    id="storeName"
-                    type="text"
-                    value={storeName}
-                    onChange={(e) => setStoreName(e.target.value)}
-                    className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                  />
+                <div>
+                  <div className="flex items-center w-[450px]">
+                    <label
+                      htmlFor="storeName"
+                      className="text-sm font-medium text-gray-700 w-40"
+                    >
+                      Store Name:
+                    </label>
+                    <input
+                      id="storeName"
+                      type="text"
+                      value={storeName}
+                      onChange={(e) => setStoreName(e.target.value)}
+                      className="flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center w-[450px]">
+                    <label
+                      htmlFor="storeId"
+                      className="text-sm font-medium text-gray-700 w-40"
+                    >
+                      Store ID:
+                    </label>
+                    <input
+                      id="storeId"
+                      disabled={updateStore}
+                      type="text"
+                      value={storeId}
+                      onChange={(e) => setStoreId(e.target.value)}
+                      className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center w-[450px]">
+                    <label
+                      htmlFor="tsmName"
+                      className="text-sm font-medium text-gray-700 w-40"
+                    >
+                      TSM Name:
+                    </label>
+                    <input
+                      id="tsmName"
+                      type="text"
+                      value={tsmName}
+                      onChange={(e) => setTsmName(e.target.value)}
+                      className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                    />
+                  </div>
                 </div>
-
-                <div className="flex items-center w-[450px]">
-                  <label
-                    htmlFor="storeId"
-                    className="text-sm font-medium text-gray-700 w-40"
-                  >
-                    Store ID:
-                  </label>
-                  <input
-                    id="storeId"
-                    disabled={updateStore}
-                    type="text"
-                    value={storeId}
-                    onChange={(e) => setStoreId(e.target.value)}
-                    className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                  />
-                </div>
-
-                <div className="flex items-center w-[450px]">
-                  <label
-                    htmlFor="tsmName"
-                    className="text-sm font-medium text-gray-700 w-40"
-                  >
-                    TSM Name:
-                  </label>
-                  <input
-                    id="tsmName"
-                    type="text"
-                    value={tsmName}
-                    onChange={(e) => setTsmName(e.target.value)}
-                    className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
-                  />
-                </div>
-
-
-                 </div>
-
-              
-
-
 
                 <div className="flex items-center justify-around">
                   {/* Upload Label & Button */}
@@ -463,7 +546,7 @@ export default function ManageStore() {
                       id="fileUpload"
                       onChange={handleImageChange}
                       className="hidden"
-                      disabled={snapshot?true:false} 
+                      disabled={snapshot ? true : false}
                     />
                     <label
                       htmlFor="fileUpload"
@@ -479,7 +562,7 @@ export default function ManageStore() {
                   <button
                     type="button"
                     onClick={() => setIsDrawerOpen(true)}
-                    disabled={previewImage?true:false}
+                    disabled={previewImage ? true : false}
                     className="border border-gray-400 flex items-center gap-2 text-indigo-600 px-5 py-1 rounded-lg cursor-pointer bg-[#F2F2FF]"
                   >
                     <Pencil className="h-4 w-4 text-[#717AEA]" />
@@ -489,11 +572,10 @@ export default function ManageStore() {
 
                 {/* Planogram Preview Area */}
                 <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
-                  {previewImage || snapshot ?
-                   (
+                  {previewImage || snapshot ? (
                     <div className="relative w-full h-full" ref={imageRef}>
                       <img
-                        src={previewImage||snapshot}
+                        src={previewImage || snapshot}
                         onClick={handleImageClick}
                         alt="Planogram Preview"
                       />
@@ -526,32 +608,48 @@ export default function ManageStore() {
               </div>
 
               <div>
-
-              
-
-              <div className="w-[400px]">
-            <h2 className="text-lg font-medium text-black mb-4">
-              Instructions
-            </h2>
-            <div className="max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
-              {INSTRUCTIONS_DATA.map((item) => (
-                <Accordion
-                  key={item.id}
-                  title={item.title}
-                  content={item.content}
-                  isOpen={openAccordion === item.id}
-                  onClick={() =>
-                    setOpenAccordion(openAccordion === item.id ? null : item.id)
-                  }
-                />
-              ))}
-            </div>
-          </div>
+                <div className="w-[400px]">
+                  <h2 className="text-lg font-medium text-black mb-4">
+                    Instructions
+                  </h2>
+                  <div className="max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+                    {INSTRUCTIONS_DATA.map((item) => (
+                      <Accordion
+                        key={item.id}
+                        title={item.title}
+                        isOpen={openAccordion === item.id}
+                        onClick={() =>
+                          setOpenAccordion(
+                            openAccordion === item.id ? null : item.id
+                          )
+                        }
+                        content={
+                          <>
+                            <div
+                              style={{
+                                fontWeight: "bold",
+                                marginBottom: "12px",
+                              }}
+                            >
+                              {item.content}
+                            </div>
+                            <div>
+                              {item.questions.map((q, index) => (
+                                <div
+                                  key={index}
+                                  style={{ marginBottom: "12px" }}
+                                >
+                                  {index + 1}. {q.question}
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
-
-               
-
-             
             </div>
 
             {/* Footer */}
@@ -576,10 +674,13 @@ export default function ManageStore() {
       )}
       {isDrawerOpen && isModalOpen && (
         <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]">
-
-      <DrawCanvasDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}  onSaveShapes={handleSaveShapes} shapes={initialShapes} />
-      </div>
-
+          <DrawCanvasDrawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            onSaveShapes={handleSaveShapes}
+            shapes={initialShapes}
+          />
+        </div>
       )}
     </>
   );
