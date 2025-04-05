@@ -192,7 +192,8 @@
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    
+    border-color: #EFF1FF;
+   
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -210,6 +211,8 @@
     overflow: hidden;
     background-color: #EFF1FF;
     padding:0px;
+    border-radius: 10px;
+   
 }
 
 .card-image {
@@ -219,7 +222,7 @@
 }
 
 .card-content {
-    padding: 15px;
+    /* padding: 15px; */
     color: #717AEA;
 }
 .card-info-row {
@@ -308,7 +311,7 @@
     transition: all 0.3s ease;
 }
 .extra-content-container {
-    background: #fcfcff; /* Light background */
+    background: #FFFFFF; /* Light background */
     padding: 12px;
     border-radius: 6px;
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
@@ -731,4 +734,22 @@
 
 .modal-close:hover {
   transform: scale(1.1);
+}
+
+
+/* report animation styles */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
 }

@@ -10,7 +10,8 @@ import apple from '../assets/apple.jpeg'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import { Upload } from 'lucide-react';
+import { Upload , ChevronUp, ChevronDown } from 'lucide-react';
+
 
 export default function StoreVisitLoad() {
     const location = useLocation();
@@ -613,7 +614,7 @@ useEffect(() => {
         </div>
       </div>
 
-        <div id="imageContainer">
+      <div id="imageContainer" className="">
           {imageHistory.length > 0 ? (
             // console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
@@ -623,21 +624,30 @@ useEffect(() => {
               // console.log("AI:",ai);  
               return (
                 <div
-                  key={index}
-                  className={`card ${selectedImage === index ? 'active' : ''}`}
-                  ref={(el) => (imageRefs.current[index] = el)}
+                  
+
+                key={index}
+                className={`card bg-[#F9F9FF] border border-[#EFF1FF] rounded-xl overflow-hidden transition-all duration-300 ${
+                  selectedImage === index ? 'active' : ''
+                }`}
+                ref={(el) => (imageRefs.current[index] = el)}
                 >
-                  <div className="card-image-container">
+                     <div className='p-3 rounded-full'>
+                     <div className="card-image-container">
                     {/* NEW LINE: onClick added here to open modal */}
                     <img
-                      src={image.image_url}
-                      alt={`Report ${index}`}
-                      className="card-image"
-                      onClick={() => openModal(image.url)}
-                    />
+                  src={image.image_url}
+                  alt={`Report ${index}`}
+                  className=" w-full rounded-lg "
+                  onClick={() => openModal(image.url)}
+                />
                   </div>
+
+
+                     </div>
+
                   <div className="card-content">
-                    <div className="card-info">
+                    <div className="card-info px-4 py-3">
                       <div className="card-info-row">
                         <span className="card-info-label">Brand</span>
                         <span className="card-info-label">Merchandise</span>
@@ -658,30 +668,39 @@ useEffect(() => {
 
                     {/* Extra Content - Conditionally rendered */}
                     {expandedCards[index] && (
-                      <div className="extra-content-container">
-                        <div className="extra-header">
-                          <img src={star} alt="Icon" className="extra-icon" />
-                          <span className="extra-title" style={{ fontWeight: 400, color: 'black' }}>
-                            AI Analysis
-                          </span>
-                        </div>
-                        {/* <p class="extra-description">
-               Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
-           </p> */}
-                        <p className="extra-details">
-                          <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
-                          <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
-                          <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
-                        </p>
-                        {/* <p>
-                          {aiDetails[index]?.summary || 'No AI analysis available.'}
-                        </p> */}
-                      </div>
-                    )}
-                    <div className="card-toggle" onClick={() => toggleCard(index)}>
-                      <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
-                      <span className="arrow">{expandedCards[index] ? '▲' : '▼'}</span>
-                    </div>
+                   
+            <div className="extra-content-container m-4 p-4 rounded-lg bg-white animate-fadeIn"
+              style={{
+                animation: 'fadeIn 0.3s ease-in-out'
+              }}>
+                        <div className="extra-header mb-3">
+                <img src={star} alt="Icon" className="extra-icon" />
+                <span className="extra-title font-normal text-black">
+                  AI Analysis
+                </span>
+              </div>
+                 
+           <p className="extra-details">
+              <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
+              <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
+              <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
+           </p>
+                      
+            </div>
+                
+    
+            )}
+            <div 
+            className="card-toggle px-4 py-3 flex items-center justify-center gap-2 cursor-pointer  transition-colors"
+            onClick={() => toggleCard(index)}
+             >
+            <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
+            {expandedCards[index] ? (
+              <ChevronUp size={20} color="#717AEA" />
+            ) : (
+              <ChevronDown size={20} color="#717AEA" />
+            )}
+          </div>
                   </div>
                 </div>
               );
