@@ -578,6 +578,40 @@ useEffect(() => {
         </div>
         
         {/* report numbers */}
+        <div className="flex gap-4 px-4 py-3 text-black">
+        <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+          <div  className="text-sm font-medium mb-1">SOV</div>
+          <div className="flex items-center">
+            <span className="text-xl font-medium mr-2">240</span>
+            <img src="/trending_up.svg" alt="trending up" className="w-4 h-4 " />
+            <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+              14%
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+          <div className="text-sm font-medium mb-1">Compliance</div>
+          <div className="flex items-center">
+            <span className="text-xl font-medium mr-2">240</span>
+            <img src="/trending_up.svg" alt="trending up" className="w-4 h-4" />
+            <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+              14%
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 bg-[#F2F2FF] rounded-xl p-3">
+          <div className="text-sm font-medium mb-1">Placement</div>
+          <div className="flex items-center">
+            <span className="text-xl font-medium mr-2">240</span>
+            <img src="/trending_up.svg" alt="trending up" className="w-4 h-4" />
+            <div className="bg-[#C5E8D7] text-black text-xs px-2 py-1 ml-2 rounded-full">
+              14%
+            </div>
+          </div>
+        </div>
+      </div>
 
         <div id="imageContainer">
           {imageHistory.length > 0 ? (
@@ -615,7 +649,7 @@ useEffect(() => {
                         <span className="card-info-value">{image?.merchandise || 'N/A'}</span>
                         <span className="card-info-value">{image?.product || 'N/A'}</span>
                         <span className="card-info-value">
-                          {parseFloat(image?.length).toFixed(3)}&times;{parseFloat(image?.breadth).toFixed(3)}
+                          {parseFloat(image?.length).toFixed(3)}&times;{parseFloat(image?.breadth).toFixed(3)} 
                         </span>
                       </div>
                     </div>

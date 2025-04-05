@@ -1098,7 +1098,7 @@ return (
       <div className="control-panel" style={{ textAlign: 'right' }}>
         <div>
        
-          <button
+          {/* <button
             // id="startButton"
             type="button"
             style={{backgroundColor:"white", color:"black"}}
@@ -1109,7 +1109,7 @@ return (
             }}
           >
             Start
-          </button>
+          </button> */}
           <button
             id="clearButton"
             type="button"
