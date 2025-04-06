@@ -439,7 +439,7 @@ useEffect(() => {
         <g
           key={polygon.image_id}
           className={`structure ${polygon.type}`}
-          title={polygon.name}
+          title={`${polygon.name} - ${polygon.instructionData?.title || ''}`}
           onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
           onMouseLeave={() => setIsHovering(null)}
           onClick={() => setSelectedImage(index)}
@@ -468,7 +468,7 @@ useEffect(() => {
             fill="#000"
             fontWeight="bold"
           >
-            {polygon.name}
+            {polygon.name} - {polygon.instructionData?.title || ''}
           </text>
         </g>
       ))}

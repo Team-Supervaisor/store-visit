@@ -39,31 +39,36 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
 const INSTRUCTIONS_DATA = [
   {
     "id": "fridge",
-    "title": "Fridge – Google",
+    "title": "Fridge",
     "type": "section",
-    "content": "Collect observations for Google refrigerators.",
+    "content": "Collect observations for Whirlpool refrigerators.",
     "questions": [
       {
-        "question": "How many Google fridge SKUs are available in the store?",
+        "id": "32270829-07b5-4645-8821-450b07438e1f",
+        "question": "How many Whirlpool fridge SKUs are available in the store?",
         "type": "integer",
         "answer": null
       },
       {
-        "question": "Any damage to Google POSMs?",
+        "id": "04988677-c83b-4ff9-aa28-8a7490c38cc7",
+        "question": "Any damage to Whirlpool POSMs?",
         "type": "boolean",
         "answer": null
       },
       {
-        "question": "Is there any competitive offer from Samsung or Apple? Mention the offer.",
+        "id": "28d7af84-11bd-4d02-b6ef-1b63f401a0c8",
+        "question": "Is there any competitive offer from Hitachi or LG? Mention the offer.",
         "type": "string",
         "answer": null
       },
       {
-        "question": "How many Google fixtures are there and what type?",
-        "type": "string",
+        "id": "fe1d82c8-f190-473f-8d20-1c238ab67b28",
+        "question": "How many Whirlpool fixtures are there and what type?",
+        "type": "integer",
         "answer": null
       },
       {
+        "id": "ba098b4d-ac3b-414b-b992-547ff76ae940",
         "question": "Any additional insights?",
         "type": "string",
         "answer": null
@@ -72,31 +77,36 @@ const INSTRUCTIONS_DATA = [
   },
   {
     "id": "smartphone",
-    "title": "Smartphones – Google",
+    "title": "Smartphones",
     "type": "section",
     "content": "Collect observations for Google smartphones.",
     "questions": [
       {
+        "id": "78c55c65-8900-481e-b984-400433a7bc4d",
         "question": "How many Google smartphone SKUs are available in the store?",
         "type": "integer",
         "answer": null
       },
       {
+        "id": "c2a9e40e-4f70-4783-af5f-3d4a91010fc5",
         "question": "Any damage to Google POSMs?",
         "type": "boolean",
         "answer": null
       },
       {
-        "question": "Is there any competitive offer from Samsung or Apple? Mention the offer.",
+        "id": "f597ac3b-13ea-464f-9118-d3d386e44c7c",
+        "question": "Is there any competitive offer from Apple or Samsung? Mention the offer.",
         "type": "string",
         "answer": null
       },
       {
+        "id": "f05e7410-a21c-4afd-a26e-fe64ba433da4",
         "question": "How many Google fixtures are there and what type?",
-        "type": "string",
+        "type": "integer",
         "answer": null
       },
       {
+        "id": "c6bc0da8-86b8-4b1a-ac08-e94c5c4b13ff",
         "question": "Any additional insights?",
         "type": "string",
         "answer": null
@@ -105,31 +115,36 @@ const INSTRUCTIONS_DATA = [
   },
   {
     "id": "washingMachine",
-    "title": "Washing Machines – Google",
+    "title": "Washing Machines",
     "type": "section",
-    "content": "Collect observations for Google washing machines.",
+    "content": "Collect observations for Whirlpool washing machines.",
     "questions": [
       {
-        "question": "How many Google washing machine SKUs are available in the store?",
+        "id": "81b168f6-553f-409e-b485-f4c2b92cdb4f",
+        "question": "How many Whirlpool washingMachine SKUs are available in the store?",
         "type": "integer",
         "answer": null
       },
       {
-        "question": "Any damage to Google POSMs?",
+        "id": "c771f644-fa04-48ad-8de0-b6553bf31842",
+        "question": "Any damage to Whirlpool POSMs?",
         "type": "boolean",
         "answer": null
       },
       {
-        "question": "Is there any competitive offer from Samsung or Apple? Mention the offer.",
+        "id": "5e5b9697-2069-45c8-a432-c922b5e1c815",
+        "question": "Is there any competitive offer from IFB or LG? Mention the offer.",
         "type": "string",
         "answer": null
       },
       {
-        "question": "How many Google fixtures are there and what type?",
-        "type": "string",
+        "id": "9bfc16b6-87ac-4086-ba32-6dcc38bccb31",
+        "question": "How many Whirlpool fixtures are there and what type?",
+        "type": "integer",
         "answer": null
       },
       {
+        "id": "87dff0bf-959c-487a-b027-464fbe29c486",
         "question": "Any additional insights?",
         "type": "string",
         "answer": null
@@ -138,31 +153,36 @@ const INSTRUCTIONS_DATA = [
   },
   {
     "id": "tv",
-    "title": "TV – Google",
+    "title": "TV",
     "type": "section",
-    "content": "Collect observations for Google TVs.",
+    "content": "Collect observations for Samsung TVs.",
     "questions": [
       {
-        "question": "How many Google TV SKUs are available in the store?",
+        "id": "6ea57e38-ad4f-47d3-81e2-3105bf94a9a2",
+        "question": "How many Samsung tv SKUs are available in the store?",
         "type": "integer",
         "answer": null
       },
       {
-        "question": "Any damage to Google POSMs?",
+        "id": "d6023eea-989a-4a61-8286-faa6f270a98d",
+        "question": "Any damage to Samsung POSMs?",
         "type": "boolean",
         "answer": null
       },
       {
-        "question": "Is there any competitive offer from Samsung or Apple? Mention the offer.",
+        "id": "b283f4e7-496e-4ed9-8043-87e249514a25",
+        "question": "Is there any competitive offer from LG or Sony? Mention the offer.",
         "type": "string",
         "answer": null
       },
       {
-        "question": "How many Google fixtures are there and what type?",
-        "type": "string",
+        "id": "a70bcb2a-60fb-4e61-b28a-8a8eb0994d72",
+        "question": "How many Samsung fixtures are there and what type?",
+        "type": "integer",
         "answer": null
       },
       {
+        "id": "bb28ede4-5517-4876-b4b6-a81c33b25095",
         "question": "Any additional insights?",
         "type": "string",
         "answer": null
@@ -170,32 +190,37 @@ const INSTRUCTIONS_DATA = [
     ]
   },
   {
-    "id": "laptop",
-    "title": "Laptops – Google",
+    "id": "d0d520cd-dbb4-425f-8b27-e1dc96588034",
+    "title": "Laptops",
     "type": "section",
-    "content": "Collect observations for Google laptops.",
+    "content": "Collect observations for HP laptops.",
     "questions": [
       {
-        "question": "How many Google laptop SKUs are available in the store?",
+        "id": "3cfe9ca5-a03c-45cc-b875-e1215b85afe7",
+        "question": "How many HP laptop SKUs are available in the store?",
         "type": "integer",
         "answer": null
       },
       {
-        "question": "Any damage to Google POSMs?",
+        "id": "59e7672a-ce0a-409f-aaf4-2a4f5a2953d0",
+        "question": "Any damage to HP POSMs?",
         "type": "boolean",
         "answer": null
       },
       {
-        "question": "Is there any competitive offer from Samsung or Apple? Mention the offer.",
+        "id": "ca0e017a-4823-4aaa-8d5c-1254824b4a4f",
+        "question": "Is there any competitive offer from Dell or Lenovo? Mention the offer.",
         "type": "string",
         "answer": null
       },
       {
-        "question": "How many Google fixtures are there and what type?",
-        "type": "string",
+        "id": "d53be3b0-1a8a-4354-90a6-a27a03fc8a7f",
+        "question": "How many HP fixtures are there and what type?",
+        "type": "integer",
         "answer": null
       },
       {
+        "id": "bdad59cc-97c1-4e45-baac-cb2b17802efc",
         "question": "Any additional insights?",
         "type": "string",
         "answer": null
@@ -203,6 +228,8 @@ const INSTRUCTIONS_DATA = [
     ]
   }
 ]
+
+
 
 // const TSM_VISIT_REPORT = [
 //   {

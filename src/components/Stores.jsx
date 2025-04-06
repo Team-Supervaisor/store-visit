@@ -286,16 +286,31 @@ const StoreVisitTracking = () => {
           </h1>
         </div>
         <div className="space-x-3 flex items-center">
-          <Button styling="flex items-center py-3 px-4">
-            <img src="/document.svg" alt="" className="mr-1" />
-            Analyse with EKG
-          </Button>
-          <Button styling="flex items-center py-3 px-4">
-            <img src="/analyse.svg" alt="" className="mr-1" />
-            Analyse on Dashboard
-          </Button>
-          <img src="/profile.svg" alt="profile" className="ml-3 w-[51px]" />
-        </div>
+
+  <button
+    onClick={() => (window.location.href = "/store-visit-tracking")}
+    className="flex items-center px-4 py-2 border border-green-500 rounded-full text-green-600 font-semibold hover:bg-green-50 transition"
+  >
+    <span className="relative flex h-3 w-3 mr-2">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+    </span>
+    Live
+  </button>
+
+  <Button styling="flex items-center py-3 px-4">
+    <img src="/document.svg" alt="" className="mr-1" />
+    Analyse with EKG
+  </Button>
+
+  <Button styling="flex items-center py-3 px-4">
+    <img src="/analyse.svg" alt="" className="mr-1" />
+    Analyse on Dashboard
+  </Button>
+
+  <img src="/profile.svg" alt="profile" className="ml-3 w-[51px]" />
+</div>
+
       </header>
       <div className="p-4 bg-[#F7FAFF]">
       <div className="flex justify-between items-center mb-6 px-4 text-black bg-white rounded-3xl py-4">
