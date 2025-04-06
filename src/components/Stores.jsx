@@ -250,6 +250,9 @@ const StoreVisitTracking = () => {
               ...response.data, // Spread original response data
               status: item.status, // Add status field
             };
+            if(responseData.images.length>0){
+            console.log(responseData);
+            }
             details.push(responseData);
           })
           .catch((error) => {
