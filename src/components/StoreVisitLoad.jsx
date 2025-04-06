@@ -159,29 +159,8 @@ useEffect(() => {
     const pPolygonsRef = useRef([]);
 
     useEffect(() => {
-      let scaledStructures = [];
       if(pstructures.length>0){
     console.log((pstructures[0]))
-
-    const scale = 2;
- scaledStructures = pstructures.map(rect => {
-  // Calculate center point of the rectangle
-  let sumX = 0, sumY = 0;
-  rect.forEach(([x, y]) => {
-    sumX += x;
-    sumY += y;
-  });
-  const cx = sumX / rect.length;
-  const cy = sumY / rect.length;
-
-  // Scale each point relative to center
-  return rect.map(([x, y]) => [
-    cx + (x - cx) * scale,
-    cy + (y - cy) * scale
-  ]);
-});
-
-console.log("Scaled Rectangles:", scaledStructures);
 
     // console.log(JSON.parse(pstructures[0]))
     // console.log(typeof(JSON.parse(pstructures[0])))
@@ -191,7 +170,7 @@ console.log("Scaled Rectangles:", scaledStructures);
     const centerx = vizDimensions.width / 2;
     const centerz = vizDimensions.height / 2;
     if(pstructures.length>0){
-    const newPolygons = scaledStructures.map((structure, structureIndex) => {
+    const newPolygons = pstructures.map((structure, structureIndex) => {
       // const parsedStructure = JSON.parse(structure);
       let pathData = "";
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
