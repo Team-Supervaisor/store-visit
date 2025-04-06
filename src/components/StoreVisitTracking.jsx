@@ -74,7 +74,7 @@ let squares=[];
 const vizRef = useRef(null);
   useEffect(() => {
     // localStorage.getItem
-    // handleClearButton();
+    handleClearButton();
   }, [])
   
   // const structures = [
@@ -435,14 +435,14 @@ axios.request(config)
     return { distance, point: [projX, projZ] };
 }
   function find_nearest(x, z,l,b,angle) {
-    console.log("imagesssssssss:",x,z,l,b,angle);
+    // console.log("imagesssssssss:",x,z,l,b,angle);
     // x=(x/100)*500;
     // z=(z/100)*250;
     console.log(x,z);
-    if (!planstructures || planstructures.length === 0) {
-      console.error("No structures found!");
-      return;
-  }
+  //   if (!planstructures || planstructures.length === 0) {
+  //     console.error("No structures found!");
+  //     // return;
+  // }
   let perpendicularPoint=null
   let nearest=null
   let minDistance = Infinity;
@@ -467,52 +467,52 @@ axios.request(config)
   //         nearestStructure = structure;
   //     }
   // });
-  planstructures.forEach(structure => {
-    let minEdgeDistance = Infinity;
-    let closestPointOnEdge = null; 
+  // planogram_coords.forEach(structure => {
+  //   let minEdgeDistance = Infinity;
+  //   let closestPointOnEdge = null; 
   
-    for (let i = 0; i < structure.coordinates.length; i++) {
-        // Get two consecutive points forming an edge
-        let [x1, z1] = structure.coordinates[i];
-        let [x2, z2] = structure.coordinates[(i + 1) % 4];
+  //   for (let i = 0; i < structure.coordinates.length; i++) {
+  //       // Get two consecutive points forming an edge
+  //       let [x1, z1] = structure.coordinates[i];
+  //       let [x2, z2] = structure.coordinates[(i + 1) % 4];
 
-        let result = getPerpendicularDistanceAndPoint(x, z, x1, z1, x2, z2);
-            let distance = result.distance;
-            let point = result.point;
-        // Calculate perpendicular distance from (x, z) to this edge
-        // let distance = getPerpendicularDistance(x, z, x1, z1, x2, z2);
+  //       let result = getPerpendicularDistanceAndPoint(x, z, x1, z1, x2, z2);
+  //           let distance = result.distance;
+  //           let point = result.point;
+  //       // Calculate perpendicular distance from (x, z) to this edge
+  //       // let distance = getPerpendicularDistance(x, z, x1, z1, x2, z2);
   
-        if (distance < minEdgeDistance) {
-            minEdgeDistance = distance;
-            closestPointOnEdge = point;
-        }
-    }
-    // Update nearest quadrilateral based on the smallest perpendicular distance
-    if (minEdgeDistance < minDistance) {
-        minDistance = minEdgeDistance;
-        nearest = structure;
-        perpendicularPoint = closestPointOnEdge;
-        setNearestStructure(structure);
-        // nearestStructure = structure;
-    }
-  });
+  //       if (distance < minEdgeDistance) {
+  //           minEdgeDistance = distance;
+  //           closestPointOnEdge = point;
+  //       }
+  //   }
+  //   // Update nearest quadrilateral based on the smallest perpendicular distance
+  //   if (minEdgeDistance < minDistance) {
+  //       minDistance = minEdgeDistance;
+  //       nearest = structure;
+  //       perpendicularPoint = closestPointOnEdge;
+  //       setNearestStructure(structure);
+  //       // nearestStructure = structure;
+  //   }
+  // });
   
-    if (minDistance===Infinity) {
-      console.error("No nearby quadrilateral found.");
-      return null;
-    }
+  //   if (minDistance===Infinity) {
+  //     console.error("No nearby quadrilateral found.");
+  //     // return null;
+  //   }
   
-    console.log("Nearest Structure:", nearest.name);
-    console.log("Perpendicular Point:", perpendicularPoint);
+  //   console.log("Nearest Structure:", nearest.name);
+  //   console.log("Perpendicular Point:", perpendicularPoint);
   
-    const center = [...getPolygonCenter(nearest.coordinates)];
-    console.log("Center:", center);
-    setCenterCoord((prev) => {
-      // console.log("Previous State:", prev);
-      const updated = [center, ...prev];
-      // console.log("Updated State:", updated);
-      return updated;
-    });
+  //   const center = [...getPolygonCenter(nearest.coordinates)];
+  //   console.log("Center:", center);
+  //   setCenterCoord((prev) => {
+  //     // console.log("Previous State:", prev);
+  //     const updated = [center, ...prev];
+  //     // console.log("Updated State:", updated);
+  //     return updated;
+  //   });
 
     setPerpendicularCoord((prev) => {
       // console.log("Previous State:", prev);
@@ -521,7 +521,7 @@ axios.request(config)
       return updated;
     });
     // setCenterCoord(center);
-    console.log("CenterCoord:", centerCoord);
+    // console.log("CenterCoord:", centerCoord);
     if(l==0 && b==0)
     {
       l=10;
@@ -557,6 +557,7 @@ axios.request(config)
       { coordinates: pcoordinates }
     ]);
     console.log("pcoordinates:",pcoordinates);
+    console.log("Pstructures:",pstructures);
     return { nearestStructure };
   
   }
@@ -717,6 +718,7 @@ const get_store_visit_details = (store_visit_id) => {
   const pPolygonsRef = useRef([]);
 
   useEffect(() => {
+    console.log("Inside use effecttt:", pstructures);
     setCenterX(vizDimensions.width / 2);
     setCenterZ(vizDimensions.height / 2);
     const centerx = vizDimensions.width / 2;
@@ -767,6 +769,7 @@ const get_store_visit_details = (store_visit_id) => {
     setPPolygons(newPolygons);
     pPolygonsRef.current = newPolygons; // Update the ref with the latest polygons
     console.log("PPolygons:", newPolygons);
+
   }, [pstructures, vizDimensions]);
   
 
@@ -838,6 +841,7 @@ useEffect(() => {
       //renderAllImages(history);
     });
     socketRef.current.on("store-id",(data)=>{
+      console.log("Store ID:",data);
       setPlanstructures(data.planogram_coords)
       planogram_coords=data.planogram_coords;
       setStoreVisitDetails(data);
@@ -851,7 +855,7 @@ useEffect(() => {
       //   get_store_visit_details(data.store_visit_id);
       // }
       if(planogram_coords?.length>0){
-      console.log("planstructures",planogram_coords);
+      // console.log("planstructures",planogram_coords);
       check_inside_structure(data.x,data.z);
       }
       if(data.photoCapture===1)
