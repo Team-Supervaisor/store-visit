@@ -16,6 +16,14 @@ const visibilityOptions = [
   { id: "3", title: "High" },
 ]
 
+const cursorMap = {
+  pointer: "cursor-pointer",
+  rectangle: "cursor-crosshair",
+  delete: 'custom-bin',
+  fill: 'custom-fill',
+};
+
+
 export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
@@ -105,20 +113,24 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         // Draw the rectangle
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
         
-        // Calculate the normalized coordinates for text placement
-        const textX = shape.width >= 0 ? shape.x + 5 : shape.x + shape.width + 5
-        const textY = shape.height >= 0 ? shape.y + 15 : shape.y + shape.height + 15
-        
         // Draw ID text
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
-        ctx.fillText(`ID: ${shape.id}`, textX, textY)
 
         // Draw name if it exists
         if (shape.name) {
           ctx.fillStyle = "#6366F1"
           ctx.font = "14px Arial"
-          ctx.fillText(shape.name, textX, textY + 20)
+          const textWidth = ctx.measureText(shape.name).width;
+          const textHeight = 14; // Approximate text height for 14px font
+          const centerX = shape.x + shape.width / 2;
+          const centerY = shape.y + shape.height / 2;
+          ctx.fillText(shape.name, centerX - textWidth / 2, centerY + textHeight / 2);
+        }
+
+        if(shape.isColored) {
+          ctx.fillStyle = "#6366F1"
+          ctx.fillRect(shape.x, shape.y, shape.width, shape.height)
         }
       } else if (shape.type === "text") {
         ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
@@ -278,6 +290,64 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     }
   }
 
+  const handleCanvasClick = (e) => {
+    if (selectedTool !== "delete") return;
+
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+
+    // console.log("Click coordinates:", clickX, clickY);
+    for (let i = 0; i < shapes.length; i++) {
+      const shape = shapes[i];
+      console.log(shape.x, shape.y, shape.width, shape.height);
+    }
+
+    const clickedRect = shapes.find(
+      (r) =>
+        canvasX >= r.x &&
+        canvasX <= r.x + r.width &&
+        canvasY >= r.y &&
+        canvasY <= r.y + r.height
+    );
+
+    if (clickedRect) {
+      // Remove the rectangle
+      setShapes((prevRects) =>
+        prevRects.filter((r) => r.id !== clickedRect.id)
+      );
+    }
+  };
+
+  const handleFill = (e) => {
+    if (selectedTool !== "fill") return;
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+    console.log("Click coordinates:", canvasX, canvasY);
+    console.log("ClickX" )
+
+    const clickedRect = shapes.find(
+      (r) =>
+        canvasX >= r.x &&
+        canvasX <= r.x + r.width &&
+        canvasY >= r.y &&
+        canvasY <= r.y + r.height
+    );
+
+
+    
+    if (clickedRect) {
+      // Update the rectangle's color property
+      setShapes((prevShapes) =>
+        prevShapes.map((shape) =>
+          shape.id === clickedRect.id
+            ? { ...shape, color: "#6366F1", isColored: true }
+            : shape
+        )
+      );
+      // Fill the rectangle with a color
+      ctx.fillStyle = "#6366F1";
+      ctx.fillRect(clickedRect.x + canvasWidth / 2, clickedRect.y + canvasHeight / 2, clickedRect.width, clickedRect.height);
+    }
+  }
+
   const stopDrawing = (e) => {
     if (!ctx || !drawingState.isDrawing || !canvasRef.current || selectedTool !== "rectangle") return
 
@@ -309,6 +379,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         width: width,
         height: height,
         vertices: vertices,
+        isColored: false,
       }
       
       setShapes([...shapes, newRectangle])
@@ -483,10 +554,12 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className={`bg-white shadow-md rounded-lg ${
-            selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"
-          }`}
-          onMouseDown={startDrawing}
+          className={`bg-white shadow-md rounded-lg ${cursorMap[selectedTool] || "cursor-default"}`}
+          onMouseDown={(e) => {
+            handleCanvasClick(e);
+            startDrawing(e); 
+            handleFill(e);
+          }}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}

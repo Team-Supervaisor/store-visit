@@ -85,3 +85,11 @@ button:focus-visible {
 .arrocdian-button, button:focus, button:focus-visible {
   outline:none;
 }
+
+.custom-bin {
+  cursor: url('/bin.svg') 16 16, auto;
+}
+
+.custom-fill {
+  cursor: url('/paint-bucket.svg') 16 16, auto;
+}
