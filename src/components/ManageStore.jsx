@@ -432,6 +432,7 @@ export default function ManageStore() {
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [storeData, setStoreData] = useState([]);
+  const [instructionData, setInstructionData] = useState(INSTRUCTIONS_DATA);
   // const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const [clickPosition, setClickPosition] = useState(null);
   const imageRef = useRef(null);
@@ -484,6 +485,19 @@ export default function ManageStore() {
   };
   const handleSaveShapes = (data) => {
     console.log("Received from child:", data);
+    for(var i = 0; i < data.shapes.length; i++){
+      const shape = data.shapes[i];
+      const title = shape.instructionData.title;
+      setInstructionData((prev) => {
+        const updatedData = [...prev];
+        const index = updatedData.findIndex((item) => item.title === title);
+        if (index === -1) {
+          return updatedData;
+        }
+        updatedData[index].title = `${updatedData[index].title} - ${shape.name}`;
+        return updatedData;
+      });
+    }
     setRectangleData(data.shapes);
     // console.log(data.snapshot)
     setSnapshot(data.snapshot);
@@ -913,7 +927,7 @@ export default function ManageStore() {
                     Instructions
                   </h2>
                   <div className="max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
-                    {INSTRUCTIONS_DATA.map((item) => (
+                    {instructionData.map((item) => (
                       <Accordion
                         key={item.id}
                         title={item.title}
