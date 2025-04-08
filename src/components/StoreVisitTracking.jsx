@@ -5,12 +5,17 @@ import logo from '../assets/logo.png'
 import star from '../assets/star.png'
 import axios, { all } from 'axios';
 import samsung from '../assets/samsung.png'
-import googlei from '../assets/google.png' 
-import apple from '../assets/apple.jpeg'
+import google from '../assets/google.png' 
+import vivo from '../assets/vivo.png'
+import oppo from '../assets/opppo.png'
+import apple from '../assets/apple.png'
 import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import ConnectionErrorModal from './ConnectionErrorModal';
+import {ChevronUp, ChevronDown } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
 const StoreVisitTracking = () => {
@@ -544,6 +549,7 @@ axios.request(config)
       // console.log("Updated State:", updated);
       return updated;
     });
+    console.log('dist coord:',distCoord);
     const pcoordinates=[
       [newCoords[0] - l/2, newCoords[1] - b/2], // Top-left
       [newCoords[0] + l/2, newCoords[1] - b/2],
@@ -718,7 +724,7 @@ const get_store_visit_details = (store_visit_id) => {
   const pPolygonsRef = useRef([]);
 
   useEffect(() => {
-    console.log("Inside use effecttt:", pstructures);
+    // console.log("Inside use effecttt:", pstructures);
     setCenterX(vizDimensions.width / 2);
     setCenterZ(vizDimensions.height / 2);
     const centerx = vizDimensions.width / 2;
@@ -768,7 +774,7 @@ const get_store_visit_details = (store_visit_id) => {
     
     setPPolygons(newPolygons);
     pPolygonsRef.current = newPolygons; // Update the ref with the latest polygons
-    console.log("PPolygons:", newPolygons);
+    // console.log("PPolygons:", newPolygons);
 
   }, [pstructures, vizDimensions]);
   
@@ -1201,14 +1207,16 @@ return (
       <div 
      onClick={() => navigate('/')}
       style={{ display: 'flex', alignItems: 'center',marginLeft:15 }}>
-        <img src={logo} alt="Logo" style={{ height: '40px', marginRight: '10px' }} />
+        <img src={logo} alt="Logo" style={{ height: '25px', marginRight: '10px' }} />
         <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }}>Store Visit Tracking</h1>
       </div>
       <div className="control-panel" style={{ textAlign: 'right' }}>
         <div>
-          <button
-            id="startButton"
+        <button
+            // id="startButton"
             type="button"
+            style={{backgroundColor:"white", color:"black"}}
+            className='bg-red text-black rounded-sm'
             onClick={(e) => {
               createRipple(e);
               handleStartButton();
@@ -1219,6 +1227,7 @@ return (
           <button
             id="clearButton"
             type="button"
+            style={{backgroundColor:"white", color:"black"}}
             className="clear"
             onClick={(e) => {
               createRipple(e);
@@ -1240,7 +1249,7 @@ return (
           </label>
 
           <label className="toggle-container">
-            <span>Structure</span>
+            <span>Planogram</span>
             <input
               type="checkbox"
               id="structureToggle"
@@ -1249,19 +1258,46 @@ return (
             />
             <span className="slider"></span>
           </label>
+          <img src="/profile.svg" alt="profile" className=" w-[51px]" />
         </div>
       </div>
     </div>
 
 {/* Distance Display */}
-<div className="info-display">
+{/* <div className="info-display">
   <span className="distance-box">
     <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
       Distance: {totalDistance?.toFixed(2)}
     </span>
     <span className="arrow">◀</span>
   </span>
-</div>
+</div> */}
+
+
+<div className="flex" style={{ width: '70%', display:"inline-block" }}>  {/* Match left-container width */}
+    {/* Store Name and Distance container */}
+    <div className="flex justify-between items-center mb-4 px-4 w-full">
+      {/* Store Name */}
+      <div className=" text-[#777FE3] items-center py-2 px-6 rounded-full">
+        {/* <span className="font-medium">
+          {storeVisitDetails.store_name || 'Store Name'}
+        </span> */}
+      </div>
+
+      {/* Distance Display */}
+      <div className="info-display">
+        <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
+          <span 
+            id="distance" 
+            ref={distanceDisplayRef} 
+            className="font-medium"
+          >
+            {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
@@ -1276,7 +1312,11 @@ return (
         backgroundRepeat: "no-repeat", 
         borderRadius:'26px',
         transition: "background 0.5s ease-in-out",
-        backgroundColor:'white'
+        backgroundColor:'white',
+        border:"none",
+        position: 'relative',
+        margin:"4px",
+        marginBottom: "7px"
         // zIndex:10 // Full height of the viewport
       }}>
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
@@ -1368,7 +1408,7 @@ return (
     </svg>
   )}
 
-  {isPathVisible  && (
+  {false  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
       {pPolygons.map((polygon, index) => (
         <g
@@ -1409,7 +1449,7 @@ return (
       ))}
     </svg>
   )}
-          {centerCoord && isStructureVisible && (
+          {distCoord && isStructureVisible && imageHistory.length>0 &&(
             distCoord.map((center, index) => {
               let a = parseImageUrl(imageHistory[index]?.url);
               // console.log("parsed:",a);
@@ -1417,7 +1457,7 @@ return (
                 <>
                   <div
                     className="tooltip"
-                    style={{ position: 'absolute', top: centerZ + center[1]-10, left: centerX + center[0] ,
+                    style={{ position: 'absolute', top: centerZ + center[1], left: centerX + center[0]+10 ,
                     display: isHovering===index  ? "block" : "none"
                   }}
                     onClick={() => setSelectedImage(index)}
@@ -1432,7 +1472,8 @@ return (
                     <div className="measurement-text">
                       <span className="measurement-label">Measurement:</span>
                       <span className="measurement-value">
-                        {parseFloat(a.measurementL).toFixed(1)}&times;{parseFloat(a.measurementB).toFixed(1)}
+                        {/* {parseFloat(a.measurementL).toFixed(1)}&times;{parseFloat(a.measurementB).toFixed(1)} */}
+                        {parseFloat(imageHistory[index]?.metadata?.measurementL||"N/A").toFixed(3)}&times;{parseFloat(imageHistory[index]?.metadata?.measurementB||"N/A").toFixed(3)}
                       </span>
                     </div>
 
@@ -1446,18 +1487,94 @@ return (
               );
             })
           )}
+          {distCoord && isStructureVisible && (
+            distCoord.map((center, index) => {
+              let comapany = imageHistory[index]?.metadata.brand.toLowerCase() || "";
+              return(
+                <>
+                  {/* <div
+                    className="circle"
+                    style={{
+                      position: 'absolute',
+                      top: centerZ + center[1],
+                      left: centerX + center[0],
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      backgroundColor: 'blue',
+                      opacity: 0.5,
+                      zIndex: 10,
+                    }}
+                    onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
+                    onMouseLeave={() => setIsHovering(null)}
+                    onClick={() => setSelectedImage(index)}
+
+                  ></div> */}
+                  <div 
+                    className="absolute"
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      top: centerZ + center[1],
+                      left: centerX + center[0],
+                      zIndex: 10,
+                    }}
+                  >
+        {/* Custom speech bubble shape with exact border radius and border width */}
+                    <div 
+                      className={`w-full h-full relative bg-white transition-all duration-300 scale-105 ring-1 ring-blue-500`}
+                      style={{
+                        borderRadius: '26px',
+                        border: '2px solid #1a56db',
+                        borderBottomRightRadius: '2px',
+                      }}
+                      onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
+                      onMouseLeave={() => setIsHovering(null)}
+                      onClick={() => setSelectedImage(index)}
+                    >
+                      {/* Speech bubble tail */}
+                      <div 
+                        className="absolute bg-white"
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          bottom: '-8px',
+                          right: '0px',
+                          borderTop: '3px solid #1a56db',
+                        }}
+                      ></div>
+                      
+                      {/* Samsung logo text - scaled down for 50px container */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-blue-600 font-bold text-xs tracking-tight"><img src={
+                          comapany === 'google' ? google :comapany==='samsung' ? samsung : comapany==='apple' ? apple : comapany==='oppo'?oppo:comapany==='vivo'?vivo:''
+                        }/></span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )
+            })
+          )}
         </div>
 
 
       </div>
-      <div className="right-container">
+      <div className="right-container"
+      style={{
+        margin:"5px",
+        marginBottom: "7px"
+    }}
+    >
         <div
           style={{
-            paddingLeft: '10px',
-            paddingTop: '10px',
-            fontWeight: 'bold',
-            boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
-            color: 'black'
+            paddingLeft: '14px',
+                  paddingTop: '10px',
+                  fontWeight: 'bold',
+                  // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
+                  borderBottom: '1px solid #EFF4FE',
+                  color: 'black',
+                  paddingBottom: '5px',
           }}
         >
           Reports
@@ -1467,25 +1584,28 @@ return (
             // console.log("ai details",imageHistory,aiDetails),
             imageHistory.map((image, index) => {
               let a = parseImageUrl(image.url);
+              
               // let ai = getAI(image.url);
               // console.log("AI:",ai);  
               return (
                 <div
                   key={index}
-                  className={`card ${selectedImage === index ? 'active' : ''}`}
+                  className={`card ${selectedImage === index ? 'active' : ''} bg-[#F9F9FF] border border-[#EFF1FF] rounded-xl overflow-hidden transition-all duration-300`}
                   ref={(el) => (imageRefs.current[index] = el)}
                 >
+                <div className='p-3 rounded-full'>
                   <div className="card-image-container">
                     {/* NEW LINE: onClick added here to open modal */}
                     <img
                       src={image.url}
                       alt={`Report ${index}`}
-                      className="card-image"
+                      className="w-full rounded-lg "
                       onClick={() => openModal(image.url)}
                     />
                   </div>
+                </div>
                   <div className="card-content">
-                    <div className="card-info">
+                    <div className="card-info px-4 py-3">
                       <div className="card-info-row">
                         <span className="card-info-label">Brand</span>
                         <span className="card-info-label">Merchandise</span>
@@ -1506,8 +1626,11 @@ return (
 
                     {/* Extra Content - Conditionally rendered */}
                     {expandedCards[index] && (
-                      <div className="extra-content-container">
-                        <div className="extra-header">
+                      <div className="extra-content-container m-4 p-4 rounded-lg bg-white animate-fadeIn"
+                      style={{
+                        animation: 'fadeIn 0.3s ease-in-out'
+                      }}>
+                        <div className="extra-header mb-3">
                           <img src={star} alt="Icon" className="extra-icon" />
                           <span className="extra-title" style={{ fontWeight: 400, color: 'black' }}>
                             AI Analysis
@@ -1526,18 +1649,39 @@ return (
                         </p> */}
                       </div>
                     )}
-                    <div className="card-toggle" onClick={() => toggleCard(index)}>
+                    <div 
+                        className="card-toggle px-4 py-3 flex items-center justify-center gap-2 cursor-pointer  transition-colors"
+                        onClick={() => toggleCard(index)}
+                   >
                       <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
-                      <span className="arrow">{expandedCards[index] ? '▲' : '▼'}</span>
+                      <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
+                  {expandedCards[index] ? (
+                    <ChevronUp size={20} color="#717AEA" />
+                  ) : (
+                    <ChevronDown size={20} color="#717AEA" />
+                  )}
                     </div>
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="no-images-message">
-              No reports available. Start tracking to capture store data.
-            </div>
+            <>
+            <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
+                    <img 
+                      src="/empty.svg" 
+                      alt="arrow" 
+                      className="h-40 object-contain "
+                    />
+                    <p className="text-gray-400 text-lg">
+                      Seems like the planogram is lonely
+                    </p>
+                  </div>
+                  <div className="relative">
+      
+    </div>
+
+                  </>
           )}
         </div>
       </div>
