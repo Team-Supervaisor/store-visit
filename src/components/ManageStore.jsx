@@ -947,48 +947,29 @@ export default function ManageStore() {
                 {/* Replace the Planogram Preview Area with this */}
                
                   <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4 relative">
-                  {previewImage || snapshot ? (
-                    <div className="relative w-full h-full" ref={imageRef}>
-                      <img
-                        src={previewImage || snapshot }
-                        onClick={handleImageClick}
-                        alt="Planogram Preview"
-                      />
-                      {clickPosition && (
-                        <img
-                          src="/pointer.svg"
-                          className="absolute w-5 h-5"
-                          style={{
-                            left: `${((clickPosition.x + 500) / 1000) * 100}%`,
-                            top: `${((clickPosition.y + 250) / 500) * 100}%`,
-                            transform: "translate(-50%, -50%)",
-                          }}
-                        ></img>
-                      )}
-                    </div>
-                    ) : (planogramWidth && planogramLength ? (
-                      <div className="w-full h-full p-4 relative">
+                  {(planogramWidth || planogramLength || storeName ? (
+                    <div className="w-full h-full p-4 relative">
 
-            <div className="flex items-center w-full justify-center" style={{ marginRight: 0}}>
-              <div className="relative w-[80%]">
-                <div className="absolute w-full top-1/2 border-t-2 border-dashed border-black"></div>
-                <div className="absolute -left-3 top-1/2 w-3 h-3 border-t-2 border-l-2 border-black -rotate-45 transform -translate-y-1/2"></div>
-                <div className="absolute -right-3 top-1/2 w-3 h-3 border-t-2 border-r-2 border-black rotate-45 transform -translate-y-1/2"></div>
-                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#EFF4FE] px-2 text-sm text-black font-normal">
-                  {planogramWidth} ft
-                </span>
-              </div>
-            </div>
+{planogramWidth && (<div className="flex items-center w-full justify-center" style={{ marginRight: 0}}>
+  <div className="relative w-[80%]">
+    <div className="absolute w-full top-1/2 border-t-2 border-dashed border-black"></div>
+    <div className="absolute -left-3 top-1/2 w-3 h-3 border-t-2 border-l-2 border-black -rotate-45 transform -translate-y-1/2"></div>
+    <div className="absolute -right-3 top-1/2 w-3 h-3 border-t-2 border-r-2 border-black rotate-45 transform -translate-y-1/2"></div>
+    <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#EFF4FE] px-2 text-sm text-black font-normal">
+      {planogramWidth} ft
+    </span>
+  </div>
+</div>)}
 
 
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-              <div className="text-base font-normal text-[#717AEA] whitespace-nowrap">
-                {storeName || "Store Layout"}
-              </div>
-            </div>
+<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+  <div className="text-base font-normal text-[#717AEA] whitespace-nowrap">
+    {storeName || "Store Layout"}
+  </div>
+</div>
 
 
-            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 h-[80%]">
+           {planogramLength &&  (<div className="absolute right-8 top-1/2 transform -translate-y-1/2 h-[80%]">
             <div className="relative h-full">
               <div className="absolute h-full right-0 border-r-2 border-dashed border-black"></div>
               <div className="absolute -top-3 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-black -rotate-45"></div>
@@ -999,8 +980,8 @@ export default function ManageStore() {
                 </span>
               </div>
             </div>
-          </div>
-          </div>
+            </div>)}
+      </div>
                     ) : (
                       <p className="text-gray-500 text-sm">Enter dimensions to preview</p>
                     ))}
