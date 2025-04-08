@@ -26,7 +26,7 @@ const cursorMap = {
 
 export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, planogramWidth, planogramLength}) {
   const canvasRef = useRef(null)
-  const [fillColor, setFillColor] = useState("")
+  const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -651,6 +651,9 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         id: rect.id,
         vertices: rect.vertices,
         name: rect.name,
+        isBricked: rect.isBricked,
+        isColored: rect.isColored,
+        color: rect.color,
         instructionData: rect.instruction && instruction_data.find(item => 
           item.id === rect.instruction
         )
