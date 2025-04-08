@@ -69,7 +69,9 @@ const StoreVisitTracking = () => {
   const [instructionModal,setInstructionModal]=useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
+  const [storeName,setStoreName]=useState();
   let planogram_coords;
+  
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -851,6 +853,7 @@ useEffect(() => {
     });
     socketRef.current.on("store-id",(data)=>{
       console.log("Store ID:",data);
+      setStoreName(data.store_name);
       setPlanstructures(data.planogram_coords)
       planogram_coords=data.planogram_coords;
       setStoreVisitDetails(data);
@@ -1279,10 +1282,10 @@ return (
     {/* Store Name and Distance container */}
     <div className="flex justify-between items-center mb-4 px-4 w-full">
       {/* Store Name */}
-      <div className=" text-[#777FE3] items-center py-2 px-6 rounded-full">
-        {/* <span className="font-medium">
-          {storeVisitDetails.store_name || 'Store Name'}
-        </span> */}
+      <div className=" text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
+        <span className="font-medium">
+          {storeName||""}
+        </span>
       </div>
 
       {/* Distance Display */}
@@ -1491,6 +1494,8 @@ return (
           {distCoord && isStructureVisible && imageHistory.length>0 && (
             distCoord.map((center, index) => {
               let comapany = imageHistory[index]?.metadata.brand.toLowerCase() || "";
+              let h = imageHistory[index]?.metadata?.measurementL*20
+              let w = imageHistory[index]?.metadata?.measurementB*20
               return(
                 <>
                   {/* <div
@@ -1514,8 +1519,8 @@ return (
                   <div 
                     className="absolute"
                     style={{
-                      width: '30px',
-                      height: '30px',
+                      width: h,
+                      height: h,
                       top: centerZ + center[1],
                       left: centerX + center[0],
                       zIndex: 10,
@@ -1535,10 +1540,10 @@ return (
                     >
                       {/* Speech bubble tail */}
                       <div 
-                        className="absolute bg-white"
+                        className="absolute"
                         style={{
-                          width: '8px',
-                          height: '8px',
+                          width: 0.73*h,
+                          height: 0.73*h,
                           bottom: '-8px',
                           right: '0px',
                           borderTop: '3px solid #1a56db',
@@ -1606,7 +1611,7 @@ return (
                   </div>
                 </div>
                   <div className="card-content">
-                    <div className="card-info px-4 py-3">
+                    {/* <div className="card-info px-4 py-3">
                       <div className="card-info-row">
                         <span className="card-info-label">Brand</span>
                         <span className="card-info-label">Merchandise</span>
@@ -1621,7 +1626,26 @@ return (
                           {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
                         </span>
                       </div>
-                    </div>
+                    </div> */}
+
+                    <div className="card-info px-4 py-3">
+        <div className="grid grid-cols-10 gap-4 mb-2">
+          <span className="col-span-2 text-left font-normal text-black">Brand</span>
+          <span className="col-span-3 text-left font-normal text-black">Merchandise</span>
+          <span className="col-span-2 text-left font-normal text-black">Product</span>
+          <span className="col-span-3 text-left font-normal text-black">Measurement</span>
+        </div>
+        
+        <div className="grid grid-cols-10 gap-4">
+          <span className="col-span-2 text-left font-semibold text-indigo-400">{a.brand}</span>
+          <span className="col-span-3 text-left font-semibold text-indigo-400">{a.merchandise}</span>
+          <span className="col-span-2 text-left font-semibold text-indigo-400">{a.product}</span>
+          <span className="col-span-3 text-left font-semibold text-indigo-400">
+          {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
+
+          </span>
+        </div>
+      </div>
 
                     {/* Toggle button */}
 

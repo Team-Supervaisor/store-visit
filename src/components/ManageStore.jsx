@@ -495,7 +495,7 @@ export default function ManageStore() {
     // console.log("Received from child:", data.snapshot);
   };
   const handleCreate = async () => {
-    if (!storeName || !storeId || !tsmName) {
+    if (!storeName || !storeId ) {
       setShowStatusModal(true);
       setIsSuccess(false);
       return;
