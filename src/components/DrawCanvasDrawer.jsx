@@ -4,16 +4,31 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ 
-  isOpen, 
-  onClose, 
-  onSaveShapes, 
-  instruction_data,
-  planogramWidth,  // in feet
-  planogramLength  // in feet
-}) {
+const tagOptions = [
+  { id: "1", title: "Tag 1" },
+  { id: "2", title: "Tag 2" },
+  { id: "3", title: "Tag 3" },
+]
+
+const visibilityOptions = [
+  { id: "1", title: "Low" },
+  { id: "2", title: "Medium" },
+  { id: "3", title: "High" },
+]
+
+const cursorMap = {
+  pointer: "cursor-pointer",
+  rectangle: "cursor-crosshair",
+  delete: 'custom-bin',
+  fill: 'custom-fill',
+};
+
+
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, planogramWidth, planogramLength}) {
   const canvasRef = useRef(null)
+  const [fillColor, setFillColor] = useState("")
   const [ctx, setCtx] = useState(null)
+  const [hoveredShape, setHoveredShape] = useState(null);
   const [selectedTool, setSelectedTool] = useState("rectangle")
   const [drawingState, setDrawingState] = useState({
     isDrawing: false,
@@ -38,6 +53,8 @@ export default function DrawingCanvas({
     shapeId: null,
     name: "",
     instruction: "",
+    tag: "",
+    visibility: "",
   })
   // Track all selected instructions to manage availability
   const [selectedInstructions, setSelectedInstructions] = useState({})
@@ -89,6 +106,7 @@ export default function DrawingCanvas({
     }
   }, [])
 
+
   useEffect(() => {
     if (!ctx || !canvasRef.current) return
 
@@ -100,7 +118,7 @@ export default function DrawingCanvas({
     ctx.translate(canvasWidth / 2, canvasHeight / 2)
 
     shapes.forEach((shape) => {
-      if (shape.type === "rectangle") {
+      if (shape.type === "rectangle" || shape.type === "brick") {
         if (selectedShape && selectedShape.id === shape.id) {
           ctx.strokeStyle = "#6366F1" 
           ctx.lineWidth = 2.5
@@ -112,20 +130,86 @@ export default function DrawingCanvas({
         // Draw the rectangle
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height)
         
-        // Calculate the normalized coordinates for text placement
-        const textX = shape.width >= 0 ? shape.x + 5 : shape.x + shape.width + 5
-        const textY = shape.height >= 0 ? shape.y + 15 : shape.y + shape.height + 15
-        
         // Draw ID text
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
-        ctx.fillText(`ID: ${shape.id}`, textX, textY)
 
         // Draw name if it exists
+
+        if (shape.isBricked) {
+          // Normalize rectangle coordinates for proper filling
+          const normalizedRect = {
+            x: shape.width < 0 ? shape.x + shape.width : shape.x,
+            y: shape.height < 0 ? shape.y + shape.height : shape.y,
+            width: Math.abs(shape.width),
+            height: Math.abs(shape.height),
+          };
+
+          // Save the current context state
+          ctx.save();
+
+          // Create a clipping path for the rectangle
+          ctx.beginPath();
+          ctx.rect(
+            normalizedRect.x,
+            normalizedRect.y,
+            normalizedRect.width,
+            normalizedRect.height
+          );
+          ctx.clip();
+
+          // Set the brick color
+          ctx.fillStyle = "#8897F1";
+
+          // Draw the brick pattern within the clipped area
+          const brickWidth = 20;
+          const brickHeight = 10;
+
+          for (
+            let y = normalizedRect.y;
+            y < normalizedRect.y + normalizedRect.height;
+            y += brickHeight * 2
+          ) {
+            // First row of bricks
+            for (
+              let x = normalizedRect.x;
+              x < normalizedRect.x + normalizedRect.width;
+              x += brickWidth
+            ) {
+              ctx.fillRect(x, y, brickWidth - 2, brickHeight - 1);
+            }
+
+            // Second row of bricks (offset)
+            for (
+              let x = normalizedRect.x - brickWidth / 2;
+              x < normalizedRect.x + normalizedRect.width;
+              x += brickWidth
+            ) {
+              ctx.fillRect(x, y + brickHeight, brickWidth - 2, brickHeight - 1);
+            }
+          }
+
+          // Restore the context to remove the clipping path
+          ctx.restore();
+        }
+
+        if (shape.isColored) {
+          ctx.fillStyle = shape.color;
+          ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        }
+
         if (shape.name) {
-          ctx.fillStyle = "#6366F1"
+          ctx.fillStyle = "#000000"
           ctx.font = "14px Arial"
-          ctx.fillText(shape.name, textX, textY + 20)
+          const textWidth = ctx.measureText(shape.name).width;
+          const textHeight = 14; // Approximate text height for 14px font
+          const centerX = shape.x + shape.width / 2;
+          const centerY = shape.y + shape.height / 2;
+          ctx.fillText(
+            shape.name,
+            centerX - textWidth / 2,
+            centerY + textHeight / 2
+          );
         }
       } else if (shape.type === "text") {
         ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
@@ -134,7 +218,7 @@ export default function DrawingCanvas({
       }
     })
 
-    if (drawingState.isDrawing && selectedTool === "rectangle") {
+    if (drawingState.isDrawing && (selectedTool === "rectangle" || selectedTool === "walls")) {
       const width = drawingState.currentX - drawingState.startX
       const height = drawingState.currentY - drawingState.startY
 
@@ -222,8 +306,9 @@ export default function DrawingCanvas({
 
     if (selectedTool === "pointer") {
       const clickedShape = findShapeAtPosition(canvasX, canvasY)
+      setHoveredShape(null)
 
-      if (clickedShape) {
+      if (clickedShape && !clickedShape.isBricked) {
         setSelectedShape(clickedShape)
         
         // Calculate the center of the rectangle properly for dialog positioning
@@ -249,7 +334,7 @@ export default function DrawingCanvas({
         setSelectedShape(null)
         setShapeDialog({ ...shapeDialog, isOpen: false })
       }
-    } else if (selectedTool === "rectangle") {
+    } else if (selectedTool === "rectangle" || selectedTool === "walls") {
       setDrawingState({
         isDrawing: true,
         startX: canvasX,
@@ -276,7 +361,7 @@ export default function DrawingCanvas({
 
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
 
-    if (selectedTool === "rectangle") {
+    if (selectedTool === "rectangle" || selectedTool === "walls") {
       setDrawingState({
         ...drawingState,
         currentX: canvasX,
@@ -285,9 +370,58 @@ export default function DrawingCanvas({
     }
   }
 
-  const stopDrawing = (e) => {
-    if (!ctx || !drawingState.isDrawing || !canvasRef.current || selectedTool !== "rectangle") return
+  const handleCanvasClick = (e) => {
+    if (selectedTool !== "delete") return;
 
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+
+    const clickedRect = shapes.find(
+      (r) =>
+        canvasX >= r.x &&
+        canvasX <= r.x + r.width &&
+        canvasY >= r.y &&
+        canvasY <= r.y + r.height
+    );
+
+    if (clickedRect) {
+      // Remove the rectangle
+      setShapes((prevRects) =>
+        prevRects.filter((r) => r.id !== clickedRect.id)
+      );
+    }
+  };
+
+  const handleFill = (e) => {
+    if (selectedTool !== "fill") return;
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+
+    const clickedRect = shapes.find(
+      (r) =>
+        canvasX >= r.x &&
+        canvasX <= r.x + r.width &&
+        canvasY >= r.y &&
+        canvasY <= r.y + r.height
+    );
+
+
+    
+    if (clickedRect && !clickedRect.isBricked) {
+      // Update the rectangle's color property
+      setShapes((prevShapes) =>
+        prevShapes.map((shape) =>
+          shape.id === clickedRect.id
+            ? { ...shape, color: fillColor, isColored: true }
+            : shape
+        )
+      );
+      // Fill the rectangle with a color
+      ctx.fillStyle = fillColor;
+      ctx.fillRect(clickedRect.x + canvasWidth / 2, clickedRect.y + canvasHeight / 2, clickedRect.width, clickedRect.height);
+    }
+  }
+
+  const stopDrawing = (e) => {
+    if (!ctx || !drawingState.isDrawing || !canvasRef.current || (selectedTool !== "rectangle" && selectedTool !== "walls")) return
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
@@ -302,10 +436,10 @@ export default function DrawingCanvas({
       
       // Calculate vertices in clockwise order regardless of drawing direction
       const vertices = [
-        [Math.min(x1, x2), -Math.min(y1, y2)],
-        [Math.min(x1, x2), -Math.max(y1, y2)],
-        [Math.max(x1, x2), -Math.max(y1, y2)],
-        [Math.max(x1, x2), -Math.min(y1, y2)],
+        [Math.min(x1, x2), Math.min(y1, y2)],
+        [Math.min(x1, x2), Math.max(y1, y2)],
+        [Math.max(x1, x2), Math.max(y1, y2)],
+        [Math.max(x1, x2), Math.min(y1, y2)],
       ];
       
       const newRectangle = {
@@ -316,10 +450,12 @@ export default function DrawingCanvas({
         width: width,
         height: height,
         vertices: vertices,
-      }
-      
-      setShapes([...shapes, newRectangle])
-      
+        isColored: false,
+        isBricked: selectedTool === "walls",
+      };
+
+      setShapes([...shapes, newRectangle]);
+
       // Add entry in availableInstructions for the new shape
       if (instruction_data) {
         setAvailableInstructions(prev => ({
@@ -340,11 +476,34 @@ export default function DrawingCanvas({
       currentX: 0,
       currentY: 0,
     })
-  }
+  };
+
+  const handleHover = (e) => {
+    if(!ctx || !canvasRef.current || selectedTool !== "pointer") return;
+    const { x: mouseX, y: mouseY } = getCustomCoordinates(e);
+
+    let foundShape = null;
+
+    for (let shape of shapes) {
+      if (
+        mouseX >= shape.x &&
+        mouseX <= shape.x + shape.width &&
+        mouseY >= shape.y &&
+        mouseY <= shape.y + shape.height
+      ) {
+        foundShape = shape;
+        break;
+      }
+    }
+    if(foundShape?.isBricked){
+      return;
+    }
+    setHoveredShape(foundShape);
+  };
 
   const handleTextSubmit = (text) => {
     if (text.trim() === "") {
-      setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+      setTextInput({ isActive: false, x: 0, y: 0, text: "" });
       return
     }
 
@@ -357,9 +516,9 @@ export default function DrawingCanvas({
       text: text,
     }
 
-    setShapes([...shapes, newText])
-    setNextId(nextId + 1)
-    setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+    setShapes([...shapes, newText]);
+    setNextId(nextId + 1);
+    setTextInput({ isActive: false, x: 0, y: 0, text: "" });
   }
 
   const handleInstructionChange = (e) => {
@@ -386,6 +545,20 @@ export default function DrawingCanvas({
       return newSelected;
     });
   };
+
+  const handleTagChange = (e) => {
+    setShapeDialog({ 
+      ...shapeDialog, 
+      tag: e.target.value 
+    });
+  }
+
+  const handleVisibilityChange = (e) => {
+    setShapeDialog({ 
+      ...shapeDialog, 
+      visibility: e.target.value 
+    });
+  }
 
   const handleShapeDialogSave = () => {
     // Update the shape with the new name and instruction
@@ -421,6 +594,7 @@ export default function DrawingCanvas({
     setShapeDialog({ ...shapeDialog, isOpen: false })
     setSelectedInstructions({})
     setAvailableInstructions({})
+    setSelectedTool("rectangle")
   }
 
   const saveShapes = () => {
@@ -516,9 +690,16 @@ export default function DrawingCanvas({
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className={`bg-white shadow-md rounded-lg ${selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"}`}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
+          className={`bg-white shadow-md rounded-lg ${cursorMap[selectedTool] || "cursor-default"}`}
+          onMouseDown={(e) => {
+            handleCanvasClick(e);
+            startDrawing(e); 
+            handleFill(e);
+          }}
+          onMouseMove={(e) => {
+            draw(e);
+            handleHover(e);
+          }}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
         />
@@ -542,20 +723,30 @@ export default function DrawingCanvas({
               className="border p-1 text-sm"
               placeholder="Enter text"
               autoFocus
-              onChange={(e) => setTextInput({ ...textInput, text: e.target.value })}
+              onChange={(e) =>
+                setTextInput({ ...textInput, text: e.target.value })
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleTextSubmit(textInput.text)
+                  handleTextSubmit(textInput.text);
                 } else if (e.key === "Escape") {
-                  setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+                  setTextInput({ isActive: false, x: 0, y: 0, text: "" });
                 }
               }}
             />
             <div className="flex mt-1 gap-1">
-              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => handleTextSubmit(textInput.text)}>
+              <button
+                className="bg-gray-200 text-xs px-2 py-1 rounded"
+                onClick={() => handleTextSubmit(textInput.text)}
+              >
                 Add
               </button>
-              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}>
+              <button
+                className="bg-gray-200 text-xs px-2 py-1 rounded"
+                onClick={() =>
+                  setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+                }
+              >
                 Cancel
               </button>
             </div>
@@ -564,7 +755,7 @@ export default function DrawingCanvas({
 
         {shapeDialog.isOpen && (
           <div
-            className="absolute bg-white p-4 rounded-xl shadow-lg w-[350px]"
+            className="absolute bg-white p-6 rounded-xl shadow-lg w-[350px]"
             style={{
               left: `${shapeDialog.x}px`,
               top: `${shapeDialog.y}px`,
@@ -572,38 +763,96 @@ export default function DrawingCanvas({
               border: "1px solid #E5E7EB",
             }}
           >
-            <button
+            {/* <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
               onClick={closeShapeDialog}
             >
               <X size={18} />
-            </button>
+            </button> */}
 
-            <div className="flex flex-col gap-4 ">
-              <div className="flex items-center justify-center mb-1">
+            <div className="flex flex-col gap-4">
+              {/* <div className="flex items-center justify-center mb-1">
                 <span className="text-sm font-semibold bg-gray-100 px-3 py-1 rounded-full text-gray-700">
                   ID: {shapeDialog.shapeId}
                 </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="font-medium text-gray-700 w-24">Name</label>
+              </div> */}
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">Name:</label>
                 <div className="flex-1">
                   <input
+                    id="storeName"
                     type="text"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-[black]"
                     placeholder="Enter the name of the Table"
                     value={shapeDialog.name}
                     onChange={(e) => setShapeDialog({ ...shapeDialog, name: e.target.value })}
+                    className="w-full flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black text-sm"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button className="bg-[#6366F1] text-white text-sm px-3 py-1 rounded-md">Map to</button>
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">
+                  Visibility:
+                </label>
+                <div className="flex-1 relative">
+                  <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
+                    value={shapeDialog.visibility}
+                    defaultValue={""}
+                    onChange={handleVisibilityChange}
+                  >
+                    <option value="" disabled>
+                      Select from below
+                    </option>
+                    {visibilityOptions.map((option) => (
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <ChevronDown size={16} className="text-gray-400" />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="font-medium text-gray-700 w-24">Instruction</label>
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">Tag:</label>
+                <div className="flex-1 relative">
+                  <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
+                    value={shapeDialog.tag}
+                    onChange={handleTagChange}
+                    defaultValue={""}
+                  >
+                    <option value="" disabled>
+                      Select from below
+                    </option>
+                    {tagOptions.map((option) => (
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <ChevronDown size={16} className="text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">
+                  Instruction:
+                </label>
                 <div className="flex-1 relative">
                   <select
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
@@ -614,7 +863,11 @@ export default function DrawingCanvas({
                       Select from below
                     </option>
                     {getFilteredInstructions().map((option) => (
-                      <option key={option.id} value={option.id} className="text-black-[500]">
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
                         {option.title}
                       </option>
                     ))}
@@ -626,16 +879,56 @@ export default function DrawingCanvas({
               </div>
 
               <div className="flex justify-end gap-2 mt-2">
-                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]" onClick={closeShapeDialog}>
+                <button
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]"
+                  onClick={closeShapeDialog}
+                >
                   Cancel
                 </button>
-                <button className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm" onClick={handleShapeDialogSave}>
+                <button
+                  className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm"
+                  onClick={handleShapeDialogSave}
+                >
                   Save
                 </button>
               </div>
             </div>
           </div>
         )}
+        {hoveredShape && (
+        <div
+          style={{
+            position: "absolute",
+            backgroundColor: "#fef3f3",
+            left: hoveredShape.x + canvasWidth / 2 ,
+            top: hoveredShape.y + canvasHeight / 2,
+            zIndex: 10,
+          }}
+          className="bg-white p-2 rounded shadow-lg border border-gray-300"
+        >
+          {/* <div className="w-2 h-2 bg-white rounded-[2px] rotate-45 translate-y-[40px] translate-x-[40px]"></div> */}
+          <button
+            className="text-sm text-white bg-red-500 px-2 py-1 rounded mr-1 hover:bg-red-600"
+            onClick={() => {
+              setShapes((prevShapes) =>
+                prevShapes.filter((shape) => shape.id !== hoveredShape.id)
+              );
+              setHoveredShape(null);
+            }}
+          >
+            Delete
+          </button>
+          <button
+            className="text-sm text-white bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
+            onClick={(e) => {
+              setHoveredShape(null);
+              startDrawing(e);
+            }}
+          >
+            Edit
+          </button>
+        </div>
+      )}
       </div>
 
       <ToolBar
@@ -644,6 +937,17 @@ export default function DrawingCanvas({
         clearCanvas={clearCanvas}
         saveShapes={saveShapes}
       />
+      {selectedTool === "fill" && (
+        <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md z-10 flex items-center">
+          <label className="text-sm font-medium text-gray-700">Fill Color:</label>
+          <input
+            type="color"
+            value={fillColor}
+            onChange={(e) => setFillColor(e.target.value)}
+            className="ml-2 w-8 h-8 border-none cursor-pointer"
+          />
+        </div>
+      )}
     </div>
-  )
+  );
 }
