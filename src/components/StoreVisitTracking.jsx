@@ -1278,30 +1278,38 @@ return (
 </div> */}
 
 
-<div className="flex" style={{ width: '70%', display:"inline-block" }}>  {/* Match left-container width */}
-    {/* Store Name and Distance container */}
-    <div className="flex justify-between items-center mb-4 px-4 w-full">
-      {/* Store Name */}
-      <div className=" text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
-        <span className="font-medium">
-          {storeName||""}
-        </span>
-      </div>
+<div className="flex" style={{ width: '70%', display: 'inline-block' }}>
+  {/* Store Name and Distance container */}
+  <div className="flex justify-between items-center mb-4 px-4 w-full">
+    {/* Store Name */}
+    <div className="text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
+      <span className="font-medium">
+        {storeVisitDetails.store_id || ""}
+      </span>
+    </div>
 
-      {/* Distance Display */}
-      <div className="info-display">
-        <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
-          <span 
-            id="distance" 
-            ref={distanceDisplayRef} 
-            className="font-medium"
-          >
-            {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
-          </span>
-        </div>
+    {/* Middle Field */}
+    <div className="text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
+      <span className="font-medium">
+        {/* Replace with actual value */}
+        {storeName || ""}
+      </span>
+    </div>
+
+    {/* Distance Display */}
+    <div className="info-display">
+      <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
+        <span
+          id="distance"
+          ref={distanceDisplayRef}
+          className="font-medium"
+        >
+          {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
+        </span>
       </div>
     </div>
   </div>
+</div>
 
 
 
@@ -1309,7 +1317,7 @@ return (
     <div className="layout-container" >
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
-        backgroundImage:storeVisitDetails.planogram_coords?.length>0 ? "none" : `url(${storeVisitDetails.planogram_url})`,
+        backgroundImage:`url(${storeVisitDetails.planogram_url})`,
         
         backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
