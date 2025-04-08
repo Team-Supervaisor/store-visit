@@ -27,6 +27,7 @@ const cursorMap = {
 export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
+  const [hoveredShape, setHoveredShape] = useState(null);
   const [selectedTool, setSelectedTool] = useState("rectangle")
   const [drawingState, setDrawingState] = useState({
     isDrawing: false,
@@ -101,7 +102,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     ctx.translate(canvasWidth / 2, canvasHeight / 2)
 
     shapes.forEach((shape) => {
-      if (shape.type === "rectangle") {
+      if (shape.type === "rectangle" || shape.type === "brick") {
         if (selectedShape && selectedShape.id === shape.id) {
           ctx.strokeStyle = "#6366F1" 
           ctx.lineWidth = 2.5
@@ -125,12 +126,73 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
           const textHeight = 14; // Approximate text height for 14px font
           const centerX = shape.x + shape.width / 2;
           const centerY = shape.y + shape.height / 2;
-          ctx.fillText(shape.name, centerX - textWidth / 2, centerY + textHeight / 2);
+          ctx.fillText(
+            shape.name,
+            centerX - textWidth / 2,
+            centerY + textHeight / 2
+          );
         }
 
-        if(shape.isColored) {
-          ctx.fillStyle = "#6366F1"
-          ctx.fillRect(shape.x, shape.y, shape.width, shape.height)
+        if (shape.isBricked) {
+          // Normalize rectangle coordinates for proper filling
+          const normalizedRect = {
+            x: shape.width < 0 ? shape.x + shape.width : shape.x,
+            y: shape.height < 0 ? shape.y + shape.height : shape.y,
+            width: Math.abs(shape.width),
+            height: Math.abs(shape.height),
+          };
+
+          // Save the current context state
+          ctx.save();
+
+          // Create a clipping path for the rectangle
+          ctx.beginPath();
+          ctx.rect(
+            normalizedRect.x,
+            normalizedRect.y,
+            normalizedRect.width,
+            normalizedRect.height
+          );
+          ctx.clip();
+
+          // Set the brick color
+          ctx.fillStyle = "#8897F1";
+
+          // Draw the brick pattern within the clipped area
+          const brickWidth = 20;
+          const brickHeight = 10;
+
+          for (
+            let y = normalizedRect.y;
+            y < normalizedRect.y + normalizedRect.height;
+            y += brickHeight * 2
+          ) {
+            // First row of bricks
+            for (
+              let x = normalizedRect.x;
+              x < normalizedRect.x + normalizedRect.width;
+              x += brickWidth
+            ) {
+              ctx.fillRect(x, y, brickWidth - 2, brickHeight - 1);
+            }
+
+            // Second row of bricks (offset)
+            for (
+              let x = normalizedRect.x - brickWidth / 2;
+              x < normalizedRect.x + normalizedRect.width;
+              x += brickWidth
+            ) {
+              ctx.fillRect(x, y + brickHeight, brickWidth - 2, brickHeight - 1);
+            }
+          }
+
+          // Restore the context to remove the clipping path
+          ctx.restore();
+        }
+
+        if (shape.isColored) {
+          ctx.fillStyle = "#6366F1";
+          ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
         }
       } else if (shape.type === "text") {
         ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
@@ -139,7 +201,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       }
     })
 
-    if (drawingState.isDrawing && selectedTool === "rectangle") {
+    if (drawingState.isDrawing && (selectedTool === "rectangle" || selectedTool === "walls")) {
       const width = drawingState.currentX - drawingState.startX
       const height = drawingState.currentY - drawingState.startY
 
@@ -254,7 +316,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         setSelectedShape(null)
         setShapeDialog({ ...shapeDialog, isOpen: false })
       }
-    } else if (selectedTool === "rectangle") {
+    } else if (selectedTool === "rectangle" || selectedTool === "walls") {
       setDrawingState({
         isDrawing: true,
         startX: canvasX,
@@ -281,7 +343,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
 
-    if (selectedTool === "rectangle") {
+    if (selectedTool === "rectangle" || selectedTool === "walls") {
       setDrawingState({
         ...drawingState,
         currentX: canvasX,
@@ -294,12 +356,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     if (selectedTool !== "delete") return;
 
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
-
-    // console.log("Click coordinates:", clickX, clickY);
-    for (let i = 0; i < shapes.length; i++) {
-      const shape = shapes[i];
-      console.log(shape.x, shape.y, shape.width, shape.height);
-    }
 
     const clickedRect = shapes.find(
       (r) =>
@@ -320,8 +376,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   const handleFill = (e) => {
     if (selectedTool !== "fill") return;
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
-    console.log("Click coordinates:", canvasX, canvasY);
-    console.log("ClickX" )
 
     const clickedRect = shapes.find(
       (r) =>
@@ -333,7 +387,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
 
     
-    if (clickedRect) {
+    if (clickedRect && !clickedRect.isBricked) {
       // Update the rectangle's color property
       setShapes((prevShapes) =>
         prevShapes.map((shape) =>
@@ -349,8 +403,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   }
 
   const stopDrawing = (e) => {
-    if (!ctx || !drawingState.isDrawing || !canvasRef.current || selectedTool !== "rectangle") return
-
+    if (!ctx || !drawingState.isDrawing || !canvasRef.current || (selectedTool !== "rectangle" && selectedTool !== "walls")) return
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
@@ -380,10 +433,11 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         height: height,
         vertices: vertices,
         isColored: false,
-      }
-      
-      setShapes([...shapes, newRectangle])
-      
+        isBricked: selectedTool === "walls",
+      };
+
+      setShapes([...shapes, newRectangle]);
+
       // Add entry in availableInstructions for the new shape
       if (instruction_data) {
         setAvailableInstructions(prev => ({
@@ -404,11 +458,34 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       currentX: 0,
       currentY: 0,
     })
-  }
+  };
+
+  const handleHover = (e) => {
+    if(!ctx || !canvasRef.current || selectedTool !== "pointer") return;
+    const { x: mouseX, y: mouseY } = getCustomCoordinates(e);
+
+    let foundShape = null;
+
+    for (let shape of shapes) {
+      if (
+        mouseX >= shape.x &&
+        mouseX <= shape.x + shape.width &&
+        mouseY >= shape.y &&
+        mouseY <= shape.y + shape.height
+      ) {
+        foundShape = shape;
+        break;
+      }
+    }
+    if(foundShape?.isBricked){
+      return;
+    }
+    setHoveredShape(foundShape);
+  };
 
   const handleTextSubmit = (text) => {
     if (text.trim() === "") {
-      setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+      setTextInput({ isActive: false, x: 0, y: 0, text: "" });
       return
     }
 
@@ -421,9 +498,9 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       text: text,
     }
 
-    setShapes([...shapes, newText])
-    setNextId(nextId + 1)
-    setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+    setShapes([...shapes, newText]);
+    setNextId(nextId + 1);
+    setTextInput({ isActive: false, x: 0, y: 0, text: "" });
   }
 
   const handleInstructionChange = (e) => {
@@ -560,7 +637,10 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
             startDrawing(e); 
             handleFill(e);
           }}
-          onMouseMove={draw}
+          onMouseMove={(e) => {
+            draw(e);
+            handleHover(e);
+          }}
           onMouseUp={stopDrawing}
           onMouseLeave={stopDrawing}
         />
@@ -756,6 +836,40 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
             </div>
           </div>
         )}
+        {hoveredShape && (
+        <div
+          style={{
+            position: "absolute",
+            backgroundColor: "#fef3f3",
+            left: hoveredShape.x + canvasWidth / 2 ,
+            top: hoveredShape.y + canvasHeight / 2,
+            zIndex: 10,
+          }}
+          className="bg-white p-2 rounded shadow-lg border border-gray-300"
+        >
+          {/* <div className="w-2 h-2 bg-white rounded-[2px] rotate-45 translate-y-[40px] translate-x-[40px]"></div> */}
+          <button
+            className="text-sm text-white bg-red-500 px-2 py-1 rounded mr-1 hover:bg-red-600"
+            onClick={() => {
+              setShapes((prevShapes) =>
+                prevShapes.filter((shape) => shape.id !== hoveredShape.id)
+              );
+              setHoveredShape(null);
+            }}
+          >
+            Delete
+          </button>
+          <button
+            className="text-sm text-white bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
+            onClick={(e) => {
+              setHoveredShape(null);
+              startDrawing(e);
+            }}
+          >
+            Edit
+          </button>
+        </div>
+      )}
       </div>
 
       <ToolBar
