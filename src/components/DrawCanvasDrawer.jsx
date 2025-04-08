@@ -4,6 +4,18 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
+const tagOptions = [
+  { id: "1", title: "Tag 1" },
+  { id: "2", title: "Tag 2" },
+  { id: "3", title: "Tag 3" },
+]
+
+const visibilityOptions = [
+  { id: "1", title: "Low" },
+  { id: "2", title: "Medium" },
+  { id: "3", title: "High" },
+]
+
 export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
@@ -31,6 +43,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     shapeId: null,
     name: "",
     instruction: "",
+    tag: "",
+    visibility: "",
   })
   // Track all selected instructions to manage availability
   const [selectedInstructions, setSelectedInstructions] = useState({})
@@ -66,6 +80,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       setCtx(context)
     }
   }, [])
+
 
   useEffect(() => {
     if (!ctx || !canvasRef.current) return
@@ -365,6 +380,20 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     });
   };
 
+  const handleTagChange = (e) => {
+    setShapeDialog({ 
+      ...shapeDialog, 
+      tag: e.target.value 
+    });
+  }
+
+  const handleVisibilityChange = (e) => {
+    setShapeDialog({ 
+      ...shapeDialog, 
+      visibility: e.target.value 
+    });
+  }
+
   const handleShapeDialogSave = () => {
     // Update the shape with the new name and instruction
     const updatedShapes = shapes.map((shape) => {
@@ -454,7 +483,9 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       <div className="relative">
         <canvas
           ref={canvasRef}
-          className={`bg-white shadow-md rounded-lg ${selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"}`}
+          className={`bg-white shadow-md rounded-lg ${
+            selectedTool === "pointer" ? "cursor-pointer" : "cursor-crosshair"
+          }`}
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
@@ -480,20 +511,30 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
               className="border p-1 text-sm"
               placeholder="Enter text"
               autoFocus
-              onChange={(e) => setTextInput({ ...textInput, text: e.target.value })}
+              onChange={(e) =>
+                setTextInput({ ...textInput, text: e.target.value })
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleTextSubmit(textInput.text)
+                  handleTextSubmit(textInput.text);
                 } else if (e.key === "Escape") {
-                  setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+                  setTextInput({ isActive: false, x: 0, y: 0, text: "" });
                 }
               }}
             />
             <div className="flex mt-1 gap-1">
-              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => handleTextSubmit(textInput.text)}>
+              <button
+                className="bg-gray-200 text-xs px-2 py-1 rounded"
+                onClick={() => handleTextSubmit(textInput.text)}
+              >
                 Add
               </button>
-              <button className="bg-gray-200 text-xs px-2 py-1 rounded" onClick={() => setTextInput({ isActive: false, x: 0, y: 0, text: "" })}>
+              <button
+                className="bg-gray-200 text-xs px-2 py-1 rounded"
+                onClick={() =>
+                  setTextInput({ isActive: false, x: 0, y: 0, text: "" })
+                }
+              >
                 Cancel
               </button>
             </div>
@@ -502,7 +543,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
         {shapeDialog.isOpen && (
           <div
-            className="absolute bg-white p-4 rounded-xl shadow-lg w-[350px]"
+            className="absolute bg-white p-6 rounded-xl shadow-lg w-[350px]"
             style={{
               left: `${shapeDialog.x}px`,
               top: `${shapeDialog.y}px`,
@@ -510,38 +551,96 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
               border: "1px solid #E5E7EB",
             }}
           >
-            <button
+            {/* <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100"
               onClick={closeShapeDialog}
             >
               <X size={18} />
-            </button>
+            </button> */}
 
-            <div className="flex flex-col gap-4 ">
-              <div className="flex items-center justify-center mb-1">
+            <div className="flex flex-col gap-4">
+              {/* <div className="flex items-center justify-center mb-1">
                 <span className="text-sm font-semibold bg-gray-100 px-3 py-1 rounded-full text-gray-700">
                   ID: {shapeDialog.shapeId}
                 </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="font-medium text-gray-700 w-24">Name</label>
+              </div> */}
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">Name:</label>
                 <div className="flex-1">
                   <input
+                    id="storeName"
                     type="text"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-[black]"
                     placeholder="Enter the name of the Table"
                     value={shapeDialog.name}
                     onChange={(e) => setShapeDialog({ ...shapeDialog, name: e.target.value })}
+                    className="w-full flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black text-sm"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button className="bg-[#6366F1] text-white text-sm px-3 py-1 rounded-md">Map to</button>
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">
+                  Visibility:
+                </label>
+                <div className="flex-1 relative">
+                  <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
+                    value={shapeDialog.visibility}
+                    defaultValue={""}
+                    onChange={handleVisibilityChange}
+                  >
+                    <option value="" disabled>
+                      Select from below
+                    </option>
+                    {visibilityOptions.map((option) => (
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <ChevronDown size={16} className="text-gray-400" />
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="font-medium text-gray-700 w-24">Instruction</label>
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">Tag:</label>
+                <div className="flex-1 relative">
+                  <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
+                    value={shapeDialog.tag}
+                    onChange={handleTagChange}
+                    defaultValue={""}
+                  >
+                    <option value="" disabled>
+                      Select from below
+                    </option>
+                    {tagOptions.map((option) => (
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
+                        {option.title}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <ChevronDown size={16} className="text-gray-400" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <label className="font-medium text-gray-700 w-24">
+                  Instruction:
+                </label>
                 <div className="flex-1 relative">
                   <select
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm appearance-none text-[black]"
@@ -552,7 +651,11 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
                       Select from below
                     </option>
                     {getFilteredInstructions().map((option) => (
-                      <option key={option.id} value={option.id} className="text-black-[500]">
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="text-black-[500]"
+                      >
                         {option.title}
                       </option>
                     ))}
@@ -564,10 +667,16 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
               </div>
 
               <div className="flex justify-end gap-2 mt-2">
-                <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]" onClick={closeShapeDialog}>
+                <button
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm text-[black]"
+                  onClick={closeShapeDialog}
+                >
                   Cancel
                 </button>
-                <button className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm" onClick={handleShapeDialogSave}>
+                <button
+                  className="px-3 py-1 bg-[#6366F1] text-white rounded-md text-sm"
+                  onClick={handleShapeDialogSave}
+                >
                   Save
                 </button>
               </div>
@@ -583,5 +692,5 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         saveShapes={saveShapes}
       />
     </div>
-  )
+  );
 }
