@@ -518,7 +518,8 @@ export default function ManageStore() {
     console.log("rectangleData", rectangleData.length);
     // console.log("clickPosition", clickPosition);
     if (rectangleData.length > 0 && !clickPosition) {
-      alert("Please click on the image to set the start pointss");
+      setShowStatusModal(true);
+      setErrorMessage("Please click on the image to set the start point");
       return;
     }
     

@@ -15,6 +15,8 @@ import { X } from 'lucide-react';
 import ConnectionErrorModal from './ConnectionErrorModal';
 import {ChevronUp, ChevronDown } from 'lucide-react';
 import lg from '../assets/lg.png'
+import vector1 from '../assets/Vector1.png'
+import vector2 from '../assets/Vector2.png'
 import { MessageCircle } from 'lucide-react';
 
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
@@ -1216,26 +1218,24 @@ return (
         <button
             // id="startButton"
             type="button"
-            style={{backgroundColor:"white", color:"black"}}
-            className='bg-red text-black rounded-sm'
+            className='bg-[#5856D6] text-black rounded-[12px] flex items-center gap-2'
             onClick={(e) => {
               createRipple(e);
               handleStartButton();
             }}
           >
-            Start
+            Start <img src={vector1}/>
           </button>
           <button
             id="clearButton"
             type="button"
-            style={{backgroundColor:"white", color:"black"}}
-            className="clear"
+            className="flex items-center gap-2 clear "
             onClick={(e) => {
               createRipple(e);
               handleClearButton();
             }}
           >
-            Clear All
+            Clear All <img src={vector2}/>
           </button>
 
           <label className="toggle-container">
@@ -1259,7 +1259,7 @@ return (
             />
             <span className="slider"></span>
           </label>
-          <img src="/profile.svg" alt="profile" className=" w-[51px]" />
+          <img src="/profile.svg" alt="profile" className=" w-[45px]" />
         </div>
       </div>
     </div>
@@ -1488,7 +1488,7 @@ return (
               );
             })
           )}
-          {distCoord && isStructureVisible && imageHistory.length>0 (
+          {distCoord && isStructureVisible && imageHistory.length>0 && (
             distCoord.map((center, index) => {
               let comapany = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               return(
