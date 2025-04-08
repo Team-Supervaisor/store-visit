@@ -487,6 +487,8 @@ export default function ManageStore() {
     console.log("Received from child:", data);
     for(var i = 0; i < data.shapes.length; i++){
       const shape = data.shapes[i];
+      if(shape.instructionData === null) continue;
+      if(shape.instructionData.type !== "section") continue;
       const title = shape.instructionData.title;
       setInstructionData((prev) => {
         const updatedData = [...prev];

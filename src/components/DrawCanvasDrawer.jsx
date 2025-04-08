@@ -26,6 +26,7 @@ const cursorMap = {
 
 export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
   const canvasRef = useRef(null)
+  const [fillColor, setFillColor] = useState("")
   const [ctx, setCtx] = useState(null)
   const [hoveredShape, setHoveredShape] = useState(null);
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -119,19 +120,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         ctx.font = "12px Arial"
 
         // Draw name if it exists
-        if (shape.name) {
-          ctx.fillStyle = "#6366F1"
-          ctx.font = "14px Arial"
-          const textWidth = ctx.measureText(shape.name).width;
-          const textHeight = 14; // Approximate text height for 14px font
-          const centerX = shape.x + shape.width / 2;
-          const centerY = shape.y + shape.height / 2;
-          ctx.fillText(
-            shape.name,
-            centerX - textWidth / 2,
-            centerY + textHeight / 2
-          );
-        }
 
         if (shape.isBricked) {
           // Normalize rectangle coordinates for proper filling
@@ -191,8 +179,22 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         }
 
         if (shape.isColored) {
-          ctx.fillStyle = "#6366F1";
+          ctx.fillStyle = shape.color;
           ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
+        }
+
+        if (shape.name) {
+          ctx.fillStyle = "#000000"
+          ctx.font = "14px Arial"
+          const textWidth = ctx.measureText(shape.name).width;
+          const textHeight = 14; // Approximate text height for 14px font
+          const centerX = shape.x + shape.width / 2;
+          const centerY = shape.y + shape.height / 2;
+          ctx.fillText(
+            shape.name,
+            centerX - textWidth / 2,
+            centerY + textHeight / 2
+          );
         }
       } else if (shape.type === "text") {
         ctx.fillStyle = selectedShape && selectedShape.id === shape.id ? "#6366F1" : "#000000"
@@ -289,8 +291,9 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
     if (selectedTool === "pointer") {
       const clickedShape = findShapeAtPosition(canvasX, canvasY)
+      setHoveredShape(null)
 
-      if (clickedShape) {
+      if (clickedShape && !clickedShape.isBricked) {
         setSelectedShape(clickedShape)
         
         // Calculate the center of the rectangle properly for dialog positioning
@@ -392,12 +395,12 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       setShapes((prevShapes) =>
         prevShapes.map((shape) =>
           shape.id === clickedRect.id
-            ? { ...shape, color: "#6366F1", isColored: true }
+            ? { ...shape, color: fillColor, isColored: true }
             : shape
         )
       );
       // Fill the rectangle with a color
-      ctx.fillStyle = "#6366F1";
+      ctx.fillStyle = fillColor;
       ctx.fillRect(clickedRect.x + canvasWidth / 2, clickedRect.y + canvasHeight / 2, clickedRect.width, clickedRect.height);
     }
   }
@@ -576,6 +579,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     setShapeDialog({ ...shapeDialog, isOpen: false })
     setSelectedInstructions({})
     setAvailableInstructions({})
+    setSelectedTool("rectangle")
   }
 
   const saveShapes = () => {
@@ -878,6 +882,17 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         clearCanvas={clearCanvas}
         saveShapes={saveShapes}
       />
+      {selectedTool === "fill" && (
+        <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md z-10 flex items-center">
+          <label className="text-sm font-medium text-gray-700">Fill Color:</label>
+          <input
+            type="color"
+            value={fillColor}
+            onChange={(e) => setFillColor(e.target.value)}
+            className="ml-2 w-8 h-8 border-none cursor-pointer"
+          />
+        </div>
+      )}
     </div>
   );
 }
