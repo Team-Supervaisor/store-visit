@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import ConnectionErrorModal from './ConnectionErrorModal';
 import {ChevronUp, ChevronDown } from 'lucide-react';
+import lg from '../assets/lg.png'
 import { MessageCircle } from 'lucide-react';
 
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
@@ -1487,7 +1488,7 @@ return (
               );
             })
           )}
-          {distCoord && isStructureVisible && (
+          {distCoord && isStructureVisible && imageHistory.length>0 (
             distCoord.map((center, index) => {
               let comapany = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               return(
@@ -1547,7 +1548,7 @@ return (
                       {/* Samsung logo text - scaled down for 50px container */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-blue-600 font-bold text-xs tracking-tight"><img src={
-                          comapany === 'google' ? google :comapany==='samsung' ? samsung : comapany==='apple' ? apple : comapany==='oppo'?oppo:comapany==='vivo'?vivo:''
+                          comapany === 'google' ? google :comapany==='samsung' ? samsung : comapany==='apple' ? apple : comapany==='oppo'?oppo:comapany==='vivo'?vivo:comapany==='lg'?lg:''
                         }/></span>
                       </div>
                     </div>
@@ -1653,7 +1654,6 @@ return (
                         className="card-toggle px-4 py-3 flex items-center justify-center gap-2 cursor-pointer  transition-colors"
                         onClick={() => toggleCard(index)}
                    >
-                      <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
                       <span>See {expandedCards[index] ? 'Less' : 'More'}</span>
                   {expandedCards[index] ? (
                     <ChevronUp size={20} color="#717AEA" />

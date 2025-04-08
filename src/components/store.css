@@ -444,10 +444,10 @@
   }
   
   .tooltip-image {
-    height: 70px; /* smaller by default */
-    width: 100%;
-    object-fit: contain;
-    border-radius: 15px;
+    height: 70px; 
+    width: 100px;
+    /* object-fit: contain; */
+    border-radius: 5px;
     transition: height 0.2s ease-in-out;
   }
   
