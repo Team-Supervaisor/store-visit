@@ -4,7 +4,14 @@ import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X } from "lucide-react"
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data }) {
+export default function DrawingCanvas({ 
+  isOpen, 
+  onClose, 
+  onSaveShapes, 
+  instruction_data,
+  planogramWidth,  // in feet
+  planogramLength  // in feet
+}) {
   const canvasRef = useRef(null)
   const [ctx, setCtx] = useState(null)
   const [selectedTool, setSelectedTool] = useState("rectangle")
@@ -39,6 +46,21 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
   const canvasWidth = 1000
   const canvasHeight = 500
+
+  // Add new state for areas
+  const [userArea, setUserArea] = useState(0);  // in square meters
+  const [canvasArea, setCanvasArea] = useState(0);  // in square meters
+  
+  // Calculate user input area when props change
+  useEffect(() => {
+    if (planogramWidth && planogramLength) {
+      // Convert feet to meters and calculate area
+      const widthInMeters = planogramWidth * 0.3048;
+      const lengthInMeters = planogramLength * 0.3048;
+      const areaInSqMeters = widthInMeters * lengthInMeters;
+      setUserArea(areaInSqMeters);
+    }
+  }, [planogramWidth, planogramLength]);
 
   // Initialize available instructions when instruction_data changes
   useEffect(() => {
@@ -405,32 +427,72 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     const canvas = canvasRef.current;
     const canvasSnapshot = canvas.toDataURL("image/png");
     
-    const rectangle = shapes
-      .filter((shape) => shape.type === "rectangle")
-      .map((rect) => {
-        // Find the complete instruction data object based on the selected instruction ID
-        const instructionData = rect.instruction && instruction_data.find(item => 
+    // Get rectangles
+    const rectangles = shapes.filter(shape => shape.type === "rectangle");
+    
+    // Calculate pixel to meter conversion factors
+    const pixelsPerMeterWidth = canvasWidth / (planogramWidth * 0.3048);  // pixels per meter
+    const pixelsPerMeterHeight = canvasHeight / (planogramLength * 0.3048);
+    
+    // Calculate total area in square meters
+    let totalDrawnArea = 0;
+    rectangles.forEach(rect => {
+      const widthInPixels = Math.abs(rect.width);
+      const heightInPixels = Math.abs(rect.height);
+      
+      // Convert pixel dimensions to meters
+      const widthInMeters = widthInPixels / pixelsPerMeterWidth;
+      const heightInMeters = heightInPixels / pixelsPerMeterHeight;
+      
+      // Add area in square meters
+      totalDrawnArea += widthInMeters * heightInMeters;
+    });
+    
+    setCanvasArea(totalDrawnArea);
+
+    console.log(`Canvas dimensions: ${canvasWidth}px × ${canvasHeight}px`);
+    console.log(`Store dimensions: ${planogramWidth}ft × ${planogramLength}ft`);
+    console.log(`Total drawn area: ${totalDrawnArea.toFixed(2)}m², User area: ${userArea.toFixed(2)}m²`);
+
+    // If drawn area is smaller than user area, scale up
+    let scaledRectangles;
+    if (totalDrawnArea < userArea) {
+      const scalingFactor = Math.sqrt(userArea / totalDrawnArea);
+      console.log(`Scaling up by factor of ${scalingFactor}`);
+      
+      scaledRectangles = rectangles.map(rect => ({
+        id: rect.id,
+        vertices: rect.vertices.map(vertex => [
+          vertex[0] * scalingFactor,
+          vertex[1] * scalingFactor
+        ]),
+        name: rect.name,
+        instructionData: rect.instruction && instruction_data.find(item => 
           item.id === rect.instruction
-        );
-        
-        return {
-          id: rect.id,
-          vertices: rect.vertices,
-          name: rect.name,
-          // instruction: rect.instruction,
-          // Include the full instruction data if it exists
-          instructionData: instructionData || null
-        };
-      });
-  
+        )
+      }));
+    } else {
+      // If drawn area is larger, keep original vertices
+      scaledRectangles = rectangles.map(rect => ({
+        id: rect.id,
+        vertices: rect.vertices,
+        name: rect.name,
+        instructionData: rect.instruction && instruction_data.find(item => 
+          item.id === rect.instruction
+        )
+      }));
+      
+      console.log(`Using original dimensions - Drawing area: ${totalDrawnArea}m², Store area: ${userArea}m²`);
+    }
+
     if (onSaveShapes) {
       onSaveShapes({
-        shapes: rectangle,
+        shapes: scaledRectangles,
         snapshot: canvasSnapshot
       });
     }
     onClose();
-  }
+  };
 
   // Get the filtered instruction options for the current shape
   const getFilteredInstructions = () => {
