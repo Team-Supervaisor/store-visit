@@ -11,6 +11,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import OverlayAddStore from "./OverlayAddStore";
 import fallback from '../assets/fallback.svg';
 
+
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
     <div className="mb-2">
@@ -445,6 +446,8 @@ export default function ManageStore() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [planogramLength, setPlanogramLength] = useState(""); // Fix typo in setter name
+  const [planogramWidth, setPlanogramWidth] = useState("");
   // let snapshot = null;
 
   const initialShapes = [
@@ -581,6 +584,8 @@ export default function ManageStore() {
     setUpdateStore(false);
     setTsmName("");
     setOpenAccordion(null);
+    setPlanogramLength(""); // Updated setter name
+    setPlanogramWidth("");
   };
 
   const handleImageClick = (event) => {
@@ -816,6 +821,48 @@ export default function ManageStore() {
 
                   <div className="flex items-center w-[450px]">
                     <label
+                      htmlFor="drawPlanogram"
+                      className="text-sm font-medium text-gray-700 w-40"
+                    >
+                      Draw Planogram:
+                    </label>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 border-b border-gray-300">
+                        
+                        <input
+                        id="planogramWidth"
+                        type="number"
+                        placeholder="Width"
+                        min="1"
+                        value={planogramWidth}
+                        onChange={(e) => setPlanogramWidth(e.target.value)}
+                        className="w-20 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                      />
+                          <span className="text-gray-500">×</span>
+                          <input
+                            id="planogramLength"
+                            type="number"
+                            placeholder="Length"
+                            min="1"
+                            value={planogramLength}
+                            onChange={(e) => setPlanogramLength(e.target.value)}
+                            className="w-20 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                          />
+                        </div>
+                        <button
+                          onClick={() => setIsDrawerOpen(true)}
+                          className="flex items-center gap-2 bg-[#717AEA] text-white px-3 py-1 rounded-lg ml-2"
+                        >
+                          <span className="text-sm">Start</span>
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* <div className="flex items-center w-[450px]">
+                    <label
                       htmlFor="tsmName"
                       className="text-sm font-medium text-gray-700 w-40"
                     >
@@ -828,11 +875,11 @@ export default function ManageStore() {
                       onChange={(e) => setTsmName(e.target.value)}
                       className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="flex items-center justify-around">
-                  {/* Upload Label & Button */}
+                {/* <div className="flex items-center justify-around">
+             
                   <div className="flex items-center">
                     <label
                       className="text-sm font-medium text-gray-700 w-40"
@@ -868,10 +915,10 @@ export default function ManageStore() {
                     <Pencil className="h-4 w-4 text-[#717AEA]" />
                     <span className="text-black text-sm">Draw</span>
                   </button>
-                </div>
+                </div> */}
 
                 {/* Planogram Preview Area */}
-                <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
+                {/* <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4">
                   {previewImage || snapshot ? (
                     <div className="relative w-full h-full" ref={imageRef}>
                       <img
@@ -894,7 +941,72 @@ export default function ManageStore() {
                   ) : (
                     <p className="text-gray-500 text-sm">Upload to view</p>
                   )}
-                </div>
+                </div> */}
+
+                {/* Replace the Planogram Preview Area with this */}
+               
+                  <div className="border border-gray-400 bg-[#EFF4FE] rounded-lg w-md h-56 flex items-center justify-center overflow-hidden mb-4 relative">
+                  {previewImage || snapshot ? (
+                    <div className="relative w-full h-full" ref={imageRef}>
+                      <img
+                        src={previewImage || snapshot }
+                        onClick={handleImageClick}
+                        alt="Planogram Preview"
+                      />
+                      {clickPosition && (
+                        <img
+                          src="/pointer.svg"
+                          className="absolute w-5 h-5"
+                          style={{
+                            left: `${((clickPosition.x + 500) / 1000) * 100}%`,
+                            top: `${((clickPosition.y + 250) / 500) * 100}%`,
+                            transform: "translate(-50%, -50%)",
+                          }}
+                        ></img>
+                      )}
+                    </div>
+                    ) : (planogramWidth && planogramLength ? (
+                      <div className="w-full h-full p-4 relative">
+
+            <div className="flex items-center w-full justify-center" style={{ marginRight: 0}}>
+              <div className="relative w-[80%]">
+                <div className="absolute w-full top-1/2 border-t-2 border-dashed border-black"></div>
+                <div className="absolute -left-3 top-1/2 w-3 h-3 border-t-2 border-l-2 border-black -rotate-45 transform -translate-y-1/2"></div>
+                <div className="absolute -right-3 top-1/2 w-3 h-3 border-t-2 border-r-2 border-black rotate-45 transform -translate-y-1/2"></div>
+                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#EFF4FE] px-2 text-sm text-black font-normal">
+                  {planogramWidth} ft
+                </span>
+              </div>
+            </div>
+
+
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+              <div className="text-base font-normal text-[#717AEA] whitespace-nowrap">
+                {storeName || "Store Layout"}
+              </div>
+            </div>
+
+
+            <div className="absolute right-8 top-1/2 transform -translate-y-1/2 h-[80%]">
+            <div className="relative h-full">
+              <div className="absolute h-full right-0 border-r-2 border-dashed border-black"></div>
+              <div className="absolute -top-3 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-black -rotate-45"></div>
+              <div className="absolute -bottom-3 -right-1.5 w-3 h-3 border-r-2 border-b-2 border-black rotate-45"></div>
+              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-1/2">
+                <span className="block rotate-90 bg-[#EFF4FE] px-2 text-sm text-black font-normal whitespace-nowrap origin-center">
+                  {planogramLength} ft
+                </span>
+              </div>
+            </div>
+          </div>
+          </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">Enter dimensions to preview</p>
+                    ))}
+                  </div>
+
+
+
                 {(previewImage || snapshot) && (
                   <div className="flex items-center">
                     <button
@@ -912,7 +1024,7 @@ export default function ManageStore() {
                   <h2 className="text-lg font-medium text-black mb-4">
                     Instructions
                   </h2>
-                  <div className="max-h-[400px] overflow-y-auto pr-2 hide-scrollbar">
+                  <div className="max-h-[300px] overflow-y-auto pr-2 hide-scrollbar">
                     {INSTRUCTIONS_DATA.map((item) => (
                       <Accordion
                         key={item.id}
