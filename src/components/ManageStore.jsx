@@ -452,6 +452,7 @@ export default function ManageStore() {
   const [planogramLength, setPlanogramLength] = useState(""); // Fix typo in setter name
   const [planogramWidth, setPlanogramWidth] = useState("");
   const [openspaceData, setOpenSpaceData] = useState([]);
+  const [uploadImage, setUploadImage] = useState(null);
   // let snapshot = null;
 
   const initialShapes = [
@@ -563,7 +564,7 @@ export default function ManageStore() {
       planogram_coords: JSON.stringify(combinedShapes),
       // openspace_coords: JSON.stringify(openspaceData),
     };
-    formData.plano_bg = backgroundImage;
+    formData.plano_bg = uploadImage;
     formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);
 
     const url = updateStore
@@ -616,6 +617,7 @@ export default function ManageStore() {
     setInstructionData(INSTRUCTIONS_DATA);
     setSnapshot(null)
     setBackgroundImage(null);
+    setUploadImage(null);
   };
 
   const handleImageClick = (event) => {
@@ -1118,7 +1120,10 @@ export default function ManageStore() {
   <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]">
     <DrawCanvasDrawer 
       isOpen={isDrawerOpen} 
-      onClose={() => setIsDrawerOpen(false)}  
+      onClose={() => {
+        setIsDrawerOpen(false)
+        setShapes([]);
+      }} 
       onSaveShapes={handleSaveShapes} 
       instruction_data={INSTRUCTIONS_DATA}
       planogramWidth={Number(planogramWidth)}
@@ -1127,6 +1132,7 @@ export default function ManageStore() {
       setShapes={setShapes}
       backgroundImage={backgroundImage}
       setBackgroundImage={setBackgroundImage}
+      setUploadImage={setUploadImage}
     />
   </div>
 )}

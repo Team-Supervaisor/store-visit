@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
-import { ChevronDown, X } from "lucide-react"
+import { ChevronDown, X, PencilIcon, Trash2 } from "lucide-react"
 
 const tagOptions = [
   { id: "1", title: "Tag 1" },
@@ -24,7 +24,7 @@ const cursorMap = {
 };
 
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength}) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage}) {
   const canvasRef = useRef(null)
   const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
@@ -399,6 +399,32 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     return null
   }
 
+  const handleEditShape = () => {
+    const clickedShape = hoveredShape;
+    setHoveredShape(null);
+    setSelectedShape(clickedShape)
+        
+    // Calculate the center of the rectangle properly for dialog positioning
+    const normalizedRect = {
+      x: clickedShape.width < 0 ? clickedShape.x + clickedShape.width : clickedShape.x,
+      y: clickedShape.height < 0 ? clickedShape.y + clickedShape.height : clickedShape.y,
+      width: Math.abs(clickedShape.width),
+      height: Math.abs(clickedShape.height)
+    }
+    
+    const centerX = normalizedRect.x + (normalizedRect.width / 2)
+    const centerY = normalizedRect.y + (normalizedRect.height / 2)
+    
+    setShapeDialog({
+      isOpen: true,
+      x: centerX + canvasWidth / 2,
+      y: centerY + canvasHeight / 2,
+      shapeId: clickedShape.id,
+      name: clickedShape.name || "",
+      instruction: clickedShape.instruction || "",
+    })
+  }
+
   const startDrawing = (e) => {
     if (!ctx) return
 
@@ -407,7 +433,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     if (selectedTool === "pointer") {
       const clickedShape = findShapeAtPosition(canvasX, canvasY)
       setHoveredShape(null)
-
       if (clickedShape && !clickedShape.isBricked) {
         setSelectedShape(clickedShape)
         
@@ -596,9 +621,10 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         break;
       }
     }
-    if(foundShape?.isBricked){
+    if(foundShape?.isBricked || foundShape?.isOpenSpace){
       return;
     }
+    console.log(foundShape)
     setHoveredShape(foundShape);
   };
 
@@ -691,6 +717,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
   const handleImageUpload = (file) => {
     if (file) {
+      setUploadImage(file)
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -711,6 +738,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     setAvailableInstructions({})
     setSelectedTool("rectangle")
     setBackgroundImage(null)
+    setUploadImage(null)
   }
 
   const saveShapes = () => {
@@ -1090,45 +1118,57 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         )}
         
         {hoveredShape && (
-  <div
-    style={{
-      position: "absolute",
-      backgroundColor: "#fef3f3",
-      left: hoveredShape.x + canvasWidth / 2,
-      top: hoveredShape.y + canvasHeight / 2,
-      zIndex: 10,
-    }}
-    className="bg-white p-2 rounded shadow-lg border border-gray-300"
-  >
-    <button
-      className="text-sm text-white bg-red-500 px-2 py-1 rounded mr-1 hover:bg-red-600"
-      onClick={() => {
-        setShapes((prevShapes) =>
-          prevShapes.filter((shape) => shape.id !== hoveredShape.id)
-        );
-        setHoveredShape(null);
-      }}
-    >
-      Delete
-    </button>
-    
-    {/* Show Edit button only for non-open space shapes */}
-    {!hoveredShape.isOpenSpace && (
-      <button
-        className="text-sm text-white bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
-        onClick={(e) => {
-          setHoveredShape(null);
-          startDrawing(e);
-        }}
-      >
-        Edit
-      </button>
-    )}
-  </div>
-)}
+          <div
+          style={{
+            position: "absolute",
+            left: hoveredShape.x + hoveredShape.width + 2 + canvasWidth / 2 +35 > canvasWidth ? hoveredShape.x + canvasWidth/2 - 33 : hoveredShape.x + hoveredShape.width + 2 + canvasWidth / 2,
+            top: hoveredShape.y + canvasHeight / 2,
+            zIndex: 10,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          {/* Edit Button with Tooltip */}
+          <div className="relative group">
+            <button
+              className="w-8 h-8 rounded-full bg-indigo-400 hover:bg-indigo-500 flex items-center justify-center shadow-md"
+              onClick={() => {
+
+                handleEditShape();
+              }}
+            >
+              <PencilIcon className="text-white w-4 h-4" />
+            </button>
+            <div className="absolute w-[65px] left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded">
+              Edit Info.
+            </div>
+          </div>
+        
+          {/* Delete Button */}
+          <div className="relative group">
+            <button
+              className="w-8 h-8 rounded-full bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center shadow-md"
+              onClick={() => {
+                setShapes((prevShapes) =>
+                  prevShapes.filter((shape) => shape.id !== hoveredShape.id)
+                );
+                setHoveredShape(null);
+              }}
+            >
+              <Trash2 className="text-indigo-400 w-4 h-4" />
+            </button>
+            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded">
+              Delete
+            </div>
+          </div>
+        </div>
+        
+        )}
       </div>
       {planogramLength && planogramWidth && <div>
-        <div className="bg-white p-2 mb-[-80px] mt-4 rounded shadow-md z-10 flex flex-col items-center">
+        <div className="bg-white p-2 mt-4 rounded shadow-md z-10 flex items-center">
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleX: 1ft = {Math.floor(1000 / planogramWidth)}px</label>
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleY: 1ft = {Math.floor(1000 / planogramLength)}px</label>
         </div>
