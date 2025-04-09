@@ -72,6 +72,8 @@ const StoreVisitTracking = () => {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [storeName,setStoreName]=useState();
   const [openPolygon, setOpenPolygon] = useState([]);
+  const [higlightPolygon, setHiglightPolygon] = useState([]);
+  const [highlightStructure, setHighlightStructure] = useState([]);
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -238,6 +240,8 @@ const check_inside_structure = (x, z) => {
   
       if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
         foundStructure = structure;
+        setHighlightStructure(structure);
+        console.log("highligting new strucuture")
         break; // found the structure we're in, no need to check others
       }
     }
@@ -249,6 +253,10 @@ const check_inside_structure = (x, z) => {
         currentStructure = foundStructure;
         sendInstructions(foundStructure);
         setLastStructure(foundStructure.name);
+        // highlightnewStruct(foundStructure);
+        console.log("highlight structure:", foundStructure);
+        setHiglightPolygon(foundStructure);
+
       }
       // else: still inside same structure, do nothing
     } else {
@@ -257,12 +265,16 @@ const check_inside_structure = (x, z) => {
         console.log("Exited structure:", currentStructure.name);
       }
       currentStructure = null;
+      setHiglightPolygon([]);
     }
   };
   
   
 
   const sendInstructions = (structure) => {
+    if(structure?.instructionData?.length===0){
+      return;
+    }
     let data = JSON.stringify({
       "region_id": structure?.id||"N/A",
       "region_name":structure?.name||"N/A",
@@ -281,7 +293,7 @@ const check_inside_structure = (x, z) => {
     
     axios.request(config)
     .then((response) => {
-      console.log(JSON.stringify(response.data));
+      console.log((response.data));
     })
     .catch((error) => {
       console.log(error);
@@ -693,6 +705,45 @@ const get_store_visit_details = (store_visit_id) => {
       measurementB: "N/A"
     };
   }
+
+  // function highlightnewStruct(structure1) {
+  //   console.log('highlightnewStruct:', structure1);
+  
+  //   setCenterX(vizDimensions.width / 2);
+  //   setCenterZ(vizDimensions.height / 2);
+  //   const centerx = vizDimensions.width / 2;
+  //   const centerz = vizDimensions.height / 2;
+  
+  //   let pathData = "";
+  //   structure1.vertices.forEach((coord, index) => {
+  //     const screenX = centerx + coord[0];
+  //     const screenZ = centerz + coord[1];
+  
+  //     pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+  //   });
+  
+  //   pathData += "Z"; // Close the polygon
+  
+  //   const centerCoord = getPolygonCenter(structure1.vertices);
+  //   const textX = centerx + centerCoord[0];
+  //   const textY = centerz + centerCoord[1];
+  
+  //   const polygonData = {
+  //     id: structure1.id,
+  //     name: structure1.name,
+  //     type: structure1.type,
+  //     pathData,
+  //     textX,
+  //     textY,
+  //     color: structure1.isColored ? structure1.color : '#E1E9FD',
+  //     instructionData: structure1.instructionData,
+  //     isBricked: structure1.isBricked,
+  //   };
+  
+  //   setHiglightPolygon([polygonData]);
+  //   console.log('highlight structure:', [polygonData]);
+  // }
+  
   useEffect(() => {
 
     if (!planstructures?.length || !vizDimensions) return;
@@ -916,7 +967,7 @@ useEffect(() => {
     });
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
-      console.log("New coordinate received:", data);
+      // console.log("New coordinate received:", data);
       // if(itr==0)
       // {
       //   get_store_visit_details(data.store_visit_id);
@@ -1392,9 +1443,9 @@ return (
       
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
-        backgroundImage:`url(${storeVisitDetails.planogram_url})`,
+        backgroundImage:`url(${storeVisitDetails.plano_bg_url})`,
         
-        // backgroundSize: "cover",  // Ensures the image covers the entire container
+        backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
         borderRadius:'26px',
@@ -1471,7 +1522,7 @@ return (
   </defs>
       {polygons.map((polygon,index) => 
         {
-          // console.log(polygon)
+          console.log(polygon)
           return(
             <g
             key={polygon.id}
@@ -1552,6 +1603,54 @@ return (
       )}
     </svg>
   )}
+      {!isStructureVisible && (
+    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:5,pointerEvents:"all",cursor:"point"}}>
+      {polygons.map((polygon,index) => 
+        {
+          if(polygon.id!=higlightPolygon.id){
+            return null;
+          }
+          console.log("highlighted",polygon) 
+          return(
+            <g
+            key={polygon.id}
+            className={`structure ${polygon.type} `}
+            title={polygon.name}
+            onClick={() => {
+              console.log('hello');
+              setInstructionModal(true);
+              setModalData(polygon);
+            }}
+          >
+                            <path
+                              d={polygon.pathData}
+                              fill={polygon.color}
+                              // fill="#FFF3A8"
+                              stroke="#000"
+                              strokeWidth="2"
+                              // fillOpacity="0.5
+                              fillOpacity="0.5"
+
+                            />
+                            <text
+                              x={polygon.textX}
+                              y={polygon.textY}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="12px"
+                              fill="#000"
+                              fontWeight="bold"
+                            >
+                                    {/* {polygon.name} */}
+
+                              {/* {polygon.instructionData} */}
+                            </text>
+                          </g>
+        )}
+        
+      )}
+    </svg>
+  )}
 
   {false  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
@@ -1594,7 +1693,7 @@ return (
       ))}
     </svg>
   )}
-          {distCoord && isStructureVisible && imageHistory.length>0 &&(
+          {distCoord  && imageHistory.length>0 &&(
             distCoord.map((center, index) => {
               let a = parseImageUrl(imageHistory[index]?.url);
               // console.log("parsed:",a);
@@ -1632,7 +1731,7 @@ return (
               );
             })
           )}
-          {distCoord && isStructureVisible && imageHistory.length>0 && (
+          {distCoord  && imageHistory.length>0 && (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
