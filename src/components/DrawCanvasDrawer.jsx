@@ -24,7 +24,7 @@ const cursorMap = {
 };
 
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage}) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength}) {
   const canvasRef = useRef(null)
   const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
@@ -98,6 +98,34 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       setCtx(context)
     }
   }, [])
+
+  const drawRulers = (ctx) => {
+    ctx.font = "10px Arial";
+    ctx.fillStyle = "black";
+    ctx.strokeStyle = "gray";
+
+    // X-axis (top)
+    const xStep = canvasWidth / planogramWidth;
+    for (let i = 10; i <= planogramWidth; i += 10) {
+      const x = i * xStep - 510;
+      ctx.beginPath();
+      ctx.moveTo(x, -250);
+      ctx.lineTo(x, -240);
+      ctx.stroke();
+      ctx.fillText(`${i}ft`, x-7, -230);
+    }
+
+    // Y-axis (left)
+    const yStep = canvasHeight / planogramLength;
+    for (let i = 10; i <= planogramLength; i += 10) {
+      const y = i * yStep - 250;
+      ctx.beginPath();
+      ctx.moveTo(-500, y);
+      ctx.lineTo(-490, y);
+      ctx.stroke();
+      ctx.fillText(`${i}ft`, -487, y + 4);
+    }
+  };
 
 
   useEffect(() => {
@@ -233,6 +261,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
       ctx.setLineDash([])
     }
+    drawRulers(ctx);
     ctx.restore()
   }, [shapes, ctx, drawingState, selectedShape, backgroundImage])
 
