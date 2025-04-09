@@ -981,6 +981,12 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         </div>
       )}
       </div>
+      {planogramLength && planogramWidth && <div>
+        <div className="bg-white p-2 mb-[-80px] mt-4 rounded shadow-md z-10 flex flex-col items-center">
+          <label className="text-sm font-medium text-gray-700 mr-2">ScaleX: 1ft = {Math.floor(1000 / planogramWidth)}px</label>
+          <label className="text-sm font-medium text-gray-700 mr-2">ScaleY: 1ft = {Math.floor(1000 / planogramLength)}px</label>
+        </div>
+      </div>}
 
       <ToolBar
         selectedTool={selectedTool}
