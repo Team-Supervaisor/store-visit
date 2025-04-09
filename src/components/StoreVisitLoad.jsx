@@ -71,12 +71,12 @@ const [aiDetails, setAIDetails] = useState();
 const [distCoord,setDistcoord]=useState([]);
   const [storeName,setStoreName]=useState();
 const [structures,setStructures]=useState();
+  const [planstructures,setPlanstructures]=useState([]);
 
 
 /// new states for showing strucutre. 
 const [openPolygon, setOpenPolygon] = useState([]);
 const [openStructure, setOpenStructure] = useState([]);
-const [higlightPolygon, setHiglightPolygon] = useState([]);
 
 
   const toggleCard = (index) => {
@@ -146,6 +146,35 @@ useEffect(() => {
       }
     }, []);
 
+useEffect(() => {
+  console.log('Store Visit Details:', storeVisitDetails);
+  if(storeVisitDetails.status === 'finished') {
+    setImageHistory(storeVisitDetails.images);
+    setStoreName(storeVisitDetails.store_name);
+    setTotalDistance(storeVisitDetails.distance);
+    
+    // Separate regular shapes and open spaces
+    if (storeVisitDetails.planogram_coords) {
+      // Process regular shapes
+      const regularShapes = storeVisitDetails.planogram_coords.regularShapes.map(shape => ({
+        ...shape,
+        color: '#E1E9FD',
+        type: 'regular'
+      }));
+      setPlanstructures(regularShapes);
+
+      // Process open spaces
+      const openSpaces = storeVisitDetails.planogram_coords.openSpaces.map(space => ({
+        id: space.id,
+        vertices: space.vertices,
+        name: space.name || '',
+        type: 'openSpace',
+        isOpenSpace: true
+      }));
+      setOpenStructure(openSpaces);
+    }
+  }
+}, [storeVisitDetails]);
 
     useEffect(() => {
       if (!structures?.length || !vizDimensions) return;
@@ -261,6 +290,41 @@ useEffect(() => {
     }
   },[pstructures,vizDimensions]);
     
+useEffect(() => {
+  if (!openStructure?.length || !vizDimensions) return;
+
+  setCenterX(vizDimensions.width / 2);
+  setCenterZ(vizDimensions.height / 2);
+  const centerx = vizDimensions.width / 2;
+  const centerz = vizDimensions.height / 2;
+
+  const newPolygons = openStructure.map((structure) => {
+    let pathData = "";
+    structure.vertices.forEach((coord, index) => {
+      const screenX = centerx + coord[0];
+      const screenZ = centerz + coord[1];
+      pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+    });
+
+    pathData += "Z"; // Close the polygon
+
+    const centerCoord = getPolygonCenter(structure.vertices);
+    const textX = centerx + centerCoord[0];
+    const textY = centerz + centerCoord[1];
+
+    return {
+      id: structure.id,
+      name: structure.name,
+      type: structure.type,
+      pathData,
+      textX,
+      textY,
+      isOpenSpace: true
+    };
+  });
+
+  setOpenPolygon(newPolygons);
+}, [openStructure, vizDimensions]);
   
   
   const createRipple = (event) => {
@@ -526,7 +590,7 @@ console.log(imageHistory, 'image history')
 
               {isStructureVisible && (
         <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, zIndex: 5 }}>
-          {openStructure.map((polygon) => (
+          {openPolygon.map((polygon) => (
             <g key={polygon.id} className={`structure ${polygon.type}`}>
               <path
                 d={polygon.pathData}
