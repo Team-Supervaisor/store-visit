@@ -653,6 +653,53 @@ console.log(imageHistory, 'image history')
 
 
 
+      {isPathVisible && (
+  <>
+    {coordinates.map((point, index) => (
+      <div key={index}>
+        <div
+          className={`point ${point?.photoCapture == 1 ? 'photo-captured' : ''}`}
+          style={{
+            left: `${centerX + point.x}px`,
+            top: `${centerZ + point.y}px`,
+            position: 'absolute'
+          }}
+          onMouseEnter={() => setIsHovering(index)}
+          onMouseLeave={() => setIsHovering(null)}
+        />
+
+        {isHovering === index && imageHistory[index] && (
+          <div
+            className="tooltip"
+            style={{
+              position: 'absolute',
+              top: `${centerZ + point.y - 150}px`, // Increased offset to position above
+              left: `${centerX + point.x}px`,
+              transform: 'translateX(-50%)', // Center horizontally
+              display: 'block',
+              zIndex: 1000
+            }}
+          >
+            <div className="imagetooltip-container">
+              <img src={imageHistory[index].image_url} alt="" className="tooltip-image" />
+            </div>
+
+            <div className="measurement-text">
+              <span className="measurement-label">Measurement:</span>
+              <span className="measurement-value">
+                {parseFloat(imageHistory[index].length || 0).toFixed(3)}×
+                {parseFloat(imageHistory[index].breadth || 0).toFixed(3)}
+              </span>
+            </div>
+
+            <div className="tooltip-pointer"></div>
+          </div>
+        )}
+      </div>
+    ))}
+  </>
+)}
+      
 
         {isPathVisible  && (
           <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
