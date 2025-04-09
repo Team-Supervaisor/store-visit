@@ -11,6 +11,7 @@ import layout from '../assets/store_layout.png'
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import {ChevronUp, ChevronDown } from 'lucide-react';
+import { X } from 'lucide-react';
 
 
 // Add brick pattern support
@@ -72,6 +73,8 @@ const [distCoord,setDistcoord]=useState([]);
   const [storeName,setStoreName]=useState();
 const [structures,setStructures]=useState();
   const [planstructures,setPlanstructures]=useState([]);
+  const [instructionModal, setInstructionModal] = useState(false);
+const [modalData, setModalData] = useState(null);
 
 
 /// new states for showing strucutre. 
@@ -176,44 +179,56 @@ useEffect(() => {
   }
 }, [storeVisitDetails]);
 
-    useEffect(() => {
-      if (!structures?.length || !vizDimensions) return;
-      // console.log(vizDimensions.width,vizDimensions.height);
-      console.log(structures)
-      setCenterX(vizDimensions.width / 2);
-      setCenterZ(vizDimensions.height / 2);
-     const centerx = vizDimensions.width / 2;
-     const centerz = vizDimensions.height / 2;
+useEffect(() => {
+  if (!structures?.length || !vizDimensions) return;
+  
+  setCenterX(vizDimensions.width / 2);
+  setCenterZ(vizDimensions.height / 2);
+  const centerx = vizDimensions.width / 2;
+  const centerz = vizDimensions.height / 2;
 
-
-    const newPolygons = structures.map((structure) => {
-      let pathData = "";
-      structure.vertices.forEach((coord, index) => {
-        const screenX = centerx + coord[0];
-        const screenZ = centerz + coord[1];
-
-        pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
-      });
-
-      pathData += "Z"; // Close the polygon
-
-      const centerCoord = getPolygonCenter(structure.vertices);
-      const textX = centerx + centerCoord[0];
-      const textY = centerz + centerCoord[1];
-
-      return {
-        id: structure.id,
-        name: structure.name,
-        type: structure.type,
-        pathData,
-        textX,
-        textY,
-        color: '#E1E9FD',
-      };
+  const newPolygons = structures.map((structure) => {
+    let pathData = "";
+    structure.vertices.forEach((coord, index) => {
+      const screenX = centerx + coord[0];
+      const screenZ = centerz + coord[1];
+      pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
     });
 
-    setPolygons(newPolygons);
-    }, [structures,vizDimensions])
+    pathData += "Z"; // Close the polygon
+
+    const centerCoord = getPolygonCenter(structure.vertices);
+    const textX = centerx + centerCoord[0];
+    const textY = centerz + centerCoord[1];
+
+    return {
+      id: structure.id,
+      name: structure.name || '',
+      type: 'regular',
+      pathData,
+      textX,
+      textY,
+      color: structure.color || '#E1E9FD',
+      isBricked: structure.isBricked || false,
+      isColored: structure.isColored || false,
+      instructionData: structure.instructionData || {
+        id: '',
+        type: 'section',
+        title: '',
+        content: '',
+        questions: []
+      },
+      onClick: () => {
+        if (structure.instructionData) {
+          setInstructionModal(true);
+          setModalData(structure);
+        }
+      }
+    };
+  });
+
+  setPolygons(newPolygons);
+}, [structures, vizDimensions]);
     
 
     function getPolygonCenter(coords) {
@@ -562,31 +577,51 @@ console.log(imageHistory, 'image history')
         {/* Store structure overlay and other SVG elements remain unchanged */}
         {isStructureVisible && <div className="overlay"></div>}
         {isStructureVisible && (
-          <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-            {polygons.map((polygon) => (
-              <g key={polygon.id} className={`structure ${polygon.type}`} title={polygon.name}>
-                <path
-                  d={polygon.pathData}
-                  fill={polygon.color}
-                  stroke="#000"
-                  strokeWidth="2"
-                  fillOpacity="0.5"
-                />
-                <text
-                  x={polygon.textX}
-                  y={polygon.textY}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize="12px"
-                  fill="#000"
-                  fontWeight="bold"
-                >
-                  {polygon.name}
-                </text>
-              </g>
-            ))}
-          </svg>
-        )}
+  <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, pointerEvents: "all", cursor: "pointer" }}>
+    <defs>
+      <pattern id="brickPattern" patternUnits="userSpaceOnUse" width="60" height="30">
+        <rect width="60" height="30" fill="white" />
+        <rect x="0" y="0" width="28" height="13" fill="#8897F1" />
+        <rect x="30" y="0" width="28" height="13" fill="#8897F1" />
+        <rect x="15" y="15" width="28" height="13" fill="#8897F1" />
+        <rect x="45" y="15" width="28" height="13" fill="#8897F1" />
+        <rect x="0" y="15" width="13" height="13" fill="#8897F1" />
+      </pattern>
+    </defs>
+    {polygons.map((polygon) => (
+      <g
+        key={polygon.id}
+        className={`structure ${polygon.type}`}
+        title={polygon.name}
+       
+        onClick={() => {
+          console.log('Opening instruction modal');
+          setInstructionModal(true);
+          setModalData(polygon);
+        }}
+      >
+        <path
+          d={polygon.pathData}
+          fill={polygon.isBricked ? "url(#brickPattern)" : polygon.color}
+          stroke="#000"
+          strokeWidth="2"
+          fillOpacity={polygon.isBricked ? "1" : "0.5"}
+        />
+        <text
+          x={polygon.textX}
+          y={polygon.textY}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fontSize="12px"
+          fill="#000"
+          fontWeight="bold"
+        >
+          { polygon.name || polygon.instructionData?.title}
+        </text>
+      </g>
+    ))}
+  </svg>
+)}
 
               {isStructureVisible && (
         <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, zIndex: 5 }}>
@@ -884,6 +919,51 @@ console.log(imageHistory, 'image history')
                 )}
               </div>
        </div>
+
+       {instructionModal && (
+  <div className="backdrop-blur-sm fixed inset-0 bg-black/30 flex items-center justify-center font-[Urbanist]" style={{ zIndex: 20 }}>
+    <div className="bg-white rounded-[34px] shadow-lg w-full max-w-3xl">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 rounded-[33px] bg-[#EFF4FE]">
+        <div className="flex items-center">
+          <h1 className="text-lg font-medium text-black ml-2">
+            {modalData?.instructionData?.title || 'Instruction Details'}
+          </h1>
+        </div>
+        <button
+          className="text-gray-500 hover:text-gray-700 bg-[#F8F8F8] p-[4px] rounded-full"
+          onClick={() => setInstructionModal(false)}
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-4 space-y-4">
+        {/* Instruction Content */}
+        <div>
+          <h2 className="text-md font-semibold text-black mb-1">Content</h2>
+          <p className="text-sm text-gray-700">
+            {modalData?.instructionData?.content || "N/A"}
+          </p>
+        </div>
+
+        {/* Questions */}
+        <div>
+          <h2 className="text-md font-semibold text-black mb-2">Questions</h2>
+          <ul className="space-y-2">
+            {modalData?.instructionData?.questions?.map((q, index) => (
+              <li key={q.id} className="text-sm text-gray-800">
+                <span className="font-medium">{index + 1}. </span>
+                {q.question || "N/A"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       
     </div>
 
