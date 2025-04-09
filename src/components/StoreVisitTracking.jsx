@@ -241,7 +241,7 @@ const check_inside_structure = (x, z) => {
       if (x >= minX && x <= maxX && z >= minZ && z <= maxZ) {
         foundStructure = structure;
         setHighlightStructure(structure);
-        console.log("highligting new strucuture")
+        // console.log("highligting new strucuture")
         break; // found the structure we're in, no need to check others
       }
     }
@@ -254,7 +254,7 @@ const check_inside_structure = (x, z) => {
         sendInstructions(foundStructure);
         setLastStructure(foundStructure.name);
         // highlightnewStruct(foundStructure);
-        console.log("highlight structure:", foundStructure);
+        // console.log("highlight structure:", foundStructure);
         setHiglightPolygon(foundStructure);
 
       }
@@ -272,9 +272,12 @@ const check_inside_structure = (x, z) => {
   
 
   const sendInstructions = (structure) => {
-    if(structure?.instructionData?.length===0){
+    console.log("check intstructions:",structure.instructionData);
+    if(structure.instructionData==undefined){
+      console.log("No instructions");
       return;
     }
+    console.log("sending")
     let data = JSON.stringify({
       "region_id": structure?.id||"N/A",
       "region_name":structure?.name||"N/A",
@@ -1522,7 +1525,7 @@ return (
   </defs>
       {polygons.map((polygon,index) => 
         {
-          console.log(polygon)
+          // console.log(polygon)
           return(
             <g
             key={polygon.id}
@@ -1605,12 +1608,27 @@ return (
   )}
       {!isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:5,pointerEvents:"all",cursor:"point"}}>
+      <defs>
+    <pattern id="brickPattern" patternUnits="userSpaceOnUse" width="60" height="30">
+      {/* Background color for mortar */}
+      <rect width="60" height="30" fill="white" />
+      
+      {/* First row of bricks */}
+      <rect x="0" y="0" width="28" height="13" fill="#8897F1" />
+      <rect x="30" y="0" width="28" height="13" fill="#8897F1" />
+      
+      {/* Second row of bricks - offset */}
+      <rect x="15" y="15" width="28" height="13" fill="#8897F1" />
+      <rect x="45" y="15" width="28" height="13" fill="#8897F1" />
+      <rect x="0" y="15" width="13" height="13" fill="#8897F1" />
+    </pattern>
+  </defs>
       {polygons.map((polygon,index) => 
         {
           if(polygon.id!=higlightPolygon.id){
             return null;
           }
-          console.log("highlighted",polygon) 
+          // console.log("highlighted",polygon) 
           return(
             <g
             key={polygon.id}
@@ -1624,12 +1642,14 @@ return (
           >
                             <path
                               d={polygon.pathData}
-                              fill={polygon.color}
+                              // fill={polygon.color}
+                              fill={polygon.isBricked ? "url(#brickPattern)" : polygon.color}
+
                               // fill="#FFF3A8"
                               stroke="#000"
                               strokeWidth="2"
-                              // fillOpacity="0.5
                               fillOpacity="0.5"
+                              // fillOpacity={polygon.isBricked ? "1" : "1"}
 
                             />
                             <text
@@ -1993,7 +2013,7 @@ return (
       <div>
         <h2 className="text-md font-semibold text-black mb-1">Content</h2>
         <p className="text-sm text-gray-700">
-          {modalData?.instructionData?.content}
+          {modalData?.instructionData?.content||"N/A"}
         </p>
       </div>
 
@@ -2003,7 +2023,7 @@ return (
         <ul className="space-y-2">
           {modalData?.instructionData?.questions?.map((q, index) => (
             <li key={q.id} className="text-sm text-gray-800">
-              <span className="font-medium">{index + 1}. </span>{q.question}
+              <span className="font-medium">{index + 1}. </span>{q.question||"N?A"}
             </li>
           ))}
         </ul>
