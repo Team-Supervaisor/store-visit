@@ -63,6 +63,7 @@ const StoreVisitTracking = () => {
   const [save,setSave]=useState(false);
   const [itr,setItr]=useState(0);
   const [planstructures,setPlanstructures]=useState([]);
+  const [openStructure,setOpenStructure]=useState([]);
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
   const [lastStructure,setLastStructure]=useState('');
   const [modalData, setModalData] = useState(null);
@@ -70,7 +71,9 @@ const StoreVisitTracking = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [storeName,setStoreName]=useState();
+  const [openPolygon, setOpenPolygon] = useState([]);
   let planogram_coords;
+  let open_coords;
   
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
@@ -725,6 +728,48 @@ const get_store_visit_details = (store_visit_id) => {
     setPolygons(newPolygons);
     console.log('planstructures:',planstructures);
   }, [planstructures,vizDimensions]);
+  useEffect(() => {
+
+    if (!openStructure?.length || !vizDimensions) return;
+
+      // console.log(vizDimensions.width,vizDimensions.height);
+      setCenterX(vizDimensions.width / 2);
+      setCenterZ(vizDimensions.height / 2);
+     const centerx = vizDimensions.width / 2;
+     const centerz = vizDimensions.height / 2;
+
+
+    const newPolygons = openStructure.map((structure) => {
+      let pathData = "";
+      structure.vertices.forEach((coord, index) => {
+        const screenX = centerx + coord[0];
+        const screenZ = centerz + coord[1];
+
+        pathData += index === 0 ? `M ${screenX} ${screenZ} ` : `L ${screenX} ${screenZ} `;
+      });
+
+      pathData += "Z"; // Close the polygon
+
+      const centerCoord = getPolygonCenter(structure.vertices);
+      const textX = centerx + centerCoord[0];
+      const textY = centerz + centerCoord[1];
+
+      return {
+        id: structure.id,
+        name: structure.name,
+        type: structure.type,
+        pathData,
+        textX,
+        textY,
+        color: structure.isColored?structure.color:'#E1E9FD',
+        instructionData: structure.instructionData,
+        isBricked: structure.isBricked,
+      };
+    });
+
+    setOpenPolygon(newPolygons);
+    console.log('open structure:',openStructure);
+  }, [openStructure,vizDimensions]);
 
 
   const pPolygonsRef = useRef([]);
@@ -855,8 +900,10 @@ useEffect(() => {
     socketRef.current.on("store-id",(data)=>{
       console.log("Store ID:",data);
       setStoreName(data.store_name);
-      setPlanstructures(data.planogram_coords)
-      planogram_coords=data.planogram_coords;
+      setPlanstructures(data.planogram_coords.regularShapes);
+      planogram_coords=data.planogram_coords.regularShapes;
+      open_coords=data.planogram_coords.openSpaces;
+      setOpenStructure(data.planogram_coords.openSpaces);
       setStoreVisitDetails(data);
 
     });
@@ -1018,6 +1065,15 @@ const savePlanogram = () => {
     setAIDetails([]);
     setDistcoord([]);
     setPlanstructures([]);
+    planogram_coords=[];
+    setStoreName("");
+    setStoreVisitDetails({});
+    setPolygons([]); // Clear polygons
+    // openStructure=[];
+    open_coords = [];
+    setOpenStructure([]);
+    setOpenPolygon([]);
+
 
   };
   
@@ -1416,7 +1472,7 @@ return (
                               stroke="#000"
                               strokeWidth="2"
                               // fillOpacity="0.5
-                              fillOpacity={polygon.isBricked ? "1" : "0.5"}
+                              fillOpacity={polygon.isBricked ? "1" : "1"}
 
                             />
                             <text
@@ -1429,6 +1485,46 @@ return (
                               fontWeight="bold"
                             >
                                     {polygon.name} - {polygon.instructionData?.title || ''}
+
+                              {/* {polygon.instructionData} */}
+                            </text>
+                          </g>
+        )}
+        
+      )}
+    </svg>
+  )}
+    {isStructureVisible && (
+    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:5,pointerEvents:"all",cursor:"point"}}>
+      {openPolygon.map((polygon,index) => 
+        {
+          // console.log(polygon)
+          return(
+            <g
+            key={polygon.id}
+            className={`structure ${polygon.type} `}
+            title={polygon.name}
+          >
+                            <path
+                              d={polygon.pathData}
+                              // fill={polygon.color}
+                              fill="#FFF3A8"
+                              stroke="#000"
+                              strokeWidth="2"
+                              // fillOpacity="0.5
+                              fillOpacity="0.5"
+
+                            />
+                            <text
+                              x={polygon.textX}
+                              y={polygon.textY}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="12px"
+                              fill="#000"
+                              fontWeight="bold"
+                            >
+                                    {polygon.name}
 
                               {/* {polygon.instructionData} */}
                             </text>
