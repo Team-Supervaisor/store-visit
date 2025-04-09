@@ -77,9 +77,13 @@ const StoreVisitTracking = () => {
   let planogram_coords;
   let open_coords;
   const company_legend= [
+    { name: 'Hitachi', color: '#7373F9' },
     { name: 'Google', color: '#FC7561' },
     { name: 'Samsung', color: '#FFB726' },
     { name: 'Apple', color: '#7373F9' },
+    { name: 'Oppo', color: '#20B15A' },
+    { name: 'Vivo', color: '#FF6584' },
+
   ]
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
@@ -1317,7 +1321,7 @@ return (
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#EFF4FE',
+        backgroundColor: 'white',
         padding: '5px',
         paddingLeft: '15px',
         width: '100%'
@@ -1331,9 +1335,11 @@ return (
         <img src={logo} alt="Logo" style={{ height: '25px', marginRight: '10px' }} />
         <h1 style={{ margin: 0, color: 'black', fontWeight: 500 }}>Store Visit Tracking</h1>
       </div>
-      <div className="control-panel" style={{ textAlign: 'right' }}>
+      <div
+       style={{backgroundColor:'white',borderRadius:'12px',padding:'5px', textAlign: 'right'}}
+       className="control-panel" >
         <div>
-        <button
+        {/* <button
             // id="startButton"
             type="button"
             className='bg-[#5856D6] text-black rounded-[12px] flex items-center gap-2'
@@ -1343,18 +1349,8 @@ return (
             }}
           >
             Start <img src={vector1}/>
-          </button>
-          <button
-            id="clearButton"
-            type="button"
-            className="flex items-center gap-2 clear "
-            onClick={(e) => {
-              createRipple(e);
-              handleClearButton();
-            }}
-          >
-            Clear All <img src={vector2}/>
-          </button>
+          </button> */}
+          
 
           <label className="toggle-container">
             <span>View path</span>
@@ -1377,12 +1373,24 @@ return (
             />
             <span className="slider"></span>
           </label>
-          <img src="/profile.svg" alt="profile" className=" w-[45px]" />
+          <button
+            // id="clearButton"
+            type="button"
+            style={{ background: 'var(--S-50, #EFF4FE)', color: "black", "fontWeight": "bold" }}
+            className="flex items-center gap-2"
+            onClick={(e) => {
+              createRipple(e);
+              handleClearButton();
+            }}
+            >
+             <img src="/delete_forever.svg" style={{ width: '25px', height: '25px' }} /> Clear All
+            </button>
+            <img src="/profile.svg" alt="profile" className=" w-[45px]" />
+          </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-{/* Distance Display */}
+      {/* Distance Display */}
 {/* <div className="info-display">
   <span className="distance-box">
     <span id="distance" ref={distanceDisplayRef} style={{ color: 'black', fontWeight: 500, marginLeft: 15 }}>
@@ -1393,39 +1401,22 @@ return (
 </div> */}
 
 
-<div className="flex" style={{ width: '70%', display: 'inline-block' }}>
-  {/* Store Name and Distance container */}
-  <div className="flex justify-between items-center mb-4 px-4 w-full">
-    {/* Store Name */}
+{/* <div className="flex" style={{ width: '70%', display: 'inline-block' }}>
+
+  <div className="flex justify-between items-center mb-4 px-4 w-full mt-2">
+
     <div className="text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
       <span className="font-medium">
        Store Id: {storeVisitDetails.store_id || ""}
       </span>
     </div>
 
-    {/* Middle Field */}
-    <div className="text-[black] bg-white items-center py-2 px-6 rounded-[12px]">
-      <span className="font-medium">
-        {/* Replace with actual value */}
-        {storeName || ""}
-      </span>
-    </div>
-
-    {/* Distance Display */}
-    <div className="info-display">
-      <div className="bg-white text-[#777FE3] items-center py-2 px-6 rounded-full">
-        <span
-          id="distance"
-          ref={distanceDisplayRef}
-          className="font-medium"
-        >
-          {`Distance: ${totalDistance ? totalDistance.toFixed(2) : '0.00'} Meters`}
-        </span>
-      </div>
-    </div>
+  
   </div>
-</div>
+</div> */}
 
+
+{/* company legend display
 <div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3 justify-end pr-[32%]">
         {company_legend.map((company, index) => (
           <div key={index} className="flex items-center gap-2">
@@ -1436,27 +1427,54 @@ return (
             <span className="text-sm font-medium text-black">{company.name}</span>
           </div>
         ))}
-      </div>
+      </div> */}
 
     {/* Main Layout */}
-    <div className="layout-container" >
+    <div className="layout-container mt-4" >
       
-      <div className="left-container"style={{
-        // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
-        backgroundImage:`url(${storeVisitDetails.plano_bg_url})`,
-        
-        backgroundSize: "cover",  // Ensures the image covers the entire container
-        backgroundPosition: "center", // Centers the image
-        backgroundRepeat: "no-repeat", 
-        borderRadius:'26px',
-        transition: "background 0.5s ease-in-out",
-        backgroundColor:'white',
-        border:"none",
-        position: 'relative',
-        margin:"4px",
-        marginBottom: "7px"
-        // zIndex:10 // Full height of the viewport
-      }}>
+    <div  className="left-container bg-white rounded-[26px]">
+  {/* Header Section - No background image */}
+  <div className="p-4 border-b border-[#E1E9FD]">
+    <div className="flex justify-between items-center">
+      {/* Store Info */}
+      <div className="flex items-center gap-4">
+        <div className="text-black font-medium">{storeName || "Store Name"}</div>
+        <div className="flex items-center gap-2 bg-[#FFF7E7] px-4 py-2 rounded-lg">
+          <img src="/footprint.svg" alt="footprint" className="w-5 h-5 font-bold" />
+          <span className="text-black font-bold">
+            {totalDistance ? `${totalDistance.toFixed(2)}m` : '0.00m'}
+          </span>
+        </div>
+      </div>
+
+      {/* Company Legend */}
+      <div className="flex items-center gap-4">
+        {company_legend.map((company, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div 
+              className="w-5 h-5 rounded-sm" 
+              style={{ backgroundColor: company.color }}
+            />
+            <span className="text-sm font-medium text-black">{company.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+  
+
+ {/* Visualization Section - With background image */}
+ <div 
+    style={{
+      backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      height: "calc(100% - 72px)", // Subtract header height
+      transition: "background 0.5s ease-in-out",
+    }}
+  >
+
       <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
@@ -1822,7 +1840,7 @@ return (
             })
           )}
         </div>
-
+</div>
 
       </div>
   
