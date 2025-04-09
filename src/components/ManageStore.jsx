@@ -517,6 +517,70 @@ export default function ManageStore() {
     setSnapshot(data.snapshot);
   };
 
+  const handleRowClick = (store) => {
+    console.log(store)
+    setStoreName(store.name);
+    setStoreId(store.store_id);
+    setTsmName(store.TSM_name);
+    const regular =  store.planogram_coords.regularShapes.map((shape) => {
+
+      const xCoords = shape.vertices.map(v => v[0]);
+      const yCoords = shape.vertices.map(v => v[1]);
+
+      const x = Math.min(...xCoords);
+      const y = Math.min(...yCoords);
+      const width = Math.max(...xCoords) - x;
+      const height = Math.max(...yCoords) - y;
+
+      return{
+        ...shape,
+        x: x,
+        type: "rectangle",
+        y: y,
+        width: width,
+        height: height,
+        isBricked: shape.isBricked? true : false,
+        isColored: shape.isColored? true : false,
+        color: shape.color? shape.color : "#000000",
+        instruction: shape.instructionData?.title,
+        tag: shape.tag,
+        visibility: shape.visibility,
+      }
+    })
+    const open = store.planogram_coords.openSpaces.map((shape) => {
+      const xCoords = shape.vertices.map(v => v[0]);
+      const yCoords = shape.vertices.map(v => v[1]);
+
+      const x = Math.min(...xCoords);
+      const y = Math.min(...yCoords);
+      const width = Math.max(...xCoords) - x;
+      const height = Math.max(...yCoords) - y;
+
+      return{
+        ...shape,
+        x: x,
+        type: "rectangle",
+        isOpenSpace: true,
+        y: y,
+        width: width,
+        height: height,
+      }
+    })
+    console.log([...regular, ...open])
+    setShapes([...regular, ...open]);
+    setSnapshot(store.planogram_url);
+    if(store.plano_bg_url){
+      const img = new Image();
+      img.crossOrigin = 'anonymous'; // Optional: use if image is from another domain
+      img.onload = () => {
+        setBackgroundImage(img); // or draw directly on the canvas
+      };
+      img.src = store.plano_bg_url;
+    } 
+    setIsModalOpen(true);
+    setUpdateStore(true);
+  }
+
   const handleCreate = async () => {
     if (!storeName || !storeId ) {
       setShowStatusModal(true);
@@ -749,11 +813,7 @@ export default function ManageStore() {
                         key={index}
                         className="border-[#EFF4FE] border-[2px] text-[14px] font-[400] text-[#000000] p-[5px] hover:bg-[#F6F9FF] transition duration-200"
                         onClick={() => {
-                          setIsModalOpen(true);
-                          setUpdateStore(true);
-                          setStoreName(store.name);
-                          setStoreId(store.store_id);
-                          setTsmName(store.TSM_name);
+                         handleRowClick(store)
                         }}
                       >
                         <td className="px-6 py-2 text-[14px]">{store.name}</td>
