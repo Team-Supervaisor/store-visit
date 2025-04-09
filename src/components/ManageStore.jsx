@@ -425,6 +425,7 @@ const INSTRUCTIONS_DATA = [
 //   }
 // ]
 export default function ManageStore() {
+  const [nextId, setNextId] = useState(1)
   const [backgroundImage, setBackgroundImage] = useState(null)
   const [shapes, setShapes] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -617,6 +618,7 @@ export default function ManageStore() {
     setSnapshot(null)
     setBackgroundImage(null);
     setUploadImage(null);
+    setNextId(1);
   };
 
   const handleImageClick = (event) => {
@@ -1131,6 +1133,8 @@ export default function ManageStore() {
       backgroundImage={backgroundImage}
       setBackgroundImage={setBackgroundImage}
       setUploadImage={setUploadImage}
+      nextId={nextId}
+      setNextId={setNextId}
     />
   </div>
 )}

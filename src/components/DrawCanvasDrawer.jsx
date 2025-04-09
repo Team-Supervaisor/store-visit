@@ -24,7 +24,7 @@ const cursorMap = {
 };
 
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage}) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage, nextId, setNextId}) {
   const canvasRef = useRef(null)
   const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
@@ -37,7 +37,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     currentX: 0,
     currentY: 0,
   })
-  const [nextId, setNextId] = useState(1)
   const [textInput, setTextInput] = useState({
     isActive: false,
     x: 0,
