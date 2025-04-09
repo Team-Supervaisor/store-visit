@@ -74,7 +74,14 @@ const StoreVisitTracking = () => {
   const [openPolygon, setOpenPolygon] = useState([]);
   let planogram_coords;
   let open_coords;
-  
+  const company_legend= [
+    { name: 'Google', color: '#FC7561' },
+    { name: 'Oppo', color: '#20B15A' },
+    { name: 'Vivo', color: '#FF6584' },
+    { name: 'Samsung', color: '#FFB726' },
+    { name: 'LG', color: '#84304C' },
+    { name: 'Apple', color: '#7373F9' },
+  ]
   const toggleCard = (index) => {
     setExpandedCards((prev) => ({
       ...prev,
@@ -909,7 +916,7 @@ useEffect(() => {
     });
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
-      // console.log("New coordinate received:", data);
+      console.log("New coordinate received:", data);
       // if(itr==0)
       // {
       //   get_store_visit_details(data.store_visit_id);
@@ -1368,10 +1375,23 @@ return (
   </div>
 </div>
 
-
+<div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3">
+        {company_legend.map((company, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div 
+              className="w-5 h-5 rounded-sm" 
+              style={{ backgroundColor: company.color }}
+            />
+            <span className="text-sm font-medium">{company.name}</span>
+          </div>
+        ))}
+      </div>
 
     {/* Main Layout */}
     <div className="layout-container" >
+      
+      
+      
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
         backgroundImage:`url(${storeVisitDetails.planogram_url})`,
@@ -1484,7 +1504,7 @@ return (
                               fill="#000"
                               fontWeight="bold"
                             >
-                                    {polygon.name} - {polygon.instructionData?.title || ''}
+                                     {polygon.instructionData?.title || ''}
 
                               {/* {polygon.instructionData} */}
                             </text>
@@ -1524,7 +1544,7 @@ return (
                               fill="#000"
                               fontWeight="bold"
                             >
-                                    {polygon.name}
+                                    {/* {polygon.name} */}
 
                               {/* {polygon.instructionData} */}
                             </text>
@@ -1570,7 +1590,7 @@ return (
             fill="#000"
             fontWeight="bold"
           >
-            {polygon.name}
+            {/* {polygon.name} */}
           </text>
         </g>
       ))}
@@ -1616,21 +1636,21 @@ return (
           )}
           {distCoord && isStructureVisible && imageHistory.length>0 && (
             distCoord.map((center, index) => {
-              let comapany = imageHistory[index]?.metadata.brand.toLowerCase() || "";
+              let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               let h = imageHistory[index]?.metadata?.measurementL*20
               let w = imageHistory[index]?.metadata?.measurementB*20
               return(
                 <>
-                  {/* <div
+                  <div
                     className="circle"
                     style={{
                       position: 'absolute',
                       top: centerZ + center[1],
                       left: centerX + center[0],
-                      width: 20,
-                      height: 20,
+                      width: h,
+                      height: h,
                       borderRadius: '50%',
-                      backgroundColor: 'blue',
+                      backgroundColor: company_legend[comp.name] || company_legend.default,
                       opacity: 0.5,
                       zIndex: 10,
                     }}
@@ -1638,8 +1658,8 @@ return (
                     onMouseLeave={() => setIsHovering(null)}
                     onClick={() => setSelectedImage(index)}
 
-                  ></div> */}
-                  <div 
+                  ></div>
+                  {/* <div 
                     className="absolute"
                     style={{
                       width: h,
@@ -1649,7 +1669,6 @@ return (
                       zIndex: 10,
                     }}
                   >
-        {/* Custom speech bubble shape with exact border radius and border width */}
                     <div 
                       className={`w-full h-full relative bg-white transition-all duration-300 scale-105 ring-1 ring-blue-500`}
                       style={{
@@ -1661,7 +1680,6 @@ return (
                       onMouseLeave={() => setIsHovering(null)}
                       onClick={() => setSelectedImage(index)}
                     >
-                      {/* Speech bubble tail */}
                       <div 
                         className="absolute"
                         style={{
@@ -1673,14 +1691,13 @@ return (
                         }}
                       ></div>
                       
-                      {/* Samsung logo text - scaled down for 50px container */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-blue-600 font-bold text-xs tracking-tight"><img src={
                           comapany === 'google' ? google :comapany==='samsung' ? samsung : comapany==='apple' ? apple : comapany==='oppo'?oppo:comapany==='vivo'?vivo:comapany==='lg'?lg:''
                         }/></span>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </>
               )
             })
@@ -1689,6 +1706,7 @@ return (
 
 
       </div>
+      
       <div className="right-container"
       style={{
         margin:"5px",
