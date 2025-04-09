@@ -454,6 +454,7 @@ export default function ManageStore() {
   const [planogramWidth, setPlanogramWidth] = useState("");
   const [openspaceData, setOpenSpaceData] = useState([]);
   const [uploadImage, setUploadImage] = useState(null);
+  const [mappedInstructions, setMappedInstructions] = useState([]);
   // let snapshot = null;
 
   const initialShapes = [
@@ -491,34 +492,31 @@ export default function ManageStore() {
       setPreviewImage(imageUrl);
     }
   };
+  
   const handleSaveShapes = (data) => {
     console.log("Received from child:", data);
-    // Process instruction data as before
-    // for(var i = 0; i < data.shapes.length; i++){
-    //   const shape = data.shapes[i];
-    //   if(!shape.instructionData) continue;
-    //   if(shape.instructionData.type !== "section") continue;
-    //   const title = shape.instructionData.title;
-    //   setInstructionData((prev) => {
-    //     const updatedData = [...INSTRUCTIONS_DATA];
-    //     const index = updatedData.findIndex((item) => item.title === title);
-    //     if (index === -1) {
-    //       return updatedData;
-    //     }
-    //     updatedData[index].title = `${updatedData[index].title} - ${shape.name}`;
-    //     return updatedData;
-    //   });
-    // }
-  
-    // Save both regular rectangles and open spaces
+    
+    // Create new mappings without modifying original INSTRUCTIONS_DATA
+    const newMappings = [];
+    
+    for(var i = 0; i < data.shapes.length; i++) {
+      const shape = data.shapes[i];
+      if(!shape.instructionData) continue;
+      if(shape.instructionData.type !== "section") continue;
+      
+      const title = shape.instructionData.title;
+      newMappings.push({
+        instructionTitle: title,
+        shapeName: shape.name
+      });
+    }
+    
+    setMappedInstructions(newMappings);
     setRectangleData(data.shapes);
     setOpenSpaceData(data.openSpaces);
-    
-    
-   
-  
     setSnapshot(data.snapshot);
   };
+
   const handleCreate = async () => {
     if (!storeName || !storeId ) {
       setShowStatusModal(true);
@@ -615,6 +613,7 @@ export default function ManageStore() {
     setPlanogramWidth("");
     setShapes([]);
     setInstructionData(INSTRUCTIONS_DATA);
+    setMappedInstructions([]);
     setSnapshot(null)
     setBackgroundImage(null);
     setUploadImage(null);
@@ -1061,13 +1060,14 @@ export default function ManageStore() {
                     {instructionData.map((item) => (
                       <Accordion
                         key={item.id}
-                        title={item.title}
+                        title={
+                            // Show mapping if exists
+                            mappedInstructions.find(m => m.instructionTitle === item.title)
+                              ? `${item.title} - ${mappedInstructions.find(m => m.instructionTitle === item.title).shapeName}`
+                              : item.title
+                          }
                         isOpen={openAccordion === item.id}
-                        onClick={() =>
-                          setOpenAccordion(
-                            openAccordion === item.id ? null : item.id
-                          )
-                        }
+                        onClick={() => setOpenAccordion(openAccordion === item.id ? null : item.id)}
                         content={
                           <>
                             <div
