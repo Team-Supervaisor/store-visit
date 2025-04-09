@@ -1375,22 +1375,20 @@ return (
   </div>
 </div>
 
-<div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3 align-right">
+<div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3 justify-end pr-[32%]">
         {company_legend.map((company, index) => (
           <div key={index} className="flex items-center gap-2">
             <div 
               className="w-5 h-5 rounded-sm" 
               style={{ backgroundColor: company.color }}
             />
-            <span className="text-sm font-medium">{company.name}</span>
+            <span className="text-sm text-black font-medium">{company.name}</span>
           </div>
         ))}
       </div>
 
     {/* Main Layout */}
     <div className="layout-container" >
-      
-      
       
       <div className="left-container"style={{
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
@@ -1641,6 +1639,8 @@ return (
               let h = imageHistory[index]?.metadata?.measurementL*40
               let w = imageHistory[index]?.metadata?.measurementB*40
               console.log('helloo',comp);
+              console.log("company color",companyColor);
+              console.log("height",h);
               return(
                 <>
                   <div
@@ -1709,6 +1709,7 @@ return (
 
 
       </div>
+  
       
       <div className="right-container"
       style={{
