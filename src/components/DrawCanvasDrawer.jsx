@@ -100,13 +100,15 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   }, [])
 
   const drawRulers = (ctx) => {
+    if(!ctx || !planogramLength || !planogramWidth) return
     ctx.font = "10px Arial";
     ctx.fillStyle = "black";
     ctx.strokeStyle = "gray";
 
     // X-axis (top)
     const xStep = canvasWidth / planogramWidth;
-    for (let i = 10; i <= planogramWidth; i += 10) {
+    const xIncrement = Math.floor(planogramWidth / 5);
+    for (let i = xIncrement; i <= planogramWidth; i += xIncrement) {
       const x = i * xStep - 510;
       ctx.beginPath();
       ctx.moveTo(x, -250);
@@ -117,13 +119,14 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
     // Y-axis (left)
     const yStep = canvasHeight / planogramLength;
-    for (let i = 10; i <= planogramLength; i += 10) {
+    const yIncrement = Math.floor(planogramLength / 5);
+    for (let i = yIncrement; i <= planogramLength; i += yIncrement) {
       const y = i * yStep - 250;
       ctx.beginPath();
-      ctx.moveTo(-500, y);
-      ctx.lineTo(-490, y);
+      ctx.moveTo(-500, y-10);
+      ctx.lineTo(-490, y-10);
       ctx.stroke();
-      ctx.fillText(`${i}ft`, -487, y + 4);
+      ctx.fillText(`${i}ft`, -487, y -5);
     }
   };
 

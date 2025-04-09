@@ -553,11 +553,8 @@ export default function ManageStore() {
       startpoint: JSON.stringify(clickPosition),
       planogram_coords: JSON.stringify(rectangleData),
     };
-    if(backgroundImage){
-      formData.planogram = backgroundImage;
-    }else{
-      formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);
-    }
+    formData.plano_bg = backgroundImage;
+    formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);
 
     const url = updateStore
       ? `https://store-visit-85801868683.us-central1.run.app/updatestore`
