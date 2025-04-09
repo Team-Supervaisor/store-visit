@@ -451,6 +451,7 @@ export default function ManageStore() {
   const [successMessage, setSuccessMessage] = useState("");
   const [planogramLength, setPlanogramLength] = useState(""); // Fix typo in setter name
   const [planogramWidth, setPlanogramWidth] = useState("");
+  const [openspaceData, setOpenSpaceData] = useState([]);
   // let snapshot = null;
 
   const initialShapes = [
@@ -490,6 +491,8 @@ export default function ManageStore() {
   };
   const handleSaveShapes = (data) => {
     console.log("Received from child:", data);
+    
+    // Process instruction data as before
     for(var i = 0; i < data.shapes.length; i++){
       const shape = data.shapes[i];
       if(!shape.instructionData) continue;
@@ -505,12 +508,15 @@ export default function ManageStore() {
         return updatedData;
       });
     }
+  
+    // Save both regular rectangles and open spaces
     setRectangleData(data.shapes);
-    // console.log(data.snapshot)
+    setOpenSpaceData(data.openSpaces);
+    
+    
+   
+  
     setSnapshot(data.snapshot);
-    // snapshot = data.snapshot;
-    // console.log("Received from child:", data.shapes);
-    // console.log("Received from child:", data.snapshot);
   };
   const handleCreate = async () => {
     if (!storeName || !storeId ) {
@@ -540,7 +546,10 @@ export default function ManageStore() {
       setErrorMessage("Please click on the image to set the start point");
       return;
     }
-    
+    const combinedShapes = {
+      regularShapes: rectangleData,
+      openSpaces: openspaceData
+    };
 
     const formData = {
       name: storeName,
@@ -551,7 +560,8 @@ export default function ManageStore() {
         scale: 1.0,
       }),
       startpoint: JSON.stringify(clickPosition),
-      planogram_coords: JSON.stringify(rectangleData),
+      planogram_coords: JSON.stringify(combinedShapes),
+      // openspace_coords: JSON.stringify(openspaceData),
     };
     formData.plano_bg = backgroundImage;
     formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);

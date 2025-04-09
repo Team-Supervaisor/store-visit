@@ -22,6 +22,8 @@ export default function ToolBar({
   setSelectedTool,
   clearCanvas,
   saveShapes,
+  isOpenSpaceMode,  // Add this prop
+  setIsOpenSpaceMode, // Add this prop
   handleImage
 }) {
   const tools = [
@@ -105,6 +107,14 @@ export default function ToolBar({
     if(file) handleImage(file)
   };
 
+  const handleToolClick = (toolName) => {
+    if (toolName === "open-space") {
+      setIsOpenSpaceMode(!isOpenSpaceMode);
+    } else {
+      setSelectedTool(toolName);
+    }
+  };
+
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 pl-4 pr-4 flex items-center gap-2">
       <div className="flex items-center gap-2 mr-6">
@@ -114,15 +124,15 @@ export default function ToolBar({
               key={tool.name}
               variant="ghost"
               size="icon"
-              onClick={() => setSelectedTool(tool.name)}
+              onClick={() => handleToolClick(tool.name)}
               className={`rounded-md h-9 w-9 ${
-                selectedTool === tool.name
-                  ? " bg-[#6366F1] ring-2 ring-blue-300"
+                (tool.name === "open-space" && isOpenSpaceMode) || selectedTool === tool.name
+                  ? "bg-[#6366F1] ring-2 ring-blue-300"
                   : "hover:bg-[#F3F4F6]"
-              } `}
+              }`}
             >
               {React.cloneElement(tool.icon, {
-                color: selectedTool === tool.name ? "#FFF" : "#333",
+                color: (tool.name === "open-space" && isOpenSpaceMode) || selectedTool === tool.name ? "#FFF" : "#333",
               })}
             </Button>
             <div className="absolute w-[100px] bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-10">
