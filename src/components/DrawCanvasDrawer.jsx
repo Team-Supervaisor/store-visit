@@ -5,15 +5,15 @@ import ToolBar from "./tool-bar"
 import { ChevronDown, X, PencilIcon, Trash2 } from "lucide-react"
 
 const tagOptions = [
-  { id: "1", title: "Tag 1" },
-  { id: "2", title: "Tag 2" },
-  { id: "3", title: "Tag 3" },
+  { id: "cashier", title: "Cashier" },
+  { id: "insurance", title: "Insurance" },
+  { id: "checker", title: "Checker" },
 ]
 
 const visibilityOptions = [
-  { id: "1", title: "Low" },
-  { id: "2", title: "Medium" },
-  { id: "3", title: "High" },
+  { id: "low", title: "Low" },
+  { id: "medium", title: "Medium" },
+  { id: "high", title: "High" },
 ]
 
 const cursorMap = {
@@ -624,7 +624,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     if(foundShape?.isBricked || foundShape?.isOpenSpace){
       return;
     }
-    console.log(foundShape)
     setHoveredShape(foundShape);
   };
 
@@ -1121,8 +1120,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
           <div
           style={{
             position: "absolute",
-            left: hoveredShape.x + hoveredShape.width + 2 + canvasWidth / 2 +35 > canvasWidth ? hoveredShape.x + canvasWidth/2 - 33 : hoveredShape.x + hoveredShape.width + 2 + canvasWidth / 2,
-            top: hoveredShape.y + canvasHeight / 2,
+            left: hoveredShape.x + hoveredShape.width + 2 + canvasWidth / 2 +35 > canvasWidth ? hoveredShape.x + canvasWidth/2 - 33 : hoveredShape.x + hoveredShape.width -35 + canvasWidth / 2,
+            top: hoveredShape.y + canvasHeight / 2 + 2,
             zIndex: 10,
             display: "flex",
             flexDirection: "column",

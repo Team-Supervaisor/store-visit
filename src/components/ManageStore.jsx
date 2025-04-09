@@ -435,7 +435,7 @@ export default function ManageStore() {
   const [storeId, setStoreId] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [storeData, setStoreData] = useState([]);
-  const [instructionData, setInstructionData] = useState(INSTRUCTIONS_DATA);
+  const [instructionData, setInstructionData] = useState([...INSTRUCTIONS_DATA]);
   // const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const [clickPosition, setClickPosition] = useState(null);
   const imageRef = useRef(null);
@@ -492,23 +492,22 @@ export default function ManageStore() {
   };
   const handleSaveShapes = (data) => {
     console.log("Received from child:", data);
-    
     // Process instruction data as before
-    for(var i = 0; i < data.shapes.length; i++){
-      const shape = data.shapes[i];
-      if(!shape.instructionData) continue;
-      if(shape.instructionData.type !== "section") continue;
-      const title = shape.instructionData.title;
-      setInstructionData((prev) => {
-        const updatedData = INSTRUCTIONS_DATA;
-        const index = updatedData.findIndex((item) => item.title === title);
-        if (index === -1) {
-          return updatedData;
-        }
-        updatedData[index].title = `${updatedData[index].title} - ${shape.name}`;
-        return updatedData;
-      });
-    }
+    // for(var i = 0; i < data.shapes.length; i++){
+    //   const shape = data.shapes[i];
+    //   if(!shape.instructionData) continue;
+    //   if(shape.instructionData.type !== "section") continue;
+    //   const title = shape.instructionData.title;
+    //   setInstructionData((prev) => {
+    //     const updatedData = [...INSTRUCTIONS_DATA];
+    //     const index = updatedData.findIndex((item) => item.title === title);
+    //     if (index === -1) {
+    //       return updatedData;
+    //     }
+    //     updatedData[index].title = `${updatedData[index].title} - ${shape.name}`;
+    //     return updatedData;
+    //   });
+    // }
   
     // Save both regular rectangles and open spaces
     setRectangleData(data.shapes);
@@ -1122,7 +1121,6 @@ export default function ManageStore() {
       isOpen={isDrawerOpen} 
       onClose={() => {
         setIsDrawerOpen(false)
-        setShapes([]);
       }} 
       onSaveShapes={handleSaveShapes} 
       instruction_data={INSTRUCTIONS_DATA}

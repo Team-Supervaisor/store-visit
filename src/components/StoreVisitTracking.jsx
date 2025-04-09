@@ -1382,7 +1382,7 @@ return (
               className="w-5 h-5 rounded-sm" 
               style={{ backgroundColor: company.color }}
             />
-            <span className="text-sm text-black font-medium">{company.name}</span>
+            <span className="text-sm font-medium text-black">{company.name}</span>
           </div>
         ))}
       </div>
