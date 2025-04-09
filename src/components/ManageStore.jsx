@@ -425,6 +425,8 @@ const INSTRUCTIONS_DATA = [
 //   }
 // ]
 export default function ManageStore() {
+  const [backgroundImage, setBackgroundImage] = useState(null)
+  const [shapes, setShapes] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updateStore, setUpdateStore] = useState(false);
   const [image, setImage] = useState(null);
@@ -551,10 +553,10 @@ export default function ManageStore() {
       startpoint: JSON.stringify(clickPosition),
       planogram_coords: JSON.stringify(rectangleData),
     };
-    if(snapshot){
-      formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);
+    if(backgroundImage){
+      formData.planogram = backgroundImage;
     }else{
-      formData.planogram = image;
+      formData.plano_b64 = snapshot.slice(snapshot.indexOf(',') + 1);
     }
 
     const url = updateStore
@@ -603,6 +605,10 @@ export default function ManageStore() {
     setOpenAccordion(null);
     setPlanogramLength(""); // Updated setter name
     setPlanogramWidth("");
+    setShapes([]);
+    setInstructionData(INSTRUCTIONS_DATA);
+    setSnapshot(null)
+    setBackgroundImage(null);
   };
 
   const handleImageClick = (event) => {
@@ -1110,6 +1116,10 @@ export default function ManageStore() {
       instruction_data={INSTRUCTIONS_DATA}
       planogramWidth={Number(planogramWidth)}
       planogramLength={Number(planogramLength)}
+      shapes={shapes}
+      setShapes={setShapes}
+      backgroundImage={backgroundImage}
+      setBackgroundImage={setBackgroundImage}
     />
   </div>
 )}

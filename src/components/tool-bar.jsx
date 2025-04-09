@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useRef } from "react";
 import {
   MousePointer,
   Square,
@@ -21,6 +22,7 @@ export default function ToolBar({
   setSelectedTool,
   clearCanvas,
   saveShapes,
+  handleImage
 }) {
   const tools = [
     { name: "pointer", icon: <MousePointer size={18} color="#333" /> },
@@ -92,6 +94,17 @@ export default function ToolBar({
     // { name: "rectangle-h", icon: <RectangleHorizontal size={18} color="#333" />, bgColor: "bg-[#F3F4F6]" },
   ];
 
+  const inputRef = useRef(null);
+
+  const handleUploadClick = () => {
+    inputRef.current.click();
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if(file) handleImage(file)
+  };
+
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg p-2 pl-4 pr-4 flex items-center gap-2">
       <div className="flex items-center gap-2 mr-6">
@@ -122,11 +135,14 @@ export default function ToolBar({
             </div>
           </div>
         ))}
-        <Button className={`rounded-md bg-[#F0F4FF] text-[#717AEA]`}>
-          <span className="flex justify-between">
-            <img src="/upload.svg" className="mr-2" /> Upload
-          </span>
-        </Button>
+        <div className="relative">
+          <input type="file" id="upload" accept="image/*" ref={inputRef} onChange={handleImageUpload} className="hidden"/>
+          <Button className={`rounded-md bg-[#F0F4FF] text-[#717AEA] relative`} onClick={handleUploadClick}>
+            <span className="flex justify-between">
+              <img src="/upload.svg" className="mr-2" /> Upload
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* <div className="flex items-center gap-2 ml-1">

@@ -24,7 +24,7 @@ const cursorMap = {
 };
 
 
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, planogramWidth, planogramLength}) {
+export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage}) {
   const canvasRef = useRef(null)
   const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
@@ -37,7 +37,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     currentX: 0,
     currentY: 0,
   })
-  const [shapes, setShapes] = useState([])
   const [nextId, setNextId] = useState(1)
   const [textInput, setTextInput] = useState({
     isActive: false,
@@ -64,21 +63,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
   const canvasWidth = 1000
   const canvasHeight = 500
 
-  // Add new state for areas
-  const [userArea, setUserArea] = useState(0);  // in square meters
-  const [canvasArea, setCanvasArea] = useState(0);  // in square meters
-  
-  // Calculate user input area when props change
-  useEffect(() => {
-    if (planogramWidth && planogramLength) {
-      // Convert feet to meters and calculate area
-      const widthInMeters = planogramWidth * 0.3048;
-      const lengthInMeters = planogramLength * 0.3048;
-      const areaInSqMeters = widthInMeters * lengthInMeters;
-      setUserArea(areaInSqMeters);
-    }
-  }, [planogramWidth, planogramLength]);
-
   // Initialize available instructions when instruction_data changes
   useEffect(() => {
     if (instruction_data) {
@@ -90,6 +74,15 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       setAvailableInstructions(initialAvailable)
     }
   }, [instruction_data, shapes.length])
+
+  // useEffect(() => {
+  //   if (backgroundImage && canvasRef.current) {
+  //     const canvas = canvasRef.current;
+  //     const ctx = canvas.getContext("2d");
+  //     ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  //   }
+  // }, [backgroundImage]);
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -116,6 +109,14 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
 
     ctx.save()
     ctx.translate(canvasWidth / 2, canvasHeight / 2)
+
+    if (backgroundImage && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+
+      ctx.clearRect(-500, -250, canvas.width, canvas.height);
+      ctx.drawImage(backgroundImage, -500, -250, canvas.width, canvas.height);
+    }
 
     shapes.forEach((shape) => {
       if (shape.type === "rectangle" || shape.type === "brick") {
@@ -233,7 +234,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       ctx.setLineDash([])
     }
     ctx.restore()
-  }, [shapes, ctx, drawingState, selectedShape])
+  }, [shapes, ctx, drawingState, selectedShape, backgroundImage])
 
   // Update available instructions when selectedInstructions change
   useEffect(() => {
@@ -588,6 +589,20 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     setShapeDialog({ ...shapeDialog, isOpen: false })
   }
 
+  const handleImageUpload = (file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          setBackgroundImage(img);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   const clearCanvas = () => {
     setShapes([])
     setSelectedShape(null)
@@ -595,6 +610,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     setSelectedInstructions({})
     setAvailableInstructions({})
     setSelectedTool("rectangle")
+    setBackgroundImage(null)
   }
 
   const saveShapes = () => {
@@ -605,67 +621,67 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     const rectangles = shapes.filter(shape => shape.type === "rectangle");
     
     // Calculate pixel to meter conversion factors
-    const pixelsPerMeterWidth = canvasWidth / (planogramWidth * 0.3048);  // pixels per meter
-    const pixelsPerMeterHeight = canvasHeight / (planogramLength * 0.3048);
+    // const pixelsPerMeterWidth = canvasWidth / (planogramWidth * 0.3048);  // pixels per meter
+    // const pixelsPerMeterHeight = canvasHeight / (planogramLength * 0.3048);
     
     // Calculate total area in square meters
-    let totalDrawnArea = 0;
-    rectangles.forEach(rect => {
-      const widthInPixels = Math.abs(rect.width);
-      const heightInPixels = Math.abs(rect.height);
+    // let totalDrawnArea = 0;
+    // rectangles.forEach(rect => {
+    //   const widthInPixels = Math.abs(rect.width);
+    //   const heightInPixels = Math.abs(rect.height);
       
-      // Convert pixel dimensions to meters
-      const widthInMeters = widthInPixels / pixelsPerMeterWidth;
-      const heightInMeters = heightInPixels / pixelsPerMeterHeight;
+    //   // Convert pixel dimensions to meters
+    //   const widthInMeters = widthInPixels / pixelsPerMeterWidth;
+    //   const heightInMeters = heightInPixels / pixelsPerMeterHeight;
       
-      // Add area in square meters
-      totalDrawnArea += widthInMeters * heightInMeters;
-    });
+    //   // Add area in square meters
+    //   totalDrawnArea += widthInMeters * heightInMeters;
+    // });
     
-    setCanvasArea(totalDrawnArea);
+    // setCanvasArea(totalDrawnArea);
 
-    console.log(`Canvas dimensions: ${canvasWidth}px × ${canvasHeight}px`);
-    console.log(`Store dimensions: ${planogramWidth}ft × ${planogramLength}ft`);
-    console.log(`Total drawn area: ${totalDrawnArea.toFixed(2)}m², User area: ${userArea.toFixed(2)}m²`);
+    // console.log(`Canvas dimensions: ${canvasWidth}px × ${canvasHeight}px`);
+    // console.log(`Store dimensions: ${planogramWidth}ft × ${planogramLength}ft`);
+    // console.log(`Total drawn area: ${totalDrawnArea.toFixed(2)}m², User area: ${userArea.toFixed(2)}m²`);
 
-    // If drawn area is smaller than user area, scale up
-    let scaledRectangles;
-    if (totalDrawnArea < userArea) {
-      const scalingFactor = Math.sqrt(userArea / totalDrawnArea);
-      console.log(`Scaling up by factor of ${scalingFactor}`);
+    // // If drawn area is smaller than user area, scale up
+    // let scaledRectangles;
+    // if (totalDrawnArea < userArea) {
+    //   const scalingFactor = Math.sqrt(userArea / totalDrawnArea);
+    //   console.log(`Scaling up by factor of ${scalingFactor}`);
       
-      scaledRectangles = rectangles.map(rect => ({
-        id: rect.id,
-        vertices: rect.vertices.map(vertex => [
-          vertex[0] * scalingFactor,
-          vertex[1] * scalingFactor
-        ]),
-        name: rect.name,
-        instructionData: rect.instruction && instruction_data.find(item => 
-          item.id === rect.instruction
-        )
-      }));
-    } else {
+    //   scaledRectangles = rectangles.map(rect => ({
+    //     id: rect.id,
+    //     vertices: rect.vertices.map(vertex => [
+    //       vertex[0] * scalingFactor,
+    //       vertex[1] * scalingFactor
+    //     ]),
+    //     name: rect.name,
+    //     instructionData: rect.instruction && instruction_data.find(item => 
+    //       item.id === rect.instruction
+    //     )
+    //   }));
+    // } else {
       // If drawn area is larger, keep original vertices
-      scaledRectangles = rectangles.map(rect => ({
-        id: rect.id,
-        vertices: rect.vertices,
-        name: rect.name,
-        isBricked: rect.isBricked,
-        isColored: rect.isColored,
-        color: rect.color,
-        instructionData: rect.instruction && instruction_data.find(item => 
-          item.id === rect.instruction
-        )
-      }));
+    const scaledRectangles = rectangles.map(rect => ({
+      id: rect.id,
+      vertices: rect.vertices,
+      name: rect.name,
+      isBricked: rect.isBricked,
+      isColored: rect.isColored,
+      color: rect.color,
+      instructionData: rect.instruction && instruction_data.find(item => 
+        item.id === rect.instruction
+      )
+    }));
       
-      console.log(`Using original dimensions - Drawing area: ${totalDrawnArea}m², Store area: ${userArea}m²`);
-    }
+
 
     if (onSaveShapes) {
       onSaveShapes({
         shapes: scaledRectangles,
-        snapshot: canvasSnapshot
+        snapshot: canvasSnapshot,
+        image: backgroundImage,
       });
     }
     onClose();
@@ -939,6 +955,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         setSelectedTool={setSelectedTool}
         clearCanvas={clearCanvas}
         saveShapes={saveShapes}
+        handleImage={handleImageUpload}
       />
       {selectedTool === "fill" && (
         <div className="absolute top-4 left-4 bg-white p-2 rounded shadow-md z-10 flex items-center">
