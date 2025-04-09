@@ -78,10 +78,7 @@ const StoreVisitTracking = () => {
   let open_coords;
   const company_legend= [
     { name: 'Google', color: '#FC7561' },
-    { name: 'Oppo', color: '#20B15A' },
-    { name: 'Vivo', color: '#FF6584' },
     { name: 'Samsung', color: '#FFB726' },
-    { name: 'LG', color: '#84304C' },
     { name: 'Apple', color: '#7373F9' },
   ]
   const toggleCard = (index) => {
