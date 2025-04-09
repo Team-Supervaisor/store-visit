@@ -178,24 +178,24 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
 
 
-      if (shape.name) {
-        ctx.fillStyle = "#000000";
-        ctx.font = "14px Arial";
-        const textWidth = ctx.measureText(shape.name).width;
-        const textHeight = 14;
-        const centerX = shape.x + shape.width / 2;
-        const centerY = shape.y + shape.height / 2;
+      // if (shape.name) {
+      //   ctx.fillStyle = "#000000";
+      //   ctx.font = "14px Arial";
+      //   const textWidth = ctx.measureText(shape.name).width;
+      //   const textHeight = 14;
+      //   const centerX = shape.x + shape.width / 2;
+      //   const centerY = shape.y + shape.height / 2;
         
-        // Save context before drawing text
-        ctx.save();
-        // Draw text above the clipping mask
-        ctx.restore();
-        ctx.fillText(
-          shape.name,
-          centerX - textWidth / 2,
-          centerY + textHeight / 2
-        );
-      }
+      //   // Save context before drawing text
+      //   ctx.save();
+      //   // Draw text above the clipping mask
+      //   ctx.restore();
+      //   ctx.fillText(
+      //     shape.name,
+      //     centerX - textWidth / 2,
+      //     centerY + textHeight / 2
+      //   );
+      // }
       
       ctx.restore();
     }
@@ -963,21 +963,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
                 </span>
               </div> */}
 
-                {shapes.find(s => s.id === shapeDialog.shapeId)?.isOpenSpace ? (
-              <div className="flex items-center">
-                <label className="font-medium text-gray-700 w-24">Name:</label>
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder="Enter open space name"
-                    value={shapeDialog.name}
-                    onChange={(e) => setShapeDialog({ ...shapeDialog, name: e.target.value })}
-                    className="w-full flex-1 border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black text-sm"
-                  />
-                </div>
-              </div>
-            ) : (
-                // Existing fields for regular rectangles
+                
+
                 <>
                   {/*  existing input fields */}
                   <div className="flex items-center">
@@ -1083,8 +1070,6 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
                       </div>
 
                 </>
-              )}
-
             
               <div className="flex justify-end gap-2 mt-2">
                 <button
@@ -1103,40 +1088,44 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
             </div>
           </div>
         )}
+        
         {hoveredShape && (
-        <div
-          style={{
-            position: "absolute",
-            backgroundColor: "#fef3f3",
-            left: hoveredShape.x + canvasWidth / 2 ,
-            top: hoveredShape.y + canvasHeight / 2,
-            zIndex: 10,
-          }}
-          className="bg-white p-2 rounded shadow-lg border border-gray-300"
-        >
-          {/* <div className="w-2 h-2 bg-white rounded-[2px] rotate-45 translate-y-[40px] translate-x-[40px]"></div> */}
-          <button
-            className="text-sm text-white bg-red-500 px-2 py-1 rounded mr-1 hover:bg-red-600"
-            onClick={() => {
-              setShapes((prevShapes) =>
-                prevShapes.filter((shape) => shape.id !== hoveredShape.id)
-              );
-              setHoveredShape(null);
-            }}
-          >
-            Delete
-          </button>
-          <button
-            className="text-sm text-white bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
-            onClick={(e) => {
-              setHoveredShape(null);
-              startDrawing(e);
-            }}
-          >
-            Edit
-          </button>
-        </div>
-      )}
+  <div
+    style={{
+      position: "absolute",
+      backgroundColor: "#fef3f3",
+      left: hoveredShape.x + canvasWidth / 2,
+      top: hoveredShape.y + canvasHeight / 2,
+      zIndex: 10,
+    }}
+    className="bg-white p-2 rounded shadow-lg border border-gray-300"
+  >
+    <button
+      className="text-sm text-white bg-red-500 px-2 py-1 rounded mr-1 hover:bg-red-600"
+      onClick={() => {
+        setShapes((prevShapes) =>
+          prevShapes.filter((shape) => shape.id !== hoveredShape.id)
+        );
+        setHoveredShape(null);
+      }}
+    >
+      Delete
+    </button>
+    
+    {/* Show Edit button only for non-open space shapes */}
+    {!hoveredShape.isOpenSpace && (
+      <button
+        className="text-sm text-white bg-blue-500 px-2 py-1 rounded hover:bg-blue-600"
+        onClick={(e) => {
+          setHoveredShape(null);
+          startDrawing(e);
+        }}
+      >
+        Edit
+      </button>
+    )}
+  </div>
+)}
       </div>
       {planogramLength && planogramWidth && <div>
         <div className="bg-white p-2 mb-[-80px] mt-4 rounded shadow-md z-10 flex flex-col items-center">
