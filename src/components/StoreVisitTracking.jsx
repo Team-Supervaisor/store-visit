@@ -716,8 +716,9 @@ const get_store_visit_details = (store_visit_id) => {
         pathData,
         textX,
         textY,
-        color: '#E1E9FD',
+        color: structure.isColored?structure.color:'#E1E9FD',
         instructionData: structure.instructionData,
+        isBricked: structure.isBricked,
       };
     });
 
@@ -1319,7 +1320,7 @@ return (
         // backgroundImage:isStructureVisible ? `url(${layout})` : "none",
         backgroundImage:`url(${storeVisitDetails.planogram_url})`,
         
-        backgroundSize: "cover",  // Ensures the image covers the entire container
+        // backgroundSize: "cover",  // Ensures the image covers the entire container
         backgroundPosition: "center", // Centers the image
         backgroundRepeat: "no-repeat", 
         borderRadius:'26px',
@@ -1379,6 +1380,21 @@ return (
   {isStructureVisible && <div className="overlay"></div>}
   {isStructureVisible && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:10,pointerEvents:"all",cursor:"point"}}>
+      <defs>
+    <pattern id="brickPattern" patternUnits="userSpaceOnUse" width="60" height="30">
+      {/* Background color for mortar */}
+      <rect width="60" height="30" fill="white" />
+      
+      {/* First row of bricks */}
+      <rect x="0" y="0" width="28" height="13" fill="#8897F1" />
+      <rect x="30" y="0" width="28" height="13" fill="#8897F1" />
+      
+      {/* Second row of bricks - offset */}
+      <rect x="15" y="15" width="28" height="13" fill="#8897F1" />
+      <rect x="45" y="15" width="28" height="13" fill="#8897F1" />
+      <rect x="0" y="15" width="13" height="13" fill="#8897F1" />
+    </pattern>
+  </defs>
       {polygons.map((polygon,index) => 
         {
           // console.log(polygon)
@@ -1395,10 +1411,13 @@ return (
           >
                             <path
                               d={polygon.pathData}
-                              fill={polygon.color}
+                              // fill={polygon.color}
+                              fill={polygon.isBricked ? "url(#brickPattern)" : polygon.color}
                               stroke="#000"
                               strokeWidth="2"
-                              fillOpacity="0.5"
+                              // fillOpacity="0.5
+                              fillOpacity={polygon.isBricked ? "1" : "0.5"}
+
                             />
                             <text
                               x={polygon.textX}
