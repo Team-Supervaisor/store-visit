@@ -1348,12 +1348,12 @@ return (
     {/* Store Name */}
     <div className="text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
       <span className="font-medium">
-        {storeVisitDetails.store_id || ""}
+       Store Id: {storeVisitDetails.store_id || ""}
       </span>
     </div>
 
     {/* Middle Field */}
-    <div className="text-[#777FE3] bg-white items-center py-2 px-6 rounded-[12px]">
+    <div className="text-[black] bg-white items-center py-2 px-6 rounded-[12px]">
       <span className="font-medium">
         {/* Replace with actual value */}
         {storeName || ""}
@@ -1375,7 +1375,7 @@ return (
   </div>
 </div>
 
-<div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3">
+<div className="pl-4 rounded-md flex flex-wrap items-center gap-4 mb-3 align-right">
         {company_legend.map((company, index) => (
           <div key={index} className="flex items-center gap-2">
             <div 
@@ -1637,8 +1637,10 @@ return (
           {distCoord && isStructureVisible && imageHistory.length>0 && (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
-              let h = imageHistory[index]?.metadata?.measurementL*20
-              let w = imageHistory[index]?.metadata?.measurementB*20
+              const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
+              let h = imageHistory[index]?.metadata?.measurementL*40
+              let w = imageHistory[index]?.metadata?.measurementB*40
+              console.log('helloo',comp);
               return(
                 <>
                   <div
@@ -1650,8 +1652,9 @@ return (
                       width: h,
                       height: h,
                       borderRadius: '50%',
-                      backgroundColor: company_legend[comp.name] || company_legend.default,
-                      opacity: 0.5,
+                      // backgroundColor: company_legend[comp.name] || company_legend.default,
+                      backgroundColor:companyColor,
+                      opacity: 1,
                       zIndex: 10,
                     }}
                     onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
