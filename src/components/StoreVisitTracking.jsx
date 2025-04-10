@@ -1393,7 +1393,7 @@ return (
           onClick={(e) => {
             createRipple(e);
             setIsDirectionActive(!isDirectionActive);
-            handleClearButton();
+            // handleClearButton();
           }}
         >
           <img 
