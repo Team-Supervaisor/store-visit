@@ -455,6 +455,7 @@ export default function ManageStore() {
   const [openspaceData, setOpenSpaceData] = useState([]);
   const [uploadImage, setUploadImage] = useState(null);
   const [mappedInstructions, setMappedInstructions] = useState([]);
+  const [loading, setLoading] = useState(false);
   // let snapshot = null;
 
   const initialShapes = [
@@ -609,6 +610,7 @@ export default function ManageStore() {
       setErrorMessage("Please click on the image to set the start point");
       return;
     }
+    setLoading(true);
     const combinedShapes = {
       regularShapes: rectangleData,
       openSpaces: openspaceData
@@ -653,7 +655,7 @@ export default function ManageStore() {
           setShowStatusModal(true);
           setSuccessMessage("Store added successfully");
           }
-       
+        setLoading(false);
         handleClose();
         fethStores();
       })
@@ -1166,12 +1168,15 @@ export default function ManageStore() {
                 Close
               </button>
               <button
-                className="px-4 py-2 bg-indigo-400 text-white rounded text-sm font-bold w-[120px] hover:bg-indigo-500"
+                className="px-8 py-2 bg-indigo-400 text-white rounded text-sm font-bold w-[120px] hover:bg-indigo-500 flex items-center justify-evenly"
                 onClick={() => {
                   handleCreate();
                 }}
               >
                 Done
+                {loading && (
+                  <Loader2 className="animate-spin text-white ml-2" size={16} />
+                )}
               </button>
             </div>
           </div>
