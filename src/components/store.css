@@ -740,3 +740,14 @@
 .modal-close:hover {
   transform: scale(1.1);
 }
+
+
+/* tooltip for header directions */
+
+.group:hover .invisible {
+  visibility: visible;
+}
+
+.group {
+  position: relative;
+}

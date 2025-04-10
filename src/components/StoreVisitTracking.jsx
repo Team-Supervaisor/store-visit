@@ -74,6 +74,8 @@ const StoreVisitTracking = () => {
   const [openPolygon, setOpenPolygon] = useState([]);
   const [higlightPolygon, setHiglightPolygon] = useState([]);
   const [highlightStructure, setHighlightStructure] = useState([]);
+  const [isDirectionActive, setIsDirectionActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -266,7 +268,18 @@ const check_inside_structure = (x, z) => {
     }
   };
   
-  
+  const handleRotation = async (direction) => {
+    setIsLoading(true);
+    try {
+      await axios.post('https://store-visit-85801868683.us-central1.run.app/api/rotation', {
+        rotation: direction
+      });
+    } catch (error) {
+      console.error(`Error sending ${direction} rotation:`, error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const sendInstructions = (structure) => {
     console.log("check intstructions:",structure.instructionData);
@@ -1370,21 +1383,71 @@ return (
             <span className="slider"></span>
           </label>
           <button
+          type="button"
+          style={{ 
+            background: isDirectionActive ? 'var(--S-500, #717AEA)' : 'var(--S-50, #EFF4FE)', 
+            padding: '10px',
+            position: 'relative'
+          }}
+          className="flex items-center gap-2 group hover:relative"
+          onClick={(e) => {
+            createRipple(e);
+            setIsDirectionActive(!isDirectionActive);
+            handleClearButton();
+          }}
+        >
+          <img 
+            src="/fork_right.svg" 
+            style={{ 
+              width: '28px', 
+              height: '28px',
+              filter: isDirectionActive ? 'brightness(0) invert(1)' : 'none'
+            }} 
+          />
+          
+          {/* Tooltip */}
+          <div className="absolute invisible group-hover:visible top-full left-1/2 transform -translate-x-1/2 mt-2">
+            <div className="relative">
+              {/* Triangle/Caret */}
+              <div 
+                className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full"
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderBottom: '6px solid #333'
+                }}
+              />
+              {/* Tooltip content */}
+              <div 
+                className="bg-[#333] text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                style={{
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}
+              >
+                Directions
+              </div>
+            </div>
+          </div>
+        </button>
+
+          <button
             // id="clearButton"
             type="button"
-            style={{ background: 'var(--S-50, #EFF4FE)', color: "black", "fontWeight": "bold" }}
+            style={{ background: 'var(--S-50, #EFF4FE)', color: "black", "fontWeight": "bold" , padding:'10px'}}
             className="flex items-center gap-2"
             onClick={(e) => {
-              createRipple(e);
+              // createRipple(e);
               handleClearButton();
             }}
             >
-             <img src="/delete_forever.svg" style={{ width: '25px', height: '25px' }} /> Clear All
+             <img src="/delete_forever.svg" style={{ width: '28px', height: '28px' }} /> 
             </button>
             <img src="/profile.svg" alt="profile" className=" w-[45px]" />
           </div>
           </div>
-        </div>
+      </div>
 
       {/* Distance Display */}
 {/* <div className="info-display">
@@ -1441,6 +1504,45 @@ return (
             {totalDistance ? `${totalDistance.toFixed(2)}m` : '0.00m'}
           </span>
         </div>
+
+       {/* Navigation Controls with transition */}
+          <div 
+      className={`flex items-center gap-2 bg-[#ECF2FF] px-1.5 py-1.5 rounded-lg transition-all duration-300 ease-in-out ${
+        isDirectionActive ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 overflow-hidden'
+      }`}
+    >
+      <button 
+        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        onClick={() => handleRotation('up')}
+        disabled={isLoading}
+      >
+        <img src="/turn_up.svg" alt="Turn Up" className="w-5 h-5" />
+      </button>
+      
+      <button 
+        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        onClick={() => handleRotation('left')}
+        disabled={isLoading}
+      >
+        <img src="/turn_left.svg" alt="Turn Left" className="w-5 h-5" />
+      </button>
+      
+      <button 
+        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        onClick={() => handleRotation('right')}
+        disabled={isLoading}
+      >
+        <img src="/turn_right.svg" alt="Turn Right" className="w-5 h-5" />
+      </button>
+      
+      <button 
+        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        onClick={() => handleRotation('down')}
+        disabled={isLoading}
+      >
+        <img src="/turn_down.svg" alt="Turn Down" className="w-5 h-5" />
+      </button>
+    </div>
       </div>
 
       {/* Company Legend */}
