@@ -426,15 +426,15 @@ const StoreVisitTracking = () => {
             />
           </div>
 
-          <div className="flex items-center rounded-xl p-2 bg-blue-50 border-2 border-blue-100">
+          <div className="flex items-center rounded-xl p-2 bg-[#F7FAFF] border-2 border-[#EFF5FE]">
       <span className="mr-2 text-black">Date Range</span>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="w-auto justify-start text-left font-normal"
+            className="w-auto justify-start text-left font-normal bg-[#EFF4FE]"
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 h-3 w-3 bg-white" />
             {date1.from ? (
               date1.to ? (
                 <>
