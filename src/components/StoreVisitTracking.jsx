@@ -77,12 +77,12 @@ const StoreVisitTracking = () => {
   let planogram_coords;
   let open_coords;
   const company_legend= [
-    { name: 'Hitachi', color: '#7373F9' },
+    // { name: 'Hitachi', color: '#7373F9' },
     { name: 'Google', color: '#FC7561' },
     { name: 'Samsung', color: '#FFB726' },
     { name: 'Apple', color: '#7373F9' },
-    { name: 'Oppo', color: '#20B15A' },
-    { name: 'Vivo', color: '#FF6584' },
+    // { name: 'Oppo', color: '#20B15A' },
+    // { name: 'Vivo', color: '#FF6584' },
 
   ]
   const toggleCard = (index) => {
@@ -1770,8 +1770,8 @@ return (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
-              let h = imageHistory[index]?.metadata?.measurementL*40
-              let w = imageHistory[index]?.metadata?.measurementB*40
+              let h = imageHistory[index]?.metadata?.measurementL*80
+              let w = imageHistory[index]?.metadata?.measurementB*80
               console.log('helloo',comp);
               console.log("company color",companyColor);
               console.log("height",h);

@@ -91,17 +91,91 @@ const [openStructure, setOpenStructure] = useState([]);
 // const [square, setSquare] = useState();
 
 const company_legend= [
-  { name: 'Hitachi', color: '#7373F9' },
+  // { name: 'Hitachi', color: '#7373F9' },
   { name: 'Google', color: '#FC7561' },
   { name: 'Samsung', color: '#FFB726' },
   { name: 'Apple', color: '#7373F9' },
-  { name: 'Oppo', color: '#20B15A' },
-  { name: 'Vivo', color: '#FF6584' },
+  // { name: 'Oppo', color: '#20B15A' },
+  // { name: 'Vivo', color: '#FF6584' },
 
 ]
 const socketRef = useRef(null);
 let squares=[];
 const vizRef = useRef(null);
+
+
+
+
+function getNewCoordinates(x, z, angle) {
+  const radians = (angle * Math.PI) / 180; // Convert angle to radians
+  const distance = 100; // Given distance
+
+  const newX = x + distance * Math.cos(radians);
+  const newZ = z - distance * Math.sin(radians);
+
+  return [newX, newZ];
+}
+
+function find_nearest(x, z,l,b,angle) {
+  // console.log("imagesssssssss:",x,z,l,b,angle);
+  // x=(x/100)*500;
+  // z=(z/100)*250;
+  console.log(x,z);
+//   if (!planstructures || planstructures.length === 0) {
+//     console.error("No structures found!");
+//     // return;
+// }
+let perpendicularPoint=null
+let nearest=null
+let minDistance = Infinity;
+
+ 
+
+  setPerpendicularCoord((prev) => {
+    // console.log("Previous State:", prev);
+    const updated = [...prev,perpendicularPoint ];
+    // console.log("Updated State:", updated);
+    return updated;
+  });
+  // setCenterCoord(center);
+  // console.log("CenterCoord:", centerCoord);
+  if(l==0 && b==0)
+  {
+    l=10;
+    b=5;
+  }
+  l=l*30;
+  b=b*30;
+ 
+  const newCoords = getNewCoordinates(x, z, angle);
+  setDistcoord((prev) => {
+    // console.log("Previous State:", prev);
+    const updated = [...prev,newCoords ];
+    // console.log("Updated State:", updated);
+    return updated;
+  });
+  console.log('dist coord:',distCoord);
+  const pcoordinates=[
+    [newCoords[0] - l/2, newCoords[1] - b/2], // Top-left
+    [newCoords[0] + l/2, newCoords[1] - b/2],
+    [newCoords[0] + l/2, newCoords[1] + b/2], // Bottom-right
+    [newCoords[0] - l/2, newCoords[1] + b/2], // Top-right
+     // Bottom-left
+  ]
+
+  setPstructures(prevStructures => [
+    ...prevStructures,
+    { coordinates: pcoordinates }
+  ]);
+  console.log("pcoordinates:",pcoordinates);
+  console.log("Pstructures:",pstructures);
+  return { nearestStructure };
+
+}
+
+
+
+
 useEffect(() => {
   const updateDimensions = () => {
     setTimeout(() => {
@@ -148,6 +222,16 @@ useEffect(() => {
         
       }
     }, []);
+
+     useEffect(()=> {
+      let value = coordinates.map((value, index) => {
+        if(value?.photoCapture)
+        {
+          find_nearest(value.x, value.y, value.l, value.b, value.rotation);
+        }
+      })
+
+     },[coordinates]);
 
 useEffect(() => {
   console.log('Store Visit Details:', storeVisitDetails);
@@ -605,7 +689,7 @@ console.log(imageHistory, 'image history')
           fill={polygon.isBricked ? "url(#brickPattern)" : polygon.color}
           stroke="#000"
           strokeWidth="2"
-          fillOpacity={polygon.isBricked ? "1" : "0.5"}
+          fillOpacity={polygon.isBricked ? "1" : "1"}
         />
         <text
           x={polygon.textX}
@@ -653,140 +737,56 @@ console.log(imageHistory, 'image history')
 
 
 
-      {isPathVisible && (
-  <>
-    {coordinates.map((point, index) => (
-      <div key={index}>
-        <div
-          className={`point ${point?.photoCapture == 1 ? 'photo-captured' : ''}`}
-          style={{
-            left: `${centerX + point.x}px`,
-            top: `${centerZ + point.y}px`,
-            position: 'absolute'
-          }}
-          onMouseEnter={() => setIsHovering(index)}
-          onMouseLeave={() => setIsHovering(null)}
-        />
-
-        {isHovering === index && imageHistory[index] && (
-          <div
-            className="tooltip"
-            style={{
-              position: 'absolute',
-              top: `${centerZ + point.y - 150}px`, // Increased offset to position above
-              left: `${centerX + point.x}px`,
-              transform: 'translateX(-50%)', // Center horizontally
-              display: 'block',
-              zIndex: 1000
-            }}
-          >
-            <div className="imagetooltip-container">
-              <img src={imageHistory[index].image_url} alt="" className="tooltip-image" />
-            </div>
-
-            <div className="measurement-text">
-              <span className="measurement-label">Measurement:</span>
-              <span className="measurement-value">
-                {parseFloat(imageHistory[index].length || 0).toFixed(3)}×
-                {parseFloat(imageHistory[index].breadth || 0).toFixed(3)}
-              </span>
-            </div>
-
-            <div className="tooltip-pointer"></div>
-          </div>
-        )}
-      </div>
-    ))}
-  </>
-)}
+  
       
 
-        {isPathVisible  && (
-          <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
-            {pPolygons.map((polygon, index) => (
-              <g
-                key={polygon.image_id}
-                className={`structure ${polygon.type}`}
-                title={`${polygon.name} - ${polygon.instructionData?.title || ''}`}
-                onMouseEnter={() => { setIsHovering(index); console.log('hovering', index); }}
-                onMouseLeave={() => setIsHovering(null)}
-                onClick={() => setSelectedImage(index)}
-              >
-                {/* <image
-          href={imageHistory[index].metadata.brand=='google'?googlei:imageHistory[index].metadata.brand=='Apple'?apple:imageHistory[index].metadata.brand=='Google'?googlei:samsung}
-          x={polygon.imageX + 5} // Slightly inward positioning
-          y={polygon.imageY + 5}
-          width={polygon.imageWidth - 10} // Reduced width
-          height={polygon.imageHeight - 10} // Reduced height
-          preserveAspectRatio="xMidYMid slice"
-        /> */}
-                <path
-                  d={polygon.pathData}
-                  fill={polygon.color}
-                  stroke="#000"
-                  strokeWidth="2"
-                  fillOpacity="0.5"
-                />
-                <text
-                  x={polygon.textX}
-                  y={polygon.textY}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize="12px"
-                  fill="#000"
-                  fontWeight="bold"
-                >
-                  {polygon.name} - {polygon.instructionData?.title || ''}
-                </text>
-              </g>
-            ))}
-          </svg>
-        )}
-                {centerCoord && isStructureVisible && (
-                  distCoord.map((center, index) => {
-                    // let a = parseImageUrl(imageHistory[index]?.url);
-                    // console.log("parsed:",a);
-                    return (
-                      <>
-                        <div
-                          className="tooltip"
-                          style={{ position: 'absolute', top: centerZ + center[1]-10, left: centerX + center[0] ,
-                          display: isHovering===index  ? "block" : "none"
-                        }}
-                          onClick={() => setSelectedImage(index)}
-                          
-                          
-                        >
-                          <div className="imagetooltip-container">
-                            <img src={imageHistory[index].metadata?.image_url} alt="" className="tooltip-image" />
-                          </div>
+        
+        
+          {distCoord  &&  imageHistory.length > 0 &&  (
+            distCoord.map((center, index) => {
+              // let a = parseImageUrl(imageHistory[index]?.url);
+              // console.log("parsed:",a);
+              return (
+                <>
+                  <div
+                    className="tooltip"
+                    style={{ position: 'absolute', top: centerZ + center[1]-10, left: centerX + center[0] ,
+                    display: isHovering===index  ? "block" : "none"
+                  }}
+                    onClick={() => setSelectedImage(index)}
+                    
+                    
+                  >
+                    <div className="imagetooltip-container">
+                      <img src={imageHistory[index].metadata?.image_url} alt="" className="tooltip-image" />
+                    </div>
 
-                          {/* Measurement text */}
-                          <div className="measurement-text">
-                            <span className="measurement-label">Measurement:</span>
-                            <span className="measurement-value">
-                              {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(1)}
-                            </span>
-                          </div>
+                    {/* Measurement text */}
+                    <div className="measurement-text">
+                      <span className="measurement-label">Measurement:</span>
+                      <span className="measurement-value">
+                        {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(1)}
+                      </span>
+                    </div>
 
-                          {/* Triangle pointer */}
-                          <div className="tooltip-pointer"></div>
-                          {/* </div> */}
-                          {/* <span className="display-text">Phone Display</span> */}
-                        </div>
+                    {/* Triangle pointer */}
+                    <div className="tooltip-pointer"></div>
+                    {/* </div> */}
+                    {/* <span className="display-text">Phone Display</span> */}
+                  </div>
 
-                      </>
-                    );
-                  })
-                )}
+                </>
+              );
+            })
+          )}
 
 
-            {/* {distCoord  && imageHistory.length>0 && (
+             {distCoord  && imageHistory.length>0 && (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
-              let h = imageHistory[index]?.metadata?.measurementL*40
-              let w = imageHistory[index]?.metadata?.measurementB*40
+              let h = imageHistory[index]?.metadata?.measurementL*400
+              let w = imageHistory[index]?.metadata?.measurementB*400
               console.log('helloo',comp);
               console.log("company color",companyColor);
               console.log("height",h);
@@ -815,7 +815,7 @@ console.log(imageHistory, 'image history')
                 </>
               )
             })
-          )} */}
+          )} 
       </div>
       </div>
 
