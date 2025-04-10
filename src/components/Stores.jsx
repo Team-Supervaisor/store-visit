@@ -4,9 +4,18 @@ import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import fallback from '../assets/fallback.svg';
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-
-const Button = ({ children, styling, onClick }) => (
+const Button1 = ({ children, styling, onClick }) => (
   <button
     className={`p-2 rounded-xl bg-[#E1E9FD] text-[#4F4FDC] ${styling}`}
     onClick={() => onClick()}
@@ -56,7 +65,7 @@ const TabsTrigger = ({ children, value, onClick, active }) => (
   </button>
 );
 
-const Calendar = () => (
+const Calendar1 = () => (
   <input type="date" className="border border-gray-300 rounded px-2 py-1" />
 );
 
@@ -168,7 +177,22 @@ const StoreVisitTracking = () => {
   const [date, setDate] = useState("");
   const [storeVisit,setStoreVisit] = useState([])
   const [storeVisitDetails, setStoreVisitDetails] = useState([]);
+  const [alert,setAlert] = useState(false);
+  const currentDate = new Date();
+  const [date1, setDate1] = useState({
+    from: currentDate, // Default to April 6, 2025
+    to: currentDate, // Default to April 10, 2025
+  });
 
+  // Format dates as YYYY-MM-DD
+  const formatDateString = (date) => {
+    if (!date) return "";
+    return format(date, "yyyy-MM-dd");
+  };
+
+  // Get formatted dates for display and output
+  const fromDate = date1.from ? formatDateString(date.from) : "";
+  const toDate = date1.to ? formatDateString(date.to) : "";
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
@@ -207,6 +231,7 @@ const StoreVisitTracking = () => {
   }, [])
   
   const handleGo = () => {
+    console.log("Datess",date1)
     setStoreVisitDetails([]);
     let url = `https://store-visit-85801868683.us-central1.run.app/api/get_store_visits?visit_date=${selectedDate}&store_id=${selectedStore}`;
     let config = {
@@ -218,7 +243,13 @@ const StoreVisitTracking = () => {
     
     axios.request(config)
     .then((response) => {
-      // console.log((response.data));
+      console.log((response.data));
+      if(response.data?.error){
+        // alert(response.data.error);
+        setAlert(true)
+        return;
+      }
+      setAlert(false);
       setStoreVisit(response.data.store_visits);
 
       storevisitdetails(response.data.store_visits);
@@ -250,9 +281,6 @@ const StoreVisitTracking = () => {
               ...response.data, // Spread original response data
               status: item.status, // Add status field
             };
-            if(responseData.images.length>0){
-            console.log(responseData);
-            }
             details.push(responseData);
           })
           .catch((error) => {
@@ -298,15 +326,15 @@ const StoreVisitTracking = () => {
     Live
   </button>
 
-  <Button styling="flex items-center py-3 px-4">
+  <Button1 styling="flex items-center py-3 px-4">
     <img src="/document.svg" alt="" className="mr-1" />
     Analyse with EKG
-  </Button>
+  </Button1>
 
-  <Button styling="flex items-center py-3 px-4">
+  <Button1 styling="flex items-center py-3 px-4">
     <img src="/analyse.svg" alt="" className="mr-1" />
     Analyse on Dashboard
-  </Button>
+  </Button1>
 
   <img src="/profile.svg" alt="profile" className="ml-3 w-[51px]" />
 </div>
@@ -368,14 +396,14 @@ const StoreVisitTracking = () => {
   <div className="flex space-x-3">
     {storeId.length > 0 && date.length > 0 && (
       <>
-        <Button
+        <Button1
           variant="outline"
           styling="bg-[#EFF4FE] border-2 border-[#E1E9FD] flex items-center text-black px-4"
           onClick={() => navigate("/manageStores")}
         >
           <img src="/store.svg" alt="store" className="w-[20px] mr-2" />
           Manage Stores
-        </Button>
+        </Button1>
 
         <div className="flex items-center space-x-3">
           {/* Store Dropdown */}
@@ -398,7 +426,47 @@ const StoreVisitTracking = () => {
             />
           </div>
 
-          {/* Go Button */}
+          <div className="flex items-center rounded-xl p-2 bg-blue-50 border-2 border-blue-100">
+      <span className="mr-2 text-black">Date Range</span>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-auto justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date1.from ? (
+              date1.to ? (
+                <>
+                  {format(date1.from, "MMM d, yyyy")} - {format(date1.to, "MMM d, yyyy")}
+                </>
+              ) : (
+                format(date1.from, "MMM d, yyyy")
+              )
+            ) : (
+              <span>Pick a date range</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="range"
+            defaultMonth={date1.from}
+            selected={date1}
+            onSelect={setDate1}
+            numberOfMonths={2}
+          />
+        </PopoverContent>
+      </Popover>
+      
+      {/* This displays the selected date range in your requested format */}
+      {/* <div className="ml-4 text-sm text-gray-600">
+        Selected: <span className="font-medium">{fromDate}</span> to <span className="font-medium">{toDate}</span>
+      </div> */}
+    </div>
+
+          {/* Go Button1 */}
           <button
             className ="bg-[#717AEA] text-white px-4 py-2 rounded-lg transition"
             onClick={() => handleGo()}
@@ -413,9 +481,23 @@ const StoreVisitTracking = () => {
 
 
         <Card className="p-4 rounded-3xl shadow-sm">
-          {storeVisitDetails.length === 0 ? (
-            <TableSkeleton />
+        {storeVisitDetails.length === 0 ? (
+          alert ? (
+            <div className="flex flex-col items-center my-auto min-h-[70vh] justify-center space-y-6">
+                    <img 
+                      src="/empty.svg" 
+                      alt="arrow" 
+                      className="h-40 object-contain "
+                    />
+                    <p className="text-gray-400 text-lg">
+                    Oops ! there is no store for the selected combination
+                    </p>
+                  </div>
           ) : (
+            <TableSkeleton />
+          )
+        ) : 
+          (
             <div className="m-5 bg-[#EFF4FE]">
               <div className="overflow-auto">
                 <table className="w-full text-sm text-left bg-white rounded-lg border-[2px] border-[#EFF4FE] pt-[20px] pb-[20px] pr-[32px] pl-[32px] ">
