@@ -159,7 +159,7 @@ useEffect(() => {
     // Separate regular shapes and open spaces
     if (storeVisitDetails.planogram_coords) {
       // Process regular shapes
-      const regularShapes = storeVisitDetails.planogram_coords.regularShapes.map(shape => ({
+      const regularShapes = storeVisitDetails.planogram_coords?.regularShapes?.map(shape => ({
         ...shape,
         color: '#E1E9FD',
         type: 'regular'
@@ -167,7 +167,7 @@ useEffect(() => {
       setPlanstructures(regularShapes);
 
       // Process open spaces
-      const openSpaces = storeVisitDetails.planogram_coords.openSpaces.map(space => ({
+      const openSpaces = storeVisitDetails.planogram_coords?.openSpaces?.map(space => ({
         id: space.id,
         vertices: space.vertices,
         name: space.name || '',
