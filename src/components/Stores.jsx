@@ -231,7 +231,9 @@ const StoreVisitTracking = () => {
   }, [])
   
   const handleGo = () => {
-    console.log("Datess",date1)
+    const fromDate = format(date1.from, 'yyyy-MM-dd')
+    const toDate = format(date1.to, 'yyyy-MM-dd')
+    console.log("Datess",fromDate,toDate);
     setStoreVisitDetails([]);
     let url = `https://store-visit-85801868683.us-central1.run.app/api/get_store_visits?visit_date=${selectedDate}&store_id=${selectedStore}`;
     let config = {
