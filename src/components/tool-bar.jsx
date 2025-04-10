@@ -7,6 +7,7 @@ import {
   BrickWall,
   Undo,
   Redo,
+  CircleFadingPlus,
   Trash2,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -145,13 +146,32 @@ export default function ToolBar({
             </div>
           </div>
         ))}
-        <div className="relative">
-          <input type="file" id="upload" accept="image/*" ref={inputRef} onChange={handleImageUpload} className="hidden"/>
-          <Button className={`rounded-md bg-[#F0F4FF] text-[#717AEA] relative`} onClick={handleUploadClick}>
-            <span className="flex justify-between">
-              <img src="/upload.svg" className="mr-2" /> Upload
-            </span>
-          </Button>
+        <div className="flex space-x-2">
+          <div>
+            <input type="file" id="upload" accept="image/*" ref={inputRef} onChange={handleImageUpload} className="hidden"/>
+            <Button className={`rounded-md bg-[#F0F4FF] text-[#717AEA] relative hover:bg-[]`} onClick={handleUploadClick}>
+              <span className="flex justify-between">
+                <img src="/upload.svg" className="mr-2" /> Upload
+              </span>
+            </Button>
+          </div>
+          <div className="group">
+            <Button className={`rounded-md bg-[#F0F4FF] text-[#717AEA] relative hover:bg-[] ${selectedTool === "start-point"
+                  ? "bg-[#6366F1] ring-2 ring-blue-300"
+                  : "hover:bg-[#F3F4F6]"}`} 
+              onClick={() => handleToolClick("start-point")}
+            >
+              <CircleFadingPlus size={18} color={selectedTool === "start-point" ? "white": "black"} />
+            </Button>
+            <div className="absolute w-[150px] bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-10">
+              {/* Arrow */}
+              <div className="w-2 h-2 bg-gray-800 rounded-[2px] rotate-45 translate-y-[27px]"></div>
+              {/* Tooltip box */}
+              <div className="bg-gray-800 text-white text-xs rounded px-2 py-1 shadow-md ">
+                Pick Starting Point
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

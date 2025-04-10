@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import ToolBar from "./tool-bar"
 import { ChevronDown, X, PencilIcon, Trash2 } from "lucide-react"
+import OverlayAddStore from "./OverlayAddStore";
 
 const tagOptions = [
   { id: "cashier", title: "Cashier" },
@@ -23,8 +24,7 @@ const cursorMap = {
   fill: 'custom-fill',
 };
 
-
-export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage, nextId, setNextId}) {
+export default function DrawingCanvas({ errorMessage, setErrorMessage, successMessage, showStatusModal, setShowStatusModal, handleClose, isSuccess, isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage, nextId, setNextId, clickPosition, setClickPosition}) {
   const canvasRef = useRef(null)
   const [fillColor, setFillColor] = useState("#000000")
   const [ctx, setCtx] = useState(null)
@@ -326,6 +326,27 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     }
     drawRulers(ctx);
 
+    if(clickPosition){
+      const { x: canvasX, y: canvasY } = clickPosition;
+      console.log(canvasX, canvasY)
+      const size = 5; // Length of half the plus lines
+
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 2;
+  
+      // Vertical line
+      ctx.beginPath();
+      ctx.moveTo(canvasX, canvasY - size);
+      ctx.lineTo(canvasX, canvasY + size);
+      ctx.stroke();
+  
+      // Horizontal line
+      ctx.beginPath();
+      ctx.moveTo(canvasX - size, canvasY);
+      ctx.lineTo(canvasX + size, canvasY);
+      ctx.stroke();
+    }
+
     // Rest of your existing drawing code...
     ctx.restore();
   }, [shapes, ctx, drawingState, selectedShape, backgroundImage, isOpenSpaceMode]);
@@ -494,7 +515,43 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
     }
   }
 
+  const erasePlusAt = (x, y, size = 6) => {
+    // Slightly larger box than plus to fully clear it
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x + 498 - size, y + 248 - size, size * 3, size * 3);
+  };
+  
+
+  const addStartPoint = (e) => {
+    if(clickPosition) {
+      erasePlusAt(clickPosition.x, clickPosition.y, 5);
+    }
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+    const size = 5; // Length of half the plus lines
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+
+    // Vertical line
+    ctx.beginPath();
+    ctx.moveTo(canvasX + 500, canvasY + 250 - size);
+    ctx.lineTo(canvasX + 500, canvasY + 250 + size);
+    ctx.stroke();
+
+    // Horizontal line
+    ctx.beginPath();
+    ctx.moveTo(canvasX + 500 - size, canvasY + 250);
+    ctx.lineTo(canvasX + 500 + size, canvasY + 250);
+    ctx.stroke();
+
+    setClickPosition({ x: canvasX, y: canvasY });
+  }
+
   const handleCanvasClick = (e) => {
+    if(selectedTool === "start-point"){
+      addStartPoint(e);
+      return;
+    }
     if (selectedTool !== "delete") return;
 
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
@@ -838,8 +895,11 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       });
       
 
-    
-
+    if(!clickPosition){
+      setShowStatusModal(true);
+      setErrorMessage("Please click on the image to set the start point")
+      return;
+    }
 
 
     if (onSaveShapes) {
@@ -849,8 +909,8 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         snapshot: canvasSnapshot,
         image: backgroundImage,
       });
+      onClose();
     }
-    onClose();
   };
 
 
@@ -1195,6 +1255,19 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         </div>
       </>
       )}
+      <OverlayAddStore 
+        message={errorMessage}
+        setErrorMessage={setErrorMessage}
+        successMessage={successMessage}
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+          if (isSuccess) {
+            handleClose();
+          }
+        }}
+        isSuccess={isSuccess}
+      />
     </div>
   );
 }

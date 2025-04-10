@@ -1101,7 +1101,7 @@ export default function ManageStore() {
 
 
 
-                {(previewImage || snapshot) && (
+                {/* {(previewImage || snapshot) && (
                   <div className="flex items-center">
                     <button
                       className="flex items-center bg-[#EFF4FE] text-[#4F4FDC] border border-[#4F4FDC] px-4 py-2 rounded-lg font-bold"
@@ -1110,7 +1110,7 @@ export default function ManageStore() {
                       <Plus size={16} /> Pick Start Point
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div>
@@ -1200,6 +1200,15 @@ export default function ManageStore() {
       setUploadImage={setUploadImage}
       nextId={nextId}
       setNextId={setNextId}
+      setClickPosition={setClickPosition}
+      clickPosition={clickPosition}
+      errorMessage={errorMessage}
+      setErrorMessage={setErrorMessage}
+      successMessage={successMessage} 
+      showStatusModal={showStatusModal}
+      setShowStatusModal={setShowStatusModal}
+      handleClose={handleClose}
+      isSuccess={isSuccess}
     />
   </div>
 )}
