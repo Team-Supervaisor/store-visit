@@ -1165,7 +1165,7 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
         
         )}
       </div>
-      {planogramLength && planogramWidth && <div>
+      {planogramLength !== 0 && planogramWidth !== 0 && <div>
         <div className="bg-white p-2 mt-4 rounded shadow-md z-10 flex items-center">
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleX: 1ft = {Math.floor(1000 / planogramWidth)}px</label>
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleY: 1ft = {Math.floor(1000 / planogramLength)}px</label>
@@ -1173,14 +1173,14 @@ export default function DrawingCanvas({ isOpen, onClose, onSaveShapes, instructi
       </div>}
 
       <ToolBar
-  selectedTool={selectedTool}
-  setSelectedTool={setSelectedTool}
-  clearCanvas={clearCanvas}
-  saveShapes={saveShapes}
+        selectedTool={selectedTool}
+        setSelectedTool={setSelectedTool}
+        clearCanvas={clearCanvas}
+        saveShapes={saveShapes}
         handleImage={handleImageUpload}
-  isOpenSpaceMode={isOpenSpaceMode}
-  setIsOpenSpaceMode={setIsOpenSpaceMode}
-/>
+        isOpenSpaceMode={isOpenSpaceMode}
+        setIsOpenSpaceMode={setIsOpenSpaceMode}
+      />
       {selectedTool === "fill" && (
       <>
       
