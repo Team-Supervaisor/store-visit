@@ -1866,7 +1866,7 @@ return (
           )}
           {distCoord  && imageHistory.length>0 && (
             distCoord.map((center, index) => {
-              let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
+              let comp = imageHistory[index]?.metadata?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() == comp)?.color || '#cccccc'; // default color if not found
               let h = imageHistory[index]?.metadata?.measurementL*80
               let w = imageHistory[index]?.metadata?.measurementB*80
@@ -2041,11 +2041,49 @@ return (
                         {/* <p class="extra-description">
                Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
            </p> */}
-                        <p className="extra-details">
-                          <strong>Brand:</strong> {imageHistory[index].aiDetails?.brand || 'N/A'} <br />
-                          <strong>Position:</strong> {imageHistory[index].aiDetails?.position || 'N/A'} <br />
-                          <strong>Summary:</strong> {imageHistory[index].aiDetails?.summary || 'No AI analysis available.'}
-                        </p>
+           <p className="extra-details">
+              {imageHistory[index].aiDetails?.brand && (
+                <><strong>Brand:</strong> {imageHistory[index].aiDetails.brand}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.position && (
+                <><strong>Position:</strong> {imageHistory[index].aiDetails.position}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.summary && (
+                <><strong>Summary:</strong> {imageHistory[index].aiDetails.summary}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.count && (
+                <><strong>Count:</strong> {imageHistory[index].aiDetails.count}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.total_phones && (
+                <><strong>Total Phones:</strong> {imageHistory[index].aiDetails.total_phones}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.phones_off && (
+                <><strong>Phones Off:</strong> {imageHistory[index].aiDetails.phones_off}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.phones_on && (
+                <><strong>Phones On:</strong> {imageHistory[index].aiDetails.phones_on}<br /></>
+              )}
+              {imageHistory[index].aiDetails?.type && (
+                <><strong>Type:</strong> {imageHistory[index].aiDetails.type}<br /></>
+              )}
+
+               {/* Add Questions and Answers section */}
+              {imageHistory[index].ques_ans && imageHistory[index].ques_ans.length > 0 && (
+                <>
+                  <div className="mt-4">
+                    <strong className="text-black block mb-2">Questions & Answers</strong>
+                    <div className="space-y-3">
+                      {imageHistory[index].ques_ans.map((qa, i) => (
+                        <div key={i} className="bg-[#F9F9FF] p-3 rounded-lg">
+                          <p className="text-indigo-900 font-medium mb-3">Q: {qa.question}</p>
+                          <p className="text-gray-600 pl-2">A: {qa.answer}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </p>
                         {/* <p>
                           {aiDetails[index]?.summary || 'No AI analysis available.'}
                         </p> */}
