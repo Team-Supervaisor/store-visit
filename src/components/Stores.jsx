@@ -417,14 +417,14 @@ const StoreVisitTracking = () => {
           </div>
 
           {/* Date Dropdown */}
-          <div className="flex items-center rounded-xl p-2 bg-[#F7FAFF] border-2 border-[#EFF5FE]">
+          {/* <div className="flex items-center rounded-xl p-2 bg-[#F7FAFF] border-2 border-[#EFF5FE]">
             <span className="mr-2 text-black">Date</span>
             <Dropdown
               options={date}
               selected={selectedDate}
               onChange={setSelectedDate}
             />
-          </div>
+          </div> */}
 
           <div className="flex items-center rounded-xl p-2 bg-[#F7FAFF] border-2 border-[#EFF5FE]">
       <span className="mr-2 text-black">Date Range</span>
