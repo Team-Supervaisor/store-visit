@@ -847,7 +847,15 @@ const get_store_visit_details = (store_visit_id) => {
     console.log('open structure:',openStructure);
   }, [openStructure,vizDimensions]);
 
+  useEffect(() => {
+    // console.log(vizDimensions.width,vizDimensions.height);
+    setCenterX(vizDimensions.width / 2);
+    setCenterZ(vizDimensions.height / 2);
+   const centerx = vizDimensions.width / 2;
+   const centerz = vizDimensions.height / 2;
 
+
+}, [vizDimensions]);
   const pPolygonsRef = useRef([]);
 
   useEffect(() => {
@@ -917,6 +925,7 @@ useEffect(() => {
         width: vizRef.current.offsetWidth,
         height: vizRef.current.offsetHeight
       });
+      // console.log("Dimensions updated:", vizDimensions)
     }
   };
 
@@ -1334,7 +1343,7 @@ useEffect(() => {
 }, [selectedImage]); 
 
 // console.log(totalDistance, "totaldistance")
-console.log(aiDetails,'aidetials')
+// console.log(aiDetails,'aidetials')
 return (
   <div className="container" style={{ backgroundColor: '#EFF4FE' }}>
     {/* Header Section */}
@@ -1607,7 +1616,7 @@ return (
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
-      // height: "calc(100% - 65px)", // Subtract header height
+      height: "calc(100% - 65px)", // Subtract header height
       transition: "background 0.5s ease-in-out",
     }}
   >
@@ -1643,11 +1652,14 @@ return (
     <>
       {coordinates.map((point, index) => 
       {
+        console.log("point",point)
+        // console.log(centerX,centerZ)
         return(
         <div
           key={index}
           className={`point ${point.photoCapture ? 'photo-captured' : ''}`}
           style={{
+            position: 'absolute',
             left: `${centerX+ point.x}px`,
             top: `${centerZ+point.z}px`
           }}
