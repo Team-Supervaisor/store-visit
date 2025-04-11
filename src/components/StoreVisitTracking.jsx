@@ -339,7 +339,7 @@ const check_inside_structure = (x, z) => {
       //   .catch((error) => {console.error(error);return error});
 
 
-let data = JSON.stringify({
+let payload = JSON.stringify({
   "image_link": data.url,
   "image_id": data.image_id,
   "measurementL": data.metadata.measurementL,
@@ -353,7 +353,7 @@ let config = {
   headers: { 
     'Content-Type': 'application/json'
   },
-  data : data
+  data : payload
 };
 
 axios.request(config)
