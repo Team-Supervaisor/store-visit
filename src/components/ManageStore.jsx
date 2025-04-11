@@ -912,6 +912,21 @@ export default function ManageStore() {
                       className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
                     />
                   </div>
+                  <div className="flex items-center w-[450px]">
+                    <label
+                      htmlFor="tsmName"
+                      className="text-sm font-medium text-gray-700 w-40"
+                    >
+                      TSM Name:
+                    </label>
+                    <input
+                      id="tsmName"
+                      type="text"
+                      value={tsmName}
+                      onChange={(e) => setTsmName(e.target.value)}
+                      className="flex-1 w-md border-b border-gray-300 px-1 py-1 focus:outline-none focus:border-indigo-500 text-black"
+                    />
+                  </div>
 
                   <div className="flex items-center w-[450px]">
                     <label
