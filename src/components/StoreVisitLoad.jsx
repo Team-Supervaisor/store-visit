@@ -75,6 +75,7 @@ const [structures,setStructures]=useState();
   const [planstructures,setPlanstructures]=useState([]);
   const [instructionModal, setInstructionModal] = useState(false);
 const [modalData, setModalData] = useState(null);
+const [newCoordinates, setNewCoordinates] = useState([]);
 
 
 /// new states for showing strucutre. 
@@ -212,12 +213,13 @@ useEffect(() => {
         setImageHistory(storeVisitDetails.images);
         setStoreName(storeVisitDetails.store_name);
         setTotalDistance(storeVisitDetails.distance);
+        setNewCoordinates(storeVisitDetails?.images[0]?.x_y_coords);
         setStructures(storeVisitDetails?.planogram_coords || []);
 
         // Separate regular shapes and open spaces
-    if (storeVisitDetails.planogram_coords?.regularShapes) {
-      setStructures(storeVisitDetails.planogram_coords.regularShapes || []);
-      setOpenStructure(storeVisitDetails.planogram_coords.openSpaces || []);
+    if (storeVisitDetails?.planogram_coords?.regularShapes) {
+      setPlanstructures(storeVisitDetails.planogram_coords.regularShapes || []);
+      setOpenStructure(storeVisitDetails?.planogram_coords?.openSpaces || []);
     }
         
       }
@@ -229,9 +231,21 @@ useEffect(() => {
         {
           find_nearest(value.x, value.y, value.l, value.b, value.rotation);
         }
+       
       })
 
-     },[coordinates]);
+      if (newCoordinates?.length > 0) {
+      let cordinatesForImagePuddle = newCoordinates.map((value, index) => {
+        if(value?.photoCapture)
+        {
+          find_nearest(value.x, value.y, value.l, value.b, value.rotation);
+          
+        }
+       })
+
+      }
+
+     },[coordinates, newCoordinates]);
 
 useEffect(() => {
   console.log('Store Visit Details:', storeVisitDetails);
@@ -243,7 +257,7 @@ useEffect(() => {
     // Separate regular shapes and open spaces
     if (storeVisitDetails.planogram_coords) {
       // Process regular shapes
-      const regularShapes = storeVisitDetails.planogram_coords?.regularShapes?.map(shape => ({
+      const regularShapes = storeVisitDetails?.planogram_coords?.regularShapes?.map(shape => ({
         ...shape,
         color: '#E1E9FD',
         type: 'regular'
@@ -251,7 +265,7 @@ useEffect(() => {
       setPlanstructures(regularShapes);
 
       // Process open spaces
-      const openSpaces = storeVisitDetails.planogram_coords?.openSpaces?.map(space => ({
+      const openSpaces = storeVisitDetails?.planogram_coords?.openSpaces?.map(space => ({
         id: space.id,
         vertices: space.vertices,
         name: space.name || '',
@@ -330,26 +344,26 @@ useEffect(() => {
     const pPolygonsRef = useRef([]);
 
     useEffect(() => {
+      console.log("pstrucutres,",pstructures);
       if(pstructures.length>0){
     console.log((pstructures))
 
     // console.log(JSON.parse(pstructures[0]))
     // console.log(typeof(JSON.parse(pstructures[0])))
       }
-      else{
-        return;
-      }
+      // else{
+      //   return;
+      // }
     setCenterX(vizDimensions.width / 2);
     setCenterZ(vizDimensions.height / 2);
     const centerx = vizDimensions.width / 2;
     const centerz = vizDimensions.height / 2;
-    if(pstructures.length>0){
+    if(pstructures?.length>0){
     const newPolygons = pstructures.map((structure, structureIndex) => {
       // const parsedStructure = JSON.parse(structure);
       console.log("structure:",structure);
       let pathData = "";
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  
       structure.forEach((coord, index) => {
         const screenX = centerx + coord[0];
         const screenZ = centerz + coord[1];
@@ -467,7 +481,7 @@ useEffect(() => {
     }, [selectedImage]); 
 
 console.log(imageHistory, 'image history')
-
+console.log(distCoord, 'cordinates vlaues')
 
     return (
       <>
@@ -762,14 +776,14 @@ console.log(imageHistory, 'image history')
                     
                   >
                     <div className="imagetooltip-container">
-                      <img src={imageHistory[index].metadata?.image_url} alt="" className="tooltip-image" />
+                      <img src={imageHistory[index]?.image_url} alt="" className="tooltip-image" />
                     </div>
 
                     {/* Measurement text */}
                     <div className="measurement-text">
                       <span className="measurement-label">Measurement:</span>
                       <span className="measurement-value">
-                        {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index].metadata?.measurementB).toFixed(1)}
+                        {parseFloat(imageHistory[index]?.metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index]?.metadata?.measurementB).toFixed(1)}
                       </span>
                     </div>
 
@@ -785,15 +799,17 @@ console.log(imageHistory, 'image history')
           )}
 
 
+            {/* image puddle display */}
              {distCoord  && imageHistory.length>0 && (
             distCoord.map((center, index) => {
-              let comp = imageHistory[index]?.metadata?.brand.toLowerCase() || "";
+              let comp = imageHistory[index]?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
               let h = imageHistory[index]?.metadata?.measurementL*400
               let w = imageHistory[index]?.metadata?.measurementB*400
               console.log('helloo',comp);
               console.log("company color",companyColor);
               console.log("height",h);
+              console.log("ceenter1",center[1]);
               return(
                 <>
                   <div
@@ -802,8 +818,8 @@ console.log(imageHistory, 'image history')
                       position: 'absolute',
                       top: centerZ + center[1],
                       left: centerX + center[0],
-                      width: h,
-                      height: h,
+                      width: 20,
+                      height: 20,
                       borderRadius: '50%',
                       // backgroundColor: company_legend[comp.name] || company_legend.default,
                       backgroundColor:companyColor,
