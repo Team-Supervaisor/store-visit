@@ -985,11 +985,17 @@ useEffect(() => {
     });
     // Receive new coordinate
     socketRef.current.on("new-coordinate", (data) => {
-      // console.log("New coordinate received:", data);
+      console.log("New coordinate received:", data);
       // if(itr==0)
       // {
       //   get_store_visit_details(data.store_visit_id);
       // }
+      if (data) {
+        // const lastCoord = history[history.length - 1];
+        console.log(data.distance, 'distance')
+        setTotalDistance(data.distance);
+        // updateDistanceDisplay(lastCoord);
+      }
       if(planogram_coords?.length>0){
       // console.log("planstructures",planogram_coords);
       check_inside_structure(data.x,data.z);
