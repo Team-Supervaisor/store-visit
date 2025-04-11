@@ -76,6 +76,7 @@ const StoreVisitTracking = () => {
   const [highlightStructure, setHighlightStructure] = useState([]);
   const [isDirectionActive, setIsDirectionActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeDirection, setActiveDirection] = useState(null);
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -270,6 +271,7 @@ const check_inside_structure = (x, z) => {
   
   const handleRotation = async (direction) => {
     setIsLoading(true);
+    setActiveDirection(direction); // Set active direction
     try {
       await axios.post('https://store-visit-85801868683.us-central1.run.app/api/rotation', {
         rotation: direction
@@ -1511,43 +1513,69 @@ return (
         </div>
 
        {/* Navigation Controls with transition */}
-          <div 
-      className={`flex items-center gap-2 bg-[#ECF2FF] px-1.5 py-1.5 rounded-lg transition-all duration-300 ease-in-out ${
-        isDirectionActive ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 overflow-hidden'
-      }`}
-    >
-      <button 
-        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-        onClick={() => handleRotation('up')}
-        disabled={isLoading}
-      >
-        <img src="/turn_up.svg" alt="Turn Up" className="w-5 h-5" />
-      </button>
-      
-      <button 
-        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-        onClick={() => handleRotation('left')}
-        disabled={isLoading}
-      >
-        <img src="/turn_left.svg" alt="Turn Left" className="w-5 h-5" />
-      </button>
-      
-      <button 
-        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-        onClick={() => handleRotation('right')}
-        disabled={isLoading}
-      >
-        <img src="/turn_right.svg" alt="Turn Right" className="w-5 h-5" />
-      </button>
-      
-      <button 
-        className="p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-        onClick={() => handleRotation('down')}
-        disabled={isLoading}
-      >
-        <img src="/turn_down.svg" alt="Turn Down" className="w-5 h-5" />
-      </button>
-    </div>
+       <div className={`flex items-center gap-2 bg-[#ECF2FF] px-1.5 py-1.5 rounded-lg transition-all duration-300 ease-in-out ${
+  isDirectionActive ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 overflow-hidden'
+}`}>
+  <button 
+    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+      activeDirection === 'up' ? 'bg-[#717AEA]' : 'bg-white'
+    }`}
+    onClick={() => handleRotation('up')}
+    disabled={isLoading}
+  >
+    <img 
+      src="/turn_up.svg" 
+      alt="Turn Up" 
+      className="w-5 h-5"
+      style={{ filter: activeDirection === 'up' ? 'brightness(0) invert(1)' : 'none' }}
+    />
+  </button>
+  
+  <button 
+    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+      activeDirection === 'left' ? 'bg-[#717AEA]' : 'bg-white'
+    }`}
+    onClick={() => handleRotation('left')}
+    disabled={isLoading}
+  >
+    <img 
+      src="/turn_left.svg" 
+      alt="Turn Left" 
+      className="w-5 h-5"
+      style={{ filter: activeDirection === 'left' ? 'brightness(0) invert(1)' : 'none' }}
+    />
+  </button>
+  
+  <button 
+    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+      activeDirection === 'right' ? 'bg-[#717AEA]' : 'bg-white'
+    }`}
+    onClick={() => handleRotation('right')}
+    disabled={isLoading}
+  >
+    <img 
+      src="/turn_right.svg" 
+      alt="Turn Right" 
+      className="w-5 h-5"
+      style={{ filter: activeDirection === 'right' ? 'brightness(0) invert(1)' : 'none' }}
+    />
+  </button>
+  
+  <button 
+    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+      activeDirection === 'down' ? 'bg-[#717AEA]' : 'bg-white'
+    }`}
+    onClick={() => handleRotation('down')}
+    disabled={isLoading}
+  >
+    <img 
+      src="/turn_down.svg" 
+      alt="Turn Down" 
+      className="w-5 h-5"
+      style={{ filter: activeDirection === 'down' ? 'brightness(0) invert(1)' : 'none' }}
+    />
+  </button>
+</div>
       </div>
 
       {/* Company Legend */}
