@@ -314,7 +314,7 @@ const check_inside_structure = (x, z) => {
     
   }
 
-  function getAI(imageurl) {
+  function getAI(data) {
       //     const myHeaders = new Headers();
       // myHeaders.append("Content-Type", "application/json");
 
@@ -340,7 +340,10 @@ const check_inside_structure = (x, z) => {
 
 
 let data = JSON.stringify({
-  "image_link": imageurl
+  "image_link": data.url,
+  "image_id": data.image_id,
+  "measurementL": data.metadata.measurementL,
+  "measurementB": data.metadata.measurementB,
 });
 
 let config = {
@@ -1026,7 +1029,7 @@ socketRef.current.on("new-image", (data) => {
   console.log("New image received:", data);
 
   // Existing functionality: process AI and update state
-  let aisummary = getAI(data.url);
+  let aisummary = getAI(data);
   setImageHistory(prevHistory => [...prevHistory, data]);
 
   // Access the latest pPolygons from the ref
@@ -1322,6 +1325,7 @@ useEffect(() => {
   }
 }, [selectedImage]); 
 
+// console.log(totalDistance, "totaldistance")
 return (
   <div className="container" style={{ backgroundColor: '#EFF4FE' }}>
     {/* Header Section */}
