@@ -312,11 +312,11 @@
     transition: all 0.3s ease;
 }
 .extra-content-container {
-    background: #fcfcff; /* Light background */
-    padding: 12px;
+    /* background: #fcfcff; Light background */
+    padding: 5px;
     border-radius: 6px;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
-    font-family: 'Arial', sans-serif;
+    /* box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1); */
+    /* font-family: 'Arial', sans-serif; */
     margin-bottom: 15px;
 }
 
@@ -341,12 +341,12 @@
     margin-top: 6px;
 }
 
-.extra-details {
+/* .extra-details {
     font-size: 14px;
     font-weight: 400;
     color: #929292;
     line-height: 1.5;
-}
+} */
 
 .no-images-message {
     text-align: center;

@@ -78,6 +78,9 @@ const StoreVisitTracking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeDirection, setActiveDirection] = useState(null);
   const [imageShow, setImageShow] = useState(false);
+  const [isAISummaryOpen, setIsAISummaryOpen] = useState(true);
+  const [isResponsesOpen, setIsResponsesOpen] = useState(true);
+  const [accordionStates, setAccordionStates] = useState({});
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -1935,7 +1938,7 @@ return (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() == comp)?.color || '#cccccc'; // default color if not found
-              let h = imageHistory[index]?.metadata?.measurementL*34
+              let h = imageHistory[index]?.metadata?.measurementL*30
               let w = imageHistory[index]?.metadata?.measurementB*30
               console.log('helloo',comp);
               console.log("company color",companyColor);
@@ -2074,86 +2077,117 @@ return (
                     </div> */}
 
                     <div className="card-info px-4 py-3">
-        <div className="grid grid-cols-10 gap-4 mb-2">
-          <span className="col-span-2 text-left font-normal text-black">Brand</span>
-          <span className="col-span-3 text-left font-normal text-black">Merchandise</span>
-          <span className="col-span-2 text-left font-normal text-black">Product</span>
-          <span className="col-span-3 text-left font-normal text-black">Measurement</span>
-        </div>
-        
-        <div className="grid grid-cols-10 gap-4">
-          <span className="col-span-2 text-left font-semibold text-indigo-400">{a.brand}</span>
-          <span className="col-span-3 text-left font-semibold text-indigo-400">{a.merchandise}</span>
-          <span className="col-span-2 text-left font-semibold text-indigo-400">{a.product}</span>
-          <span className="col-span-3 text-left font-semibold text-indigo-400">
-          {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
+                    <div className="grid grid-cols-10 gap-4 mb-2">
+                      <span className="col-span-2 text-left font-normal text-black">Brand</span>
+                      <span className="col-span-3 text-left font-normal text-black">Merchandise</span>
+                      <span className="col-span-2 text-left font-normal text-black">Product</span>
+                      <span className="col-span-3 text-left font-normal text-black">Measurement</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-10 gap-4">
+                      <span className="col-span-2 text-left font-semibold text-indigo-400">{a.brand}</span>
+                      <span className="col-span-3 text-left font-semibold text-indigo-400">{a.merchandise}</span>
+                      <span className="col-span-2 text-left font-semibold text-indigo-400">{a.product}</span>
+                      <span className="col-span-3 text-left font-semibold text-indigo-400">
+                      {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
 
-          </span>
-        </div>
-      </div>
+                      </span>
+                    </div>
+                    </div>
 
                     {/* Toggle button */}
 
                     {/* Extra Content - Conditionally rendered */}
                     {expandedCards[index] && (
-                      <div className="extra-content-container m-4 p-4 rounded-lg bg-white animate-fadeIn"
-                      style={{
-                        animation: 'fadeIn 0.3s ease-in-out'
-                      }}>
-                        <div className="extra-header mb-3">
-                          <img src={star} alt="Icon" className="extra-icon" />
-                          <span className="extra-title" style={{ fontWeight: 400, color: 'black' }}>
-                            AI Analysis
-                          </span>
-                        </div>
-                        {/* <p class="extra-description">
-               Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
-           </p> */}
-           <p className="extra-details">
-           {aiDetails[index]?.brand && (
-              <><strong>Brand:</strong> {aiDetails[index].brand}<br /></>
-            )}
-            {aiDetails[index]?.summary && (
-              <><strong>Summary:</strong> {aiDetails[index].summary}<br /></>
-            )}
-            {typeof aiDetails[index]?.count === 'number' && (
-              <><strong>Count:</strong> {aiDetails[index].count}<br /></>
-            )}
-            {typeof aiDetails[index]?.total_phones === 'number' && aiDetails[index].total_phones >= 0 && (
-              <><strong>Total Phones:</strong> {aiDetails[index].total_phones}<br /></>
-            )}
-            {typeof aiDetails[index]?.phones_off === 'number' && aiDetails[index].phones_off >= 0 && (
-              <><strong>Phones Off:</strong> {aiDetails[index].phones_off}<br /></>
-            )}
-            {typeof aiDetails[index]?.phones_on === 'number' && aiDetails[index].phones_on >=0 && (
-              <><strong>Phones On:</strong> {aiDetails[index].phones_on}<br /></>
-            )}
-            {aiDetails[index]?.type && (
-              <><strong>Type:</strong> {aiDetails[index].type}<br /></>
-            )}
-              
-               {/* Add Questions and Answers section */}
-              {imageHistory[index].ques_ans && imageHistory[index].ques_ans.length > 0 && (
-                <>
-                  <div className="mt-4">
-                    <strong className="text-black block mb-2">Questions & Answers</strong>
-                    <div className="space-y-3">
-                      {imageHistory[index].ques_ans.map((qa, i) => (
-                        <div key={i} className="bg-[#F9F9FF] p-3 rounded-lg">
-                          <p className="text-indigo-900 font-medium mb-3">Q: {qa.question}</p>
-                          <p className="text-gray-600 pl-2">A: {qa.answer}</p>
-                        </div>
-                      ))}
+  <div className="extra-content-container m-4 space-y-4">
+    {/* AI Summary Accordion */}
+    <div className="rounded-md bg-[#EFF4FE] overflow-hidden">
+      <button 
+        className="w-full px-4 py-3 flex items-center justify-between text-[#717AEA] hover:bg-[#E9EDFD] transition-colors"
+        onClick={() => {
+          setAccordionStates(prev => ({
+            ...prev,
+            [`aiSummary-${index}`]: !prev[`aiSummary-${index}`]
+          }));
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <img src="/summary-icon.svg" alt="Summary" className="w-5 h-5" />
+          <span className="font-urbanist font-semibold">AI Summary</span>
+        </div>
+        {accordionStates[`aiSummary-${index}`] ? (
+          <ChevronUp size={20} />
+        ) : (
+          <ChevronDown size={20} />
+        )}
+      </button>
+      
+      {accordionStates[`aiSummary-${index}`] && (
+        <div className="px-4 pb-4">
+        <div className="font-urbanist font-semibold text-[#454651] space-y-2">
+                      {aiDetails[index]?.brand && (
+                        <p><strong>Brand:</strong> {aiDetails[index].brand}</p>
+                      )}
+                      {aiDetails[index]?.summary && (
+                        <p><strong>Summary:</strong> {aiDetails[index].summary}</p>
+                      )}
+                      {typeof aiDetails[index]?.count === 'number' && (
+                        <p><strong>Count:</strong> {aiDetails[index].count}</p>
+                      )}
+                      {typeof aiDetails[index]?.total_phones === 'number' && aiDetails[index].total_phones >= 0 && (
+                        <p><strong>Total Phones:</strong> {aiDetails[index].total_phones}</p>
+                      )}
+                      {typeof aiDetails[index]?.phones_off === 'number' && aiDetails[index].phones_off >= 0 && (
+                        <p><strong>Phones Off:</strong> {aiDetails[index].phones_off}</p>
+                      )}
+                      {typeof aiDetails[index]?.phones_on === 'number' && aiDetails[index].phones_on >= 0 && (
+                        <p><strong>Phones On:</strong> {aiDetails[index].phones_on}</p>
+                      )}
+                      {aiDetails[index]?.type && (
+                        <p><strong>Type:</strong> {aiDetails[index].type}</p>
+                      )}
                     </div>
                   </div>
-                </>
-              )}
-            </p>
-                        {/* <p>
-                          {aiDetails[index]?.summary || 'No AI analysis available.'}
-                        </p> */}
-                      </div>
-                    )}
+                )}
+              </div>
+
+              {/* Responses Accordion */}
+              <div className="rounded-md bg-[#EFF4FE] overflow-hidden">
+      <button 
+        className="w-full px-4 py-3 flex items-center justify-between text-[#717AEA] hover:bg-[#E9EDFD] transition-colors"
+        onClick={() => {
+          setAccordionStates(prev => ({
+            ...prev,
+            [`responses-${index}`]: !prev[`responses-${index}`]
+          }));
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <img src="/article.svg" alt="Responses" className="w-5 h-5" />
+          <span className="font-urbanist font-semibold">Responses</span>
+        </div>
+        {accordionStates[`responses-${index}`] ? (
+          <ChevronUp size={20} />
+        ) : (
+          <ChevronDown size={20} />
+        )}
+      </button>
+      
+      {accordionStates[`responses-${index}`] && imageHistory[index].ques_ans && imageHistory[index].ques_ans.length > 0 && (
+        <div className="px-4 pb-4">
+          <div className="space-y-3 font-urbanist font-semibold text-[#454651]">
+          {imageHistory[index].ques_ans.map((qa, i) => (
+              <div key={i} className="space-y-1">
+                <p><strong>Ques:</strong> {qa.question}</p>
+                <p className=""><strong>Ans:</strong> {qa.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+              </div>
+            </div>
+               )}
                     <div 
                         className="card-toggle px-4 py-3 flex items-center justify-center gap-2 cursor-pointer  transition-colors"
                         onClick={() => toggleCard(index)}
