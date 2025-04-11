@@ -77,6 +77,7 @@ const StoreVisitTracking = () => {
   const [isDirectionActive, setIsDirectionActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeDirection, setActiveDirection] = useState(null);
+  const [imageShow, setImageShow] = useState(false);
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -1311,6 +1312,10 @@ const savePlanogram = () => {
   const togglePath = () => {
     setIsPathVisible(!isPathVisible);
   }
+  const toggleImage = () => {
+    setImageShow(!imageShow);
+    console.log("Image show:",imageShow);
+  }
 
   // Function to create a ripple effect on button click
   const createRipple = (event) => {
@@ -1382,7 +1387,16 @@ return (
             Start <img src={vector1}/>
           </button> */}
           
-
+          <label className="toggle-container">
+            <span>Image</span>
+            <input
+              type="checkbox"
+              id="pathToggle"
+              checked={imageShow}
+              onChange={toggleImage}
+            />
+            <span className="slider"></span>
+          </label>
           <label className="toggle-container">
             <span>View path</span>
             <input
@@ -1612,7 +1626,9 @@ return (
  {/* Visualization Section - With background image */}
  <div 
     style={{
-      backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
+      // backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
+      //conditional rendering of background image
+      backgroundImage: imageShow ? `url(${storeVisitDetails.plano_bg_url})` : "",
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
@@ -1652,7 +1668,7 @@ return (
     <>
       {coordinates.map((point, index) => 
       {
-        console.log("point",point)
+        // console.log("point",point)
         // console.log(centerX,centerZ)
         return(
         <div
