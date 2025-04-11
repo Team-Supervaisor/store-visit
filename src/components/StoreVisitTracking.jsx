@@ -992,7 +992,7 @@ useEffect(() => {
       // }
       if (data) {
         // const lastCoord = history[history.length - 1];
-        console.log(data.distance, 'distance')
+        // console.log(data.distance, 'distance')
         setTotalDistance(data.distance);
         // updateDistanceDisplay(lastCoord);
       }
