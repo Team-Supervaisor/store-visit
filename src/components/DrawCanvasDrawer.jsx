@@ -6,12 +6,11 @@ import { ChevronDown, X, PencilIcon, Trash2 } from "lucide-react"
 import OverlayAddStore from "./OverlayAddStore";
 
 const tagOptions = [
-  { id: "cashier", title: "Cashier" ,color:"red"},
-  { id: "open space", title: "Open Space",color:"yellow"},
-  { id:'table', title: "Table",color:"blue"},
-  { id: "entry gate", title: "Entry Gate" ,color:"green"},
-]
-
+  { id: "cashier", title: "Cashier", color: "#FFD6C3" },
+  { id: "open space", title: "Open Space", color: "#FFF7CD" },
+  { id: "table", title: "Table", color: "#D4E5FC" },
+  { id: "entry gate", title: "Entry Gate", color: "#BAE5AF91" },
+];
 const visibilityOptions = [
   { id: "low", title: "Low" },
   { id: "medium", title: "Medium" },
@@ -24,6 +23,27 @@ const cursorMap = {
   delete: 'custom-bin',
   fill: 'custom-fill',
 };
+
+const tagBorderStyles = {
+  "open space": {
+    color: "#EEA74C",
+    style: [5, 3] // dash pattern
+  },
+  "cashier": {
+    color: "#E76024",
+    style: [5, 3]
+  },
+  "table": {
+    color: "#11458D",
+    style: [5, 3]
+  },
+  "entry gate": {
+    color: "#2C9717",
+    style: [5, 3]
+  }
+};
+
+
 
 export default function DrawingCanvas({ errorMessage, setErrorMessage, successMessage, showStatusModal, setShowStatusModal, handleClose, isSuccess, isOpen, onClose, onSaveShapes, instruction_data, shapes, setShapes, backgroundImage, setBackgroundImage, planogramWidth, planogramLength, setUploadImage, nextId, setNextId, clickPosition, setClickPosition}) {
   const canvasRef = useRef(null)
@@ -204,22 +224,30 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
     // Then draw regular shapes and walls
     shapes.forEach((shape) => {
       if ((shape.type === "rectangle" || shape.type === "brick") && !shape.isOpenSpace) {
-        // Draw regular shapes
-        if (selectedShape && selectedShape.id === shape.id) {
+        // Set border style based on tag
+        if (shape.tag && tagBorderStyles[shape.tag]) {
+          ctx.strokeStyle = tagBorderStyles[shape.tag].color;
+          ctx.setLineDash(tagBorderStyles[shape.tag].style);
+        } else if (selectedShape && selectedShape.id === shape.id) {
           ctx.strokeStyle = "#6366F1";
-          ctx.lineWidth = 2.5;
+          ctx.setLineDash([]); // solid line for selected shape
         } else {
           ctx.strokeStyle = "#000000";
-          ctx.lineWidth = 2;
+          ctx.setLineDash([]); // solid line for untagged shapes
         }
-
+        
+        ctx.lineWidth = 2;
         ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+        
+        // Reset line dash to prevent affecting other drawings
+        ctx.setLineDash([]);
 
-        // Add transparent gray background in open space mode
-        if (isOpenSpaceMode) {
-          ctx.fillStyle = "rgba(225, 225, 225, 0.3)";
+        // Fill color logic remains the same
+        if (shape.isColored) {
+          ctx.fillStyle = shape.color;
           ctx.fillRect(shape.x, shape.y, shape.width, shape.height);
         }
+
         // Draw ID text
         ctx.fillStyle = "#000000"
         ctx.font = "12px Arial"
