@@ -1872,8 +1872,8 @@ return (
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.metadata?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() == comp)?.color || '#cccccc'; // default color if not found
-              let h = imageHistory[index]?.metadata?.measurementL*80
-              let w = imageHistory[index]?.metadata?.measurementB*80
+              let h = imageHistory[index]?.metadata?.measurementL*50
+              let w = imageHistory[index]?.metadata?.measurementB*50
               console.log('helloo',comp);
               console.log("company color",companyColor);
               console.log("height",h);
