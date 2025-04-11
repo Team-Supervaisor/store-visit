@@ -1532,7 +1532,7 @@ return (
   isDirectionActive ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 overflow-hidden'
 }`}>
   <button 
-    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+    className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
       activeDirection === 'up' ? 'bg-[#717AEA]' : 'bg-white'
     }`}
     onClick={() => handleRotation('up')}
@@ -1547,7 +1547,7 @@ return (
   </button>
   
   <button 
-    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+    className={`p-2 rounded-lg  transition-colors disabled:opacity-50 ${
       activeDirection === 'left' ? 'bg-[#717AEA]' : 'bg-white'
     }`}
     onClick={() => handleRotation('left')}
@@ -1562,7 +1562,7 @@ return (
   </button>
   
   <button 
-    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+    className={`p-2 rounded-lg  transition-colors disabled:opacity-50 ${
       activeDirection === 'right' ? 'bg-[#717AEA]' : 'bg-white'
     }`}
     onClick={() => handleRotation('right')}
@@ -1577,7 +1577,7 @@ return (
   </button>
   
   <button 
-    className={`p-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 ${
+    className={`p-2 rounded-lg  transition-colors disabled:opacity-50 ${
       activeDirection === 'down' ? 'bg-[#717AEA]' : 'bg-white'
     }`}
     onClick={() => handleRotation('down')}
