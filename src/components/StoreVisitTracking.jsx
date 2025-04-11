@@ -1326,6 +1326,7 @@ useEffect(() => {
 }, [selectedImage]); 
 
 // console.log(totalDistance, "totaldistance")
+console.log(aiDetails,'aidetials')
 return (
   <div className="container" style={{ backgroundColor: '#EFF4FE' }}>
     {/* Header Section */}
@@ -2046,31 +2047,28 @@ return (
                Designed for online marketing campaigns, this banner comes with various attributes to ensure adaptability across platforms:
            </p> */}
            <p className="extra-details">
-              {imageHistory[index].aiDetails?.brand && (
-                <><strong>Brand:</strong> {imageHistory[index].aiDetails.brand}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.position && (
-                <><strong>Position:</strong> {imageHistory[index].aiDetails.position}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.summary && (
-                <><strong>Summary:</strong> {imageHistory[index].aiDetails.summary}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.count && (
-                <><strong>Count:</strong> {imageHistory[index].aiDetails.count}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.total_phones && (
-                <><strong>Total Phones:</strong> {imageHistory[index].aiDetails.total_phones}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.phones_off && (
-                <><strong>Phones Off:</strong> {imageHistory[index].aiDetails.phones_off}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.phones_on && (
-                <><strong>Phones On:</strong> {imageHistory[index].aiDetails.phones_on}<br /></>
-              )}
-              {imageHistory[index].aiDetails?.type && (
-                <><strong>Type:</strong> {imageHistory[index].aiDetails.type}<br /></>
-              )}
-
+           {aiDetails[index]?.brand && (
+              <><strong>Brand:</strong> {aiDetails[index].brand}<br /></>
+            )}
+            {aiDetails[index]?.summary && (
+              <><strong>Summary:</strong> {aiDetails[index].summary}<br /></>
+            )}
+            {typeof aiDetails[index]?.count === 'number' && (
+              <><strong>Count:</strong> {aiDetails[index].count}<br /></>
+            )}
+            {typeof aiDetails[index]?.total_phones === 'number' && aiDetails[index].total_phones >= 0 && (
+              <><strong>Total Phones:</strong> {aiDetails[index].total_phones}<br /></>
+            )}
+            {typeof aiDetails[index]?.phones_off === 'number' && aiDetails[index].phones_off >= 0 && (
+              <><strong>Phones Off:</strong> {aiDetails[index].phones_off}<br /></>
+            )}
+            {typeof aiDetails[index]?.phones_on === 'number' && aiDetails[index].phones_on >=0 && (
+              <><strong>Phones On:</strong> {aiDetails[index].phones_on}<br /></>
+            )}
+            {aiDetails[index]?.type && (
+              <><strong>Type:</strong> {aiDetails[index].type}<br /></>
+            )}
+              
                {/* Add Questions and Answers section */}
               {imageHistory[index].ques_ans && imageHistory[index].ques_ans.length > 0 && (
                 <>
