@@ -163,10 +163,10 @@ let minDistance = Infinity;
      // Bottom-left
   ]
 
-  setPstructures(prevStructures => [
-    ...prevStructures,
-    { coordinates: pcoordinates }
-  ]);
+  // setPstructures(prevStructures => [
+  //   ...prevStructures,
+  //   { coordinates: pcoordinates }
+  // ]);
   console.log("pcoordinates:",pcoordinates);
   console.log("Pstructures:",pstructures);
   return { nearestStructure };
@@ -212,11 +212,11 @@ useEffect(() => {
         setImageHistory(storeVisitDetails.images);
         setStoreName(storeVisitDetails.store_name);
         setTotalDistance(storeVisitDetails.distance);
-        setStructures(storeVisitDetails.planogram_coords.regularShapes || []);
+        setStructures(storeVisitDetails?.planogram_coords || []);
 
         // Separate regular shapes and open spaces
-    if (storeVisitDetails.planogram_coords) {
-      // setPlanstructures(storeVisitDetails.planogram_coords.regularShapes || []);
+    if (storeVisitDetails.planogram_coords?.regularShapes) {
+      setStructures(storeVisitDetails.planogram_coords.regularShapes || []);
       setOpenStructure(storeVisitDetails.planogram_coords.openSpaces || []);
     }
         
@@ -331,10 +331,13 @@ useEffect(() => {
 
     useEffect(() => {
       if(pstructures.length>0){
-    console.log((pstructures[0]))
+    console.log((pstructures))
 
     // console.log(JSON.parse(pstructures[0]))
     // console.log(typeof(JSON.parse(pstructures[0])))
+      }
+      else{
+        return;
       }
     setCenterX(vizDimensions.width / 2);
     setCenterZ(vizDimensions.height / 2);
@@ -343,6 +346,7 @@ useEffect(() => {
     if(pstructures.length>0){
     const newPolygons = pstructures.map((structure, structureIndex) => {
       // const parsedStructure = JSON.parse(structure);
+      console.log("structure:",structure);
       let pathData = "";
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   
@@ -765,7 +769,7 @@ console.log(imageHistory, 'image history')
                     <div className="measurement-text">
                       <span className="measurement-label">Measurement:</span>
                       <span className="measurement-value">
-                        {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(1)}
+                        {parseFloat(imageHistory[index].metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index].metadata?.measurementB).toFixed(1)}
                       </span>
                     </div>
 
@@ -783,7 +787,7 @@ console.log(imageHistory, 'image history')
 
              {distCoord  && imageHistory.length>0 && (
             distCoord.map((center, index) => {
-              let comp = imageHistory[index]?.metadata.brand.toLowerCase() || "";
+              let comp = imageHistory[index]?.metadata?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
               let h = imageHistory[index]?.metadata?.measurementL*400
               let w = imageHistory[index]?.metadata?.measurementB*400
