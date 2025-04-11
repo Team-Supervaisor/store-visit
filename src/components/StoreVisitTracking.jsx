@@ -1498,7 +1498,7 @@ return (
       
     <div  className="left-container bg-white rounded-[26px]">
   {/* Header Section - No background image */}
-  <div className="p-4 border-b border-[#E1E9FD]">
+  <div className="p-4 pl-6 pr-6 border-b border-[#E1E9FD]">
     <div className="flex justify-between items-center">
       {/* Store Info */}
       <div className="flex items-center gap-4">
@@ -1555,7 +1555,7 @@ return (
         {company_legend.map((company, index) => (
           <div key={index} className="flex items-center gap-2">
             <div 
-              className="w-5 h-5 rounded-sm" 
+              className="w-3 h-3 rounded-lg " 
               style={{ backgroundColor: company.color }}
             />
             <span className="text-sm font-medium text-black">{company.name}</span>
@@ -1573,7 +1573,7 @@ return (
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
-      height: "calc(100% - 72px)", // Subtract header height
+      // height: "calc(100% - 65px)", // Subtract header height
       transition: "background 0.5s ease-in-out",
     }}
   >
@@ -1951,18 +1951,19 @@ return (
       <div className="right-container"
       style={{
         margin:"5px",
-        marginBottom: "7px"
+        // marginBottom: "7px"
+        height:"99%"
     }}
     >
         <div
           style={{
-            paddingLeft: '14px',
+            paddingLeft: '16px',
                   paddingTop: '10px',
                   fontWeight: 'bold',
                   // boxShadow: '0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
                   borderBottom: '1px solid #EFF4FE',
                   color: 'black',
-                  paddingBottom: '5px',
+                  paddingBottom: '10px',
           }}
         >
           Reports

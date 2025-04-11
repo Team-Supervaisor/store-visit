@@ -15,7 +15,7 @@ import fallback from '../assets/fallback.svg';
 const Accordion = ({ title, content, isOpen, onClick }) => {
   return (
     <div className="mb-2">
-      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden`}>
+      <div className={`bg-[#EFF4FE] rounded-lg overflow-hidden p-1 `}>
         <button
           className="w-full p-3 flex justify-between items-center focus:ring-0 focus:outline-none hover:bg-[#E5EDFD] transition-colors"
           onClick={onClick}
@@ -28,7 +28,7 @@ const Accordion = ({ title, content, isOpen, onClick }) => {
           )}
         </button>
         {isOpen && (
-          <div className="p-4 bg-white rounded-lg m-1 shadow-sm">
+          <div className="p-4 bg-white rounded-lg m-1 ">
             <p className="text-sm text-gray-600">{content}</p>
           </div>
         )}
@@ -879,7 +879,7 @@ export default function ManageStore() {
             <div className="p-4 flex gap-6">
               {/* Existing Form Content */}
               <div className="space-y-6">
-                <div>
+                <div className="gap-4 space-y-4">
                   <div className="flex items-center w-[450px]">
                     <label
                       htmlFor="storeName"
@@ -1133,7 +1133,7 @@ export default function ManageStore() {
                   <h2 className="text-lg font-medium text-black mb-4">
                     Instructions
                   </h2>
-                  <div className="max-h-[300px] overflow-y-auto pr-2 hide-scrollbar">
+                  <div className="max-h-[330px] overflow-y-auto pr-2 hide-scrollbar ">
                     {instructionData.map((item) => (
                       <Accordion
                         key={item.id}
@@ -1167,6 +1167,7 @@ export default function ManageStore() {
                             </div>
                           </>
                         }
+                        className="mb-4"
                       />
                     ))}
                   </div>
