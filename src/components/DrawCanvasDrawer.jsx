@@ -6,9 +6,10 @@ import { ChevronDown, X, PencilIcon, Trash2 } from "lucide-react"
 import OverlayAddStore from "./OverlayAddStore";
 
 const tagOptions = [
-  { id: "cashier", title: "Cashier" },
-  { id: "insurance", title: "Insurance" },
-  { id: "checker", title: "Checker" },
+  { id: "cashier", title: "Cashier" ,color:"red"},
+  { id: "open space", title: "Open Space",color:"yellow"},
+  { id:'table', title: "Table",color:"blue"},
+  { id: "entry gate", title: "Entry Gate" ,color:"green"},
 ]
 
 const visibilityOptions = [
@@ -474,6 +475,8 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
           shapeId: clickedShape.id,
           name: clickedShape.name || "",
           instruction: clickedShape.instruction || "",
+          tag: clickedShape.tag || "",
+        visibility: clickedShape.visibility || "",
         })
       } else {
         setSelectedShape(null)
@@ -744,12 +747,20 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
 
   const handleShapeDialogSave = () => {
     // Update the shape with the new name and instruction
+
+    const selectedTagOption = tagOptions.find(option => option.id === shapeDialog.tag);
+
     const updatedShapes = shapes.map((shape) => {
       if (shape.id === shapeDialog.shapeId) {
         return {
           ...shape,
           name: shapeDialog.name || "N/A",
           instruction: shapeDialog.instruction || "N/A",
+          tag: shapeDialog.tag || "",
+          visibility: shapeDialog.visibility || "",
+          // Apply color based on visibility if selected
+          color: selectedTagOption ? selectedTagOption.color : shape.color,
+          isColored: selectedTagOption ? true : shape.isColored,
         }
       }
       return shape
