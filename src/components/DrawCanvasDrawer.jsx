@@ -901,7 +901,9 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         color: rect.color,
         instructionData: rect.instruction && instruction_data.find(item => 
           item.id === rect.instruction
-        )
+        ),
+        tag: rect.tag || "",
+        visibility: rect.visibility || "",
       }));
       
       // console.log(`Using original dimensions - Drawing area: ${totalDrawnArea}m², Store area: ${userArea}m²`);
