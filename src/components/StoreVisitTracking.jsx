@@ -18,6 +18,7 @@ import lg from '../assets/lg.png'
 import vector1 from '../assets/Vector1.png'
 import vector2 from '../assets/Vector2.png'
 import { MessageCircle } from 'lucide-react';
+import fallback from "../assets/fallback.svg"
 
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -81,6 +82,8 @@ const StoreVisitTracking = () => {
   const [isAISummaryOpen, setIsAISummaryOpen] = useState(true);
   const [isResponsesOpen, setIsResponsesOpen] = useState(true);
   const [accordionStates, setAccordionStates] = useState({});
+  const [circleData, setCircleData] = useState([]);
+  let circle_coords;
   let planogram_coords;
   let open_coords;
   const company_legend= [
@@ -992,6 +995,8 @@ useEffect(() => {
       setPlanstructures(data.planogram_coords.regularShapes);
       planogram_coords=data.planogram_coords.regularShapes;
       open_coords=data.planogram_coords.openSpaces;
+      circle_coords=data.planogram_coords?.circle;
+      setCircleData(data.planogram_coords.circle);
       setOpenStructure(data.planogram_coords.openSpaces);
       setStoreVisitDetails(data);
 
@@ -1628,19 +1633,18 @@ return (
 
  {/* Visualization Section - With background image */}
  <div 
-    style={{
-      // backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
-      //conditional rendering of background image
-      backgroundImage: imageShow ? `url(${storeVisitDetails.plano_bg_url})` : "",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      height: "calc(100% - 65px)", // Subtract header height
-      transition: "background 0.5s ease-in-out",
-    }}
-  >
+          style={{width: "1000px",height: "500px",position:"relative"}}
+        >
+          <img src={storeVisitDetails?.plano_bg_url||fallback} alt="" className=" inset-0 z-0"
+       style={{width: "100%", height:" 100%" ,objectFit:"fill" ,}} />
 
-      <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
+
+
+      <div id="visualization" ref={vizRef} style={{
+            position:'absolute',
+            top: 0,
+            left: 0,
+      }}>
   {/* Render the route polyline when path is visible */}
   {isPathVisible && coordinates.length > 0 && (
     <svg
@@ -1854,7 +1858,52 @@ return (
       )}
     </svg>
   )}
+  {isStructureVisible && (
+    //make circles from given cneter x,y and radius r
+    <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0,zIndex:10,pointerEvents:"all",cursor:"pointer"}}>
+      {circleData.map((circle,index) => 
+        {
+          console.log("circles",circle)
+          return(
+            <g
+            key={circle.id}
+            className={`structure ${circle.type} `}
+            title={circle.name}
+            onClick={() => {
+              console.log('hello');
+              setInstructionModal(true);
+              setModalData(circle);
+            }}
+          >
+                            <circle
+                              cx={centerX+circle.x}
+                              cy={centerZ+circle.y}
+                              r={circle.radius}
+                              fill={circle.color}
+                              stroke="#000"
+                              strokeWidth="2"
+                              fillOpacity="1"
 
+                            />
+                              <text
+                              x={centerX + circle.x}
+                              y={centerZ + circle.y}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                              fontSize="12px"
+                              fill="#000"
+                              fontWeight="bold"
+                            >
+                                    {circle.name}
+
+                              {/* {polygon.instructionData} */}
+                            </text>
+                          </g>
+        )}
+        
+      )}
+    </svg>
+  )}
   {false  && (
     <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0 }}>
       {pPolygons.map((polygon, index) => (
@@ -2040,7 +2089,7 @@ return (
               let a = parseImageUrl(image.url);
               
               // let ai = getAI(image.url);
-              // console.log("AI:",ai);  
+              console.log("image:",image);  
               return (
                 <div
                   key={index}
@@ -2085,9 +2134,9 @@ return (
                     </div>
                     
                     <div className="grid grid-cols-10 gap-4">
-                      <span className="col-span-2 text-left font-semibold text-indigo-400">{a.brand}</span>
-                      <span className="col-span-3 text-left font-semibold text-indigo-400">{a.merchandise}</span>
-                      <span className="col-span-2 text-left font-semibold text-indigo-400">{a.product}</span>
+                      <span className="col-span-2 text-left font-semibold text-indigo-400">{imageHistory[index].metadata.brand}</span>
+                      <span className="col-span-3 text-left font-semibold text-indigo-400">{imageHistory[index].metadata.merchandise}</span>
+                      <span className="col-span-2 text-left font-semibold text-indigo-400">{imageHistory[index].metadata.product}</span>
                       <span className="col-span-3 text-left font-semibold text-indigo-400">
                       {parseFloat(imageHistory[index].metadata.measurementL).toFixed(3)}&times;{parseFloat(imageHistory[index].metadata.measurementB).toFixed(3)}
 

@@ -218,7 +218,7 @@ useEffect(() => {
 
         // Separate regular shapes and open spaces
     if (storeVisitDetails?.planogram_coords?.regularShapes) {
-      setPlanstructures(storeVisitDetails.planogram_coords.regularShapes || []);
+      setStructures(storeVisitDetails.planogram_coords.regularShapes || []);
       setOpenStructure(storeVisitDetails?.planogram_coords?.openSpaces || []);
     }
         
@@ -618,18 +618,26 @@ console.log(distCoord, 'cordinates vlaues')
 
    {/* Visualization Section - With background image */}
       <div 
-          style={{
-            backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            height: "calc(100% - 72px)", // Subtract header height
-            transition: "background 0.5s ease-in-out",
-          }}
+          style={{width: "1000px",height: "500px",position:"relative"}}
         >
+          <img src={storeVisitDetails.plano_bg_url} alt="Background" className=" inset-0 z-0"
+       style={{width: "100%", height:" 100%" ,objectFit:"fill"}} />
 
 
-      <div id="visualization" ref={vizRef} style={{ position: 'relative' }}>
+
+      <div id="visualization" ref={vizRef} style={{
+            position:'absolute',
+            top: 0,
+            left: 0,
+            // backgroundImage: `url(${storeVisitDetails.plano_bg_url})`,
+            // backgroundSize: "contain",
+            // backgroundPosition: "center",
+            // backgroundRepeat: "no-repeat",
+            // // height: "calc(100% - 72px)", // Subtract header height
+            // height:"500px",
+            // width:"1000px",
+            // transition: "background 0.5s ease-in-out",
+          }}>
         {/* Render the route polyline when path is visible */}
         {isPathVisible && coordinates.length > 0 && (
           <svg
