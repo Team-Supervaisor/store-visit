@@ -334,6 +334,40 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         ctx.font = "16px Arial"
         ctx.fillText(shape.text, shape.x, shape.y)
       }
+      else if(shape.type === "circle"){
+        console.log(shape)
+        if (shape.tag && tagBorderStyles[shape.tag]) {
+          ctx.strokeStyle = tagBorderStyles[shape.tag].color;
+          ctx.setLineDash(tagBorderStyles[shape.tag].style);
+        } else if (selectedShape && selectedShape.id === shape.id) {
+          ctx.strokeStyle = "#6366F1";
+          ctx.setLineDash([]); // solid line for selected shape
+        } else {
+          ctx.strokeStyle = "#000000";
+          ctx.setLineDash([]); // solid line for untagged shapes
+        }
+        ctx.beginPath();
+        ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        if (shape.isColored) {
+          ctx.fillStyle = shape.color;
+          ctx.fill();
+        }
+        ctx.stroke();
+        if (shape.name) {
+          ctx.fillStyle = "#000000"
+          ctx.font = "14px Arial"
+          const textWidth = ctx.measureText(shape.name).width;
+          const textHeight = 14; // Approximate text height for 14px font
+          const centerX = shape.x;
+          const centerY = shape.y;
+          ctx.fillText(
+            shape.name,
+            centerX - textWidth / 2,
+            centerY + textHeight / 2
+          );
+        }
+      }
     })
 
     
@@ -352,6 +386,20 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
       ctx.fillRect(drawingState.startX, drawingState.startY, width, height)
 
       ctx.setLineDash([])
+    }
+
+    if(drawingState.isDrawing && selectedTool === "circle"){
+      const radius = Math.sqrt(
+        Math.pow(drawingState.currentX - drawingState.startX, 2) +
+        Math.pow(drawingState.currentY - drawingState.startY, 2)
+      );
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      ctx.arc(drawingState.startX, drawingState.startY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
     drawRulers(ctx);
 
@@ -444,6 +492,11 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
           return shape
         }
       }
+      else if(shape.type === "circle"){
+        if (Math.sqrt(Math.pow(x - shape.x, 2) + Math.pow(y - shape.y, 2)) <= shape.radius) {
+          return shape
+        }
+      }
     }
     return null
   }
@@ -482,7 +535,7 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
     if (selectedTool === "pointer") {
       const clickedShape = findShapeAtPosition(canvasX, canvasY)
       setHoveredShape(null)
-      if (clickedShape && !clickedShape.isBricked) {
+      if (clickedShape && !clickedShape.isBricked && clickedShape.type === "rectangle") {
         setSelectedShape(clickedShape)
         
         // Calculate the center of the rectangle properly for dialog positioning
@@ -506,7 +559,28 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
           tag: clickedShape.tag || "",
         visibility: clickedShape.visibility || "",
         })
-      } else {
+      } else if(clickedShape && clickedShape.type === "circle"){
+        setSelectedShape(clickedShape)
+        console.log(clickedShape)
+        
+        // Calculate the center of the circle properly for dialog positioning
+        const centerX = clickedShape.x + clickedShape.radius;
+        const centerY = clickedShape.y + clickedShape.radius;
+        console.log(centerX + canvasWidth/2)
+        console.log(centerY)
+        
+        setShapeDialog({
+          isOpen: true,
+          x: centerX + canvasWidth / 2,
+          y: centerY + canvasHeight / 2,
+          shapeId: clickedShape.id,
+          name: clickedShape.name || "",
+          instruction: clickedShape.instruction || "",
+          tag: clickedShape.tag || "",
+          visibility: clickedShape.visibility || "",
+        })
+      }
+      else {
         setSelectedShape(null)
         setShapeDialog({ ...shapeDialog, isOpen: false })
       }
@@ -530,6 +604,17 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
       setSelectedShape(null)
       setShapeDialog({ ...shapeDialog, isOpen: false })
     }
+    else if(selectedTool === "circle"){
+      setDrawingState({
+        isDrawing: true,
+        startX: canvasX,
+        startY: canvasY,
+        currentX: canvasX,
+        currentY: canvasY,
+      })
+      setSelectedShape(null)
+      setShapeDialog({ ...shapeDialog, isOpen: false })
+    }
   }
 
   const draw = (e) => {
@@ -537,7 +622,7 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
 
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
 
-    if (selectedTool === "rectangle" || selectedTool === "walls") {
+    if (selectedTool === "rectangle" || selectedTool === "walls" || selectedTool === "circle") {
       setDrawingState({
         ...drawingState,
         currentX: canvasX,
@@ -595,12 +680,25 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         canvasY <= r.y + r.height
     );
 
+    const clickedCircle = shapes.find(
+      (c) =>
+        Math.sqrt(Math.pow(canvasX - c.x, 2) + Math.pow(canvasY - c.y, 2)) <= c.radius
+    )
+
     if (clickedRect) {
       // Remove the rectangle
       setShapes((prevRects) =>
         prevRects.filter((r) => r.id !== clickedRect.id)
       );
     }
+
+    if(clickedCircle){
+      // Remove the circle
+      setShapes((prevCircles) =>
+        prevCircles.filter((c) => c.id !== clickedCircle.id)
+      );
+    }
+
   };
 
   const handleFill = (e) => {
@@ -615,7 +713,10 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         canvasY <= r.y + r.height
     );
 
-
+    const clickedCircle = shapes.find(
+      (c) =>
+        Math.sqrt(Math.pow(canvasX - c.x, 2) + Math.pow(canvasY - c.y, 2)) <= c.radius
+    )
     
     if (clickedRect && !clickedRect.isBricked) {
       // Update the rectangle's color property
@@ -630,16 +731,79 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
       ctx.fillStyle = fillColor;
       ctx.fillRect(clickedRect.x + canvasWidth / 2, clickedRect.y + canvasHeight / 2, clickedRect.width, clickedRect.height);
     }
+
+    if(clickedCircle){
+      // Update the circle's color property
+      setShapes((prevShapes) =>
+        prevShapes.map((shape) =>
+          shape.id === clickedCircle.id
+            ? { ...shape, color: fillColor, isColored: true }
+            : shape
+        )
+      );
+      // Fill the circle with a color
+      ctx.fillStyle = fillColor;
+      ctx.beginPath();
+      ctx.arc(clickedCircle.x + canvasWidth / 2, clickedCircle.y + canvasHeight / 2, clickedCircle.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const drawCircle = (e) => {
+
+    const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
+
+    const radius = Math.sqrt(
+      Math.pow(canvasX - drawingState.startX, 2) +
+      Math.pow(canvasY - drawingState.startY, 2)
+    );
+    if(radius > 5){
+      const newCircle = {
+        id: nextId,
+        type: "circle",
+        x: drawingState.startX,
+        y: drawingState.startY,
+        radius: radius,
+        isColored: false,
+      }
+
+      setShapes([...shapes, newCircle]);
+
+        // Add entry in availableInstructions for the new shape
+      if (instruction_data) {
+        setAvailableInstructions(prev => ({
+          ...prev,
+          [nextId]: instruction_data
+            .map(item => item.id)
+            .filter(id => !Object.values(selectedInstructions).includes(id))
+        }));
+      }
+      
+      setNextId(nextId + 1)
+    }
+    setDrawingState({
+      isDrawing: false,
+      startX: 0,
+      startY: 0,
+      currentX: 0,
+      currentY: 0,
+    })
   }
 
   const stopDrawing = (e) => {
-    if (!ctx || !drawingState.isDrawing || !canvasRef.current || (selectedTool !== "rectangle" && selectedTool !== "walls")) return
+    if (!ctx || !drawingState.isDrawing || !canvasRef.current || (selectedTool !== "rectangle" && selectedTool !== "walls" && selectedTool !== "circle")) return;
+
+    if(selectedTool === "circle"){
+      drawCircle(e);
+      return;
+    }
+
     const { x: canvasX, y: canvasY } = getCustomCoordinates(e)
     const width = canvasX - drawingState.startX
     const height = canvasY - drawingState.startY
     
     // Only create rectangle if it has a reasonable size
-    if (Math.abs(width) > 5 && Math.abs(height) > 5) {
+    if (Math.abs(width) > 5 && Math.abs(height) > 5 && selectedTool !== "circle") {
       // Calculate the corner coordinates for vertices correctly
       const x1 = drawingState.startX;
       const y1 = drawingState.startY;
@@ -842,12 +1006,14 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
       shape.type === "rectangle" && !shape.isOpenSpace
     );
 
+    const circles = shapes.filter(shape => shape.type === "circle");
+
     const openSpaceRectangles = shapes.filter(shape => 
       shape.type === "rectangle" && shape.isOpenSpace
     );
     
     // Get rectangles
-    const rectangles = shapes.filter(shape => shape.type === "rectangle" );
+
     
     // Calculate pixel to meter conversion factors
     // const pixelsPerMeterWidth = canvasWidth / (planogramWidth * 0.3048);  // pixels per meter
@@ -906,6 +1072,21 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         visibility: rect.visibility || "",
       }));
       
+      const circlesData = circles.map(circle => ({
+        id: circle.id,
+        x: circle.x,
+        y: circle.y,
+        radius: circle.radius,
+        name: circle.name,
+        isColored: circle.isColored,
+        color: circle.color,
+        tag: circle.tag || "",
+        visibility: circle.visibility || "",
+        instructionData: circle.instruction && instruction_data.find(item => 
+          item.id === circle.instruction
+        ),
+
+      }))
       // console.log(`Using original dimensions - Drawing area: ${totalDrawnArea}m², Store area: ${userArea}m²`);
     
 
@@ -947,6 +1128,7 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
       onSaveShapes({
         shapes: scaledRectangles,
         openSpaces: processedOpenSpaces,
+        circles: circlesData,
         snapshot: canvasSnapshot,
         image: backgroundImage,
       });
@@ -1267,7 +1449,7 @@ export default function DrawingCanvas({ errorMessage, setErrorMessage, successMe
         )}
       </div>
       {planogramLength !== 0 && planogramWidth !== 0 && <div>
-        <div className="bg-white p-2 mt-4 rounded shadow-md z-10 flex items-center">
+        <div className="bg-white p-2 mt-4 rounded shadow-md z-10 flex items-center mb-6">
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleX: 1ft = {Math.floor(1000 / planogramWidth)}px</label>
           <label className="text-sm font-medium text-gray-700 mr-2">ScaleY: 1ft = {Math.floor(1000 / planogramLength)}px</label>
         </div>

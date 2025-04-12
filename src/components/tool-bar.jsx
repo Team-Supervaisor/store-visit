@@ -8,7 +8,7 @@ import {
   Undo,
   Redo,
   CircleFadingPlus,
-  Trash2,
+  Circle
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
@@ -30,6 +30,7 @@ export default function ToolBar({
   const tools = [
     { name: "pointer", icon: <MousePointer size={18} color="#333" /> },
     { name: "rectangle", icon: <Square size={18} color="#333" /> },
+    { name: "circle", icon: <Circle size={18} color="#333" /> },
     {
       name: "walls",
       icon: (

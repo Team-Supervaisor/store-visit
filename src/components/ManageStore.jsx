@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "../assets/logo.png";
-import { Plus, ChevronRight } from "lucide-react";
+import { Plus, ChevronRight, Radius } from "lucide-react";
 import { Store, X, Upload, Pencil } from "lucide-react";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -456,6 +456,7 @@ export default function ManageStore() {
   const [uploadImage, setUploadImage] = useState(null);
   const [mappedInstructions, setMappedInstructions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [circleData, setCircleData] = useState([]);
   // let snapshot = null;
 
   const initialShapes = [
@@ -515,6 +516,7 @@ export default function ManageStore() {
     setMappedInstructions(newMappings);
     setRectangleData(data.shapes);
     setOpenSpaceData(data.openSpaces);
+    setCircleData(data.circles);
     setSnapshot(data.snapshot);
   };
 
@@ -567,8 +569,25 @@ export default function ManageStore() {
         height: height,
       }
     })
+
+    const circles = store.planogram_coords.circle.map((shape) => {
+
+      return{
+        ...shape,
+        x: shape.x,
+        type: "circle",
+        y: shape.y,
+        radius: shape.radius,
+        isBricked: shape.isBricked? true : false,
+        isColored: shape.isColored? true : false,
+        color: shape.color? shape.color : "#000000",
+        instruction: shape.instructionData?.title,
+        tag: shape.tag,
+        visibility: shape.visibility,
+      }
+    })
     console.log([...regular, ...open])
-    setShapes([...regular, ...open]);
+    setShapes([...regular, ...open, ...circles]);
     setSnapshot(store.planogram_url);
     if(store.plano_bg_url){
       const img = new Image();
@@ -613,7 +632,8 @@ export default function ManageStore() {
     setLoading(true);
     const combinedShapes = {
       regularShapes: rectangleData,
-      openSpaces: openspaceData
+      openSpaces: openspaceData,
+      circle: circleData
     };
 
     const formData = {
