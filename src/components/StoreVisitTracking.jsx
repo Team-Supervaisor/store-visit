@@ -1635,8 +1635,17 @@ return (
  <div 
           style={{width: "1000px",height: "500px",position:"relative"}}
         >
-          <img src={storeVisitDetails?.plano_bg_url||fallback} alt="" className=" inset-0 z-0"
-       style={{width: "100%", height:" 100%" ,objectFit:"fill" ,}} />
+          <img
+  src={storeVisitDetails?.plano_bg_url||fallback}
+  alt=""
+  className="inset-0 z-0"
+  style={{
+    display: imageShow ? "block" : "none",
+    width: "100%",
+    height: "100%",
+    objectFit: "fill"
+  }}
+/>
 
 
 
