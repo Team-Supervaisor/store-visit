@@ -570,7 +570,7 @@ export default function ManageStore() {
       }
     })
 
-    const circles = store.planogram_coords.circle.map((shape) => {
+    const circles = store.planogram_coords.circle ? store.planogram_coords.circle.map((shape) => {
 
       return{
         ...shape,
@@ -585,7 +585,7 @@ export default function ManageStore() {
         tag: shape.tag,
         visibility: shape.visibility,
       }
-    })
+    }) : [];
     console.log([...regular, ...open])
     setShapes([...regular, ...open, ...circles]);
     setSnapshot(store.planogram_url);
