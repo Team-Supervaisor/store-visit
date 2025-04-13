@@ -302,7 +302,7 @@ const StoreVisitTracking = () => {
 
 
   return (
-    <div className="bg-[#F7FAFF] min-h-screen min-w-screen font-[Urbanist]">
+    <div className="bg-[#F7FAFF] min-h-screen w-full _min-w-screen font-[Urbanist]">
    
       <header className="flex p-4 bg-[#F7FAFF] justify-between items-center">
         <div style={{ display: "flex", alignItems: "center", marginLeft: 15 }}>

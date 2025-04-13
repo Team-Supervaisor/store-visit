@@ -486,7 +486,7 @@ console.log(distCoord, 'cordinates vlaues')
     return (
       <>
 {coordinates.length>0?<>
-<div className="container" style={{ backgroundColor: '#EFF4FE' }}>
+<div className="w-full" style={{ backgroundColor: '#EFF4FE' }}>
     {/* Header Section */}
 
 
