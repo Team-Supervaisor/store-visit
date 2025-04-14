@@ -595,7 +595,7 @@ console.log(distCoord, 'cordinates vlaues')
         <div className="flex items-center gap-2 bg-[#FFF7E7] px-4 py-2 rounded-lg">
           <img src="/footprint.svg" alt="footprint" className="w-5 h-5 font-bold" />
           <span className="text-black font-bold">
-            {totalDistance ? `${totalDistance.toFixed(2)}m` : '0.00m'}
+            {totalDistance ? `${totalDistance.toFixed(2)}ft` : '0.00ft'}
           </span>
         </div>
       </div>
