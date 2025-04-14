@@ -149,6 +149,7 @@ let minDistance = Infinity;
   b=b*30;
  
   const newCoords = getNewCoordinates(x, z, angle);
+  // console.log(newCoords, 'new coords')
   setDistcoord((prev) => {
     // console.log("Previous State:", prev);
     const updated = [...prev,newCoords ];
@@ -234,16 +235,16 @@ useEffect(() => {
        
       })
 
-      if (newCoordinates?.length > 0) {
-      let cordinatesForImagePuddle = newCoordinates.map((value, index) => {
-        if(value?.photoCapture)
-        {
-          find_nearest(value.x, value.y, value.l, value.b, value.rotation);
+      // if (newCoordinates?.length > 0) {
+      // let cordinatesForImagePuddle = newCoordinates.map((value, index) => {
+      //   if(value?.photoCapture)
+      //   {
+      //     find_nearest(value.x, value.y, value.l, value.b, value.rotation);
           
-        }
-       })
+      //   }
+      //  })
 
-      }
+      // }
 
      },[coordinates, newCoordinates]);
 
@@ -777,7 +778,7 @@ console.log(distCoord, 'cordinates vlaues')
                   <div
                     className="tooltip"
                     style={{ position: 'absolute', top: centerZ + center[1]-10, left: centerX + center[0] ,
-                    display: isHovering===index  ? "block" : "none"
+                    display: isHovering===index  ? "block" : "none", 
                   }}
                     onClick={() => setSelectedImage(index)}
                     
@@ -791,7 +792,7 @@ console.log(distCoord, 'cordinates vlaues')
                     <div className="measurement-text">
                       <span className="measurement-label">Measurement:</span>
                       <span className="measurement-value">
-                        {parseFloat(imageHistory[index]?.metadata?.measurementL).toFixed(1)}&times;{parseFloat(imageHistory[index]?.metadata?.measurementB).toFixed(1)}
+                        {parseFloat(imageHistory[index]?.length).toFixed(1)}&times;{parseFloat(imageHistory[index]?.breadth).toFixed(1)}
                       </span>
                     </div>
 
@@ -812,7 +813,7 @@ console.log(distCoord, 'cordinates vlaues')
             distCoord.map((center, index) => {
               let comp = imageHistory[index]?.brand.toLowerCase() || "";
               const companyColor = company_legend.find(c => c.name.toLowerCase() === comp)?.color || '#cccccc'; // default color if not found
-              let h = imageHistory[index]?.metadata?.measurementL*400
+              let h = imageHistory[index]?.length*20
               let w = imageHistory[index]?.metadata?.measurementB*400
               console.log('helloo',comp);
               console.log("company color",companyColor);
@@ -826,8 +827,8 @@ console.log(distCoord, 'cordinates vlaues')
                       position: 'absolute',
                       top: centerZ + center[1],
                       left: centerX + center[0],
-                      width: 20,
-                      height: 20,
+                      width: h,
+                      height: h,
                       borderRadius: '50%',
                       // backgroundColor: company_legend[comp.name] || company_legend.default,
                       backgroundColor:companyColor,
