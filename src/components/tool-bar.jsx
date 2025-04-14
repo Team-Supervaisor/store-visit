@@ -122,17 +122,17 @@ export default function ToolBar({
       <div className="flex items-center gap-2 mr-6">
         {tools.map((tool) => (
           <div className="relative group">
-            <Button
-              key={tool.name}
-              variant="ghost"
-              size="icon"
-              onClick={() => handleToolClick(tool.name)}
-              className={`rounded-md h-9 w-9 ${
-                (tool.name === "open-space" && isOpenSpaceMode) || selectedTool === tool.name
-                  ? "bg-[#6366F1] ring-2 ring-blue-300"
-                  : "hover:bg-[#F3F4F6]"
-              }`}
-            >
+          <Button
+          key={tool.name}
+          variant="ghost"
+          size="icon"
+          onClick={() => handleToolClick(tool.name)}
+          className={`rounded-md h-9 w-9 ${
+            (tool.name === "open-space" && isOpenSpaceMode) || selectedTool === tool.name
+              ? "bg-[#6366F1] ring-2 ring-blue-300 hover:bg-[#6366F1]"
+              : ""
+          }`}
+        >
               {React.cloneElement(tool.icon, {
                 color: (tool.name === "open-space" && isOpenSpaceMode) || selectedTool === tool.name ? "#FFF" : "#333",
               })}

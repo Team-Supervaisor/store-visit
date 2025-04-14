@@ -19,6 +19,7 @@ import vector1 from '../assets/Vector1.png'
 import vector2 from '../assets/Vector2.png'
 import { MessageCircle } from 'lucide-react';
 import fallback from "../assets/fallback.svg"
+import DeleteModalLive from './DeleteModalLive';
 
 const backendUrl=import.meta.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -83,6 +84,8 @@ const StoreVisitTracking = () => {
   const [isResponsesOpen, setIsResponsesOpen] = useState(true);
   const [accordionStates, setAccordionStates] = useState({});
   const [circleData, setCircleData] = useState([]);
+  // Add this with your other state declarations
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   let circle_coords;
   let planogram_coords;
   let open_coords;
@@ -1140,40 +1143,49 @@ const savePlanogram = () => {
 }
   
   // Add these functions to handle button actions
-  const handleClearButton = () => {
-    if (socketRef.current) {
-      socketRef.current.emit("clear-coordinates");
-      socketRef.current.emit("clear-images");
-    }
-    fetch("https://store-visit-85801868683.us-central1.run.app/api/all", {
-      method: "DELETE",
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Response:", data))
-      .catch((error) => console.error("Error:", error));
-    
-    // Also update local state
-    setCoordinates([]);
-    setImageHistory([]);
-    setTotalDistance(0);
-    setDistance(0);
-    setImagePointMap(new Map());
-    setCenterCoord([]);
-    setPerpendicularCoord([]);
-    setPPolygons([]);
-    setPstructures([]);
-    setAIDetails([]);
-    setDistcoord([]);
-    setPlanstructures([]);
-    planogram_coords=[];
-    setStoreName("");
-    setStoreVisitDetails({});
-    setPolygons([]); // Clear polygons
-    // openStructure=[];
-    open_coords = [];
-    setOpenStructure([]);
-    setOpenPolygon([]);
+  const handleClearButton = async () => {
 
+    try {
+      await axios.delete('https://store-visit-85801868683.us-central1.run.app/api/clear_globals');
+      if (socketRef.current) {
+        socketRef.current.emit("clear-coordinates");
+        socketRef.current.emit("clear-images");
+      }
+      fetch("https://store-visit-85801868683.us-central1.run.app/api/all", {
+        method: "DELETE",
+      })
+        .then((response) => response.json())
+        .then((data) => console.log("Response:", data))
+        .catch((error) => console.error("Error:", error));
+      
+      // Also update local state
+      setCoordinates([]);
+      setImageHistory([]);
+      setTotalDistance(0);
+      setDistance(0);
+      setImagePointMap(new Map());
+      setCenterCoord([]);
+      setPerpendicularCoord([]);
+      setPPolygons([]);
+      setPstructures([]);
+      setAIDetails([]);
+      setDistcoord([]);
+      setPlanstructures([]);
+      planogram_coords=[];
+      setStoreName("");
+      setStoreVisitDetails({});
+      setPolygons([]); // Clear polygons
+      // openStructure=[];
+      open_coords = [];
+      setOpenStructure([]);
+      setOpenPolygon([]);
+  
+      
+    } catch (error) {
+      console.error('Error clearing data:', error);
+    }
+
+   
 
   };
   
@@ -1395,7 +1407,9 @@ return (
             Start <img src={vector1}/>
           </button> */}
           
-          <label className="toggle-container">
+          {/* <label 
+          style={{ padding:'0px'}}
+          className="toggle-container">
             <span>Image</span>
             <input
               type="checkbox"
@@ -1404,7 +1418,20 @@ return (
               onChange={toggleImage}
             />
             <span className="slider"></span>
+          </label> */}
+
+          <label 
+          className="toggle-container">
+            <span className='pl-5'>Image</span>
+            <input
+              type="checkbox"
+              id="pathToggle"
+              checked={imageShow}
+              onChange={toggleImage}
+            />
+            <span className="slider" style={{paddingRight:"10px"}}></span>
           </label>
+
           <label className="toggle-container">
             <span>View path</span>
             <input
@@ -1476,7 +1503,7 @@ return (
           </div>
         </button>
 
-          <button
+          {/* <button
             // id="clearButton"
             type="button"
             style={{ background: 'var(--S-50, #EFF4FE)', color: "black", "fontWeight": "bold" , padding:'10px'}}
@@ -1484,9 +1511,48 @@ return (
             onClick={(e) => {
               // createRipple(e);
               handleClearButton();
+              setIsDeleteModalOpen(true)
             }}
             >
              <img src="/delete_forever.svg" style={{ width: '28px', height: '28px' }} /> 
+            </button> */}
+            <button
+              type="button"
+              style={{ background: 'var(--S-50, #EFF4FE)', color: "black", "fontWeight": "bold", padding:'10px'}}
+              className="flex items-center gap-2 group hover:relative"
+              onClick={(e) => {
+                handleClearButton();
+                setIsDeleteModalOpen(true)
+              }}
+            >
+              <img src="/delete_forever.svg" style={{ width: '28px', height: '28px' }} /> 
+              
+              {/* Tooltip */}
+              <div className="absolute invisible group-hover:visible top-full left-1/2 transform -translate-x-1/2 mt-2">
+                <div className="relative">
+                  {/* Triangle/Caret */}
+                  <div 
+                    className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-full"
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: '6px solid transparent',
+                      borderRight: '6px solid transparent',
+                      borderBottom: '6px solid #333'
+                    }}
+                  />
+                  {/* Tooltip content */}
+                  <div 
+                className="bg-[#333] text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                style={{
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}
+              >
+                Clear All
+              </div>
+                 
+                </div>
+              </div>
             </button>
             <img src="/profile.svg" alt="profile" className=" w-[45px]" />
           </div>
@@ -2345,6 +2411,14 @@ return (
     }
 
      <ConnectionErrorModal isOpen={showConnectionModal} />
+     <DeleteModalLive 
+      isOpen={isDeleteModalOpen}
+      onClose={() => setIsDeleteModalOpen(false)}
+      onConfirm={() => {
+        handleClearButton();
+        setIsDeleteModalOpen(false);
+      }}
+    />
   </div>
 );
 };
