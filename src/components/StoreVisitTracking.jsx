@@ -1370,7 +1370,7 @@ useEffect(() => {
 // console.log(totalDistance, "totaldistance")
 // console.log(aiDetails,'aidetials')
 return (
-  <div className="container" style={{ backgroundColor: '#EFF4FE' }}>
+  <div className="w-full _container" style={{ backgroundColor: '#EFF4FE' }}>
     {/* Header Section */}
     <div
       style={{
